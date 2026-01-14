@@ -40,7 +40,8 @@ export default function StockManagementPage() {
   const { 
     inventoryItems, 
     addProduct, 
-    deleteProduct, 
+    deleteProduct,
+    updateStock,
     categories,
     addCategory,
     removeCategory 
@@ -50,14 +51,33 @@ export default function StockManagementPage() {
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>, type: 'add' | 'sell') => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
-    const item = formData.get('item');
-    const quantity = formData.get('quantity');
+    const itemName = formData.get('item') as string;
+    const quantity = Number(formData.get('quantity'));
 
-    toast({
-        title: `Stock ${type === 'add' ? 'Added' : 'Sold'}`,
-        description: `${quantity} units of ${item} have been processed. (This is a demo)`,
-    });
-    (e.target as HTMLFormElement).reset();
+    if (!itemName || !quantity) {
+        toast({
+            title: "Invalid Input",
+            description: "Please select an item and enter a quantity.",
+            variant: "destructive",
+        });
+        return;
+    }
+
+    const result = updateStock(itemName, quantity, type);
+
+    if (result.success) {
+        toast({
+            title: `Stock ${type === 'add' ? 'Added' : 'Updated'}`,
+            description: `${quantity} units of ${itemName} have been processed.`,
+        });
+        (e.target as HTMLFormElement).reset();
+    } else {
+        toast({
+            title: `Error ${type === 'add' ? 'Adding' : 'Updating'} Stock`,
+            description: result.message,
+            variant: "destructive",
+        });
+    }
   };
 
   const handleAddProduct = (e: React.FormEvent<HTMLFormElement>) => {

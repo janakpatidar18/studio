@@ -10,6 +10,7 @@ interface InventoryContextType {
   inventoryItems: InventoryItem[];
   addProduct: (product: NewProductData) => void;
   deleteProduct: (productId: string) => void;
+  updateStock: (itemName: string, quantity: number, type: 'add' | 'sell') => { success: boolean; message?: string };
   categories: string[];
   addCategory: (category: string) => { success: boolean, message?: string };
   removeCategory: (category: string) => { success: boolean, message?: string };
@@ -33,6 +34,30 @@ export const InventoryProvider = ({ children }: { children: ReactNode }) => {
   const deleteProduct = (productId: string) => {
     setInventoryItems(prevItems => prevItems.filter(item => item.id !== productId));
   };
+
+  const updateStock = (itemName: string, quantity: number, type: 'add' | 'sell') => {
+    const itemToUpdate = inventoryItems.find(item => item.name === itemName);
+    if (!itemToUpdate) {
+      return { success: false, message: 'Item not found.' };
+    }
+
+    if (type === 'sell' && itemToUpdate.quantity < quantity) {
+        return { success: false, message: `Not enough stock for ${itemName}. Only ${itemToUpdate.quantity} available.` };
+    }
+
+    setInventoryItems(prevItems =>
+      prevItems.map(item => {
+        if (item.name === itemName) {
+          return {
+            ...item,
+            quantity: type === 'add' ? item.quantity + quantity : item.quantity - quantity,
+          };
+        }
+        return item;
+      })
+    );
+    return { success: true };
+  };
   
   const addCategory = (category: string) => {
     if (categories.includes(category)) {
@@ -53,7 +78,7 @@ export const InventoryProvider = ({ children }: { children: ReactNode }) => {
 
 
   return (
-    <InventoryContext.Provider value={{ inventoryItems, addProduct, deleteProduct, categories, addCategory, removeCategory }}>
+    <InventoryContext.Provider value={{ inventoryItems, addProduct, deleteProduct, updateStock, categories, addCategory, removeCategory }}>
       {children}
     </InventoryContext.Provider>
   );
