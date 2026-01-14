@@ -57,7 +57,7 @@ export default function DashboardLayout({
     { href: "/dashboard/gallery", label: "Gallery", icon: ImageIcon },
   ];
   
-  if (isAuthenticated === null) {
+  if (isAuthenticated === null || !isAuthenticated) {
     return <div className="flex h-screen w-full items-center justify-center bg-background"><p>Loading...</p></div>;
   }
 
