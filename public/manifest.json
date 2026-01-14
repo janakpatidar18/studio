@@ -1,21 +1,21 @@
 {
-  "name": "SVLSM Stock Manager",
-  "short_name": "SVLSM",
-  "description": "Manage your stock with ease.",
-  "start_url": "/",
-  "display": "standalone",
-  "background_color": "#2a1a1f",
-  "theme_color": "#2a1a1f",
-  "icons": [
-    {
-      "src": "/icons/icon-192x192.png",
-      "sizes": "192x192",
-      "type": "image/png"
-    },
-    {
-      "src": "/icons/icon-512x512.png",
-      "sizes": "512x512",
-      "type": "image/png"
-    }
-  ]
+    "name": "SVLSM Stock Manager",
+    "short_name": "SVLSM",
+    "description": "Manage your stock with ease.",
+    "start_url": "/",
+    "display": "standalone",
+    "background_color": "#2a1a1f",
+    "theme_color": "#2a1a1f",
+    "icons": [
+        {
+            "src": "/logo.png",
+            "sizes": "192x192",
+            "type": "image/png"
+        },
+        {
+            "src": "/logo.png",
+            "sizes": "512x512",
+            "type": "image/png"
+        }
+    ]
 }
