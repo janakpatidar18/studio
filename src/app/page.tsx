@@ -3,26 +3,11 @@
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 
-function getCookie(name: string) {
-  if (typeof window === "undefined") {
-    return null;
-  }
-  const value = `; ${document.cookie}`;
-  const parts = value.split(`; ${name}=`);
-  if (parts.length === 2) return parts.pop()?.split(";").shift();
-  return null;
-}
-
 export default function Home() {
   const router = useRouter();
 
   useEffect(() => {
-    const isAuthenticated = getCookie("svlsm_auth") === "true";
-    if (isAuthenticated) {
-      router.replace("/dashboard");
-    } else {
-      router.replace("/login");
-    }
+    router.replace("/login");
   }, [router]);
 
   return (

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -12,6 +12,14 @@ import { PlaceHolderImages } from "@/lib/placeholder-images";
 
 const CORRECT_PIN = "1234";
 
+function getCookie(name: string) {
+  if (typeof window === "undefined") return null;
+  const value = `; ${document.cookie}`;
+  const parts = value.split(`; ${name}=`);
+  if (parts.length === 2) return parts.pop()?.split(";").shift() || null;
+  return null;
+}
+
 export default function LoginPage() {
   const [pin, setPin] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -19,6 +27,13 @@ export default function LoginPage() {
   const { toast } = useToast();
   const woodTextureBg = PlaceHolderImages.find(p => p.id === 'wood-texture-bg');
   
+  useEffect(() => {
+    const isAuthenticated = getCookie("svlsm_auth") === "true";
+    if (isAuthenticated) {
+      router.replace("/dashboard");
+    }
+  }, [router]);
+
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
