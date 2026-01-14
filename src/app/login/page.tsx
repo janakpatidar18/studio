@@ -72,9 +72,6 @@ export default function LoginPage() {
           <div className="flex items-center gap-4">
              <Image src="/logo.png" alt="SVLSM Logo" width={240} height={65} />
           </div>
-          <p className="mt-6 text-2xl max-w-lg text-background/80">
-            Precision Stock Management for Master Carpenters.
-          </p>
         </div>
 
         <div className="flex items-center justify-center p-4">
