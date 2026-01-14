@@ -90,7 +90,7 @@ export default function InventoryPage() {
               <div className="flex w-full text-center">
                 <div className="p-4 w-1/2">
                   <p className="text-sm text-muted-foreground">Price</p>
-                  <p className="font-semibold">${item.sellingPrice.toFixed(2)}</p>
+                  <p className="font-semibold">₹{item.sellingPrice.toFixed(2)}</p>
                 </div>
                 <div className="p-4 w-1/2 border-l">
                   <p className="text-sm text-muted-foreground">Stock</p>

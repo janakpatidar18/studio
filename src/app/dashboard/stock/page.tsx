@@ -285,7 +285,7 @@ export default function StockManagementPage() {
                 </Select>
               </div>
               <div className="space-y-3">
-                <Label htmlFor="selling-price">Selling Price</Label>
+                <Label htmlFor="selling-price">Selling Price (₹)</Label>
                 <Input id="selling-price" name="selling-price" type="number" placeholder="0.00" min="0" step="0.01" required />
               </div>
               <div className="space-y-3">
