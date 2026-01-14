@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -10,32 +10,17 @@ import { useToast } from "@/hooks/use-toast";
 import Image from "next/image";
 import { PlaceHolderImages } from "@/lib/placeholder-images";
 import { Warehouse } from "lucide-react";
+import { useAuth } from "@/context/AuthContext";
 
 const CORRECT_PIN = "1234";
-
-function getCookie(name: string) {
-  if (typeof document === 'undefined') return null;
-  const value = `; ${document.cookie}`;
-  const parts = value.split(`; ${name}=`);
-  if (parts.length === 2) return parts.pop()?.split(';').shift() || null;
-  return null;
-}
 
 export default function LoginPage() {
   const [pin, setPin] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [isVerifying, setIsVerifying] = useState(true);
   const router = useRouter();
   const { toast } = useToast();
+  const { login } = useAuth();
   const woodTextureBg = PlaceHolderImages.find(p => p.id === 'wood-texture-bg');
-  
-  useEffect(() => {
-    if (getCookie("svlsm_auth") === "true") {
-      router.replace("/dashboard");
-    } else {
-      setIsVerifying(false);
-    }
-  }, [router]);
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
@@ -43,7 +28,7 @@ export default function LoginPage() {
 
     setTimeout(() => {
       if (pin === CORRECT_PIN) {
-        document.cookie = "svlsm_auth=true; path=/; max-age=86400"; // Expires in 24 hours
+        login();
         router.replace("/dashboard");
       } else {
         toast({
@@ -56,36 +41,6 @@ export default function LoginPage() {
       }
     }, 500);
   };
-  
-  if (isVerifying) {
-    return (
-       <div className="flex h-screen w-full items-center justify-center bg-background">
-            <div className="flex flex-col items-center gap-4">
-                <svg
-                    className="h-12 w-12 animate-spin text-primary"
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                >
-                    <circle
-                        className="opacity-25"
-                        cx="12"
-                        cy="12"
-                        r="10"
-                        stroke="currentColor"
-                        strokeWidth="4"
-                    ></circle>
-                    <path
-                        className="opacity-75"
-                        fill="currentColor"
-                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                    ></path>
-                </svg>
-                <p className="text-muted-foreground">Verifying session...</p>
-            </div>
-        </div>
-    );
-  }
 
   return (
     <main className="relative flex min-h-screen flex-col items-center justify-center p-4">

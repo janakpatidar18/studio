@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import {
@@ -19,14 +19,7 @@ import Image from "next/image";
 import { PlaceHolderImages } from "@/lib/placeholder-images";
 import { InventoryProvider } from "@/context/InventoryContext";
 import { cn } from "@/lib/utils";
-
-function getCookie(name: string) {
-    if (typeof document === 'undefined') return null;
-    const value = `; ${document.cookie}`;
-    const parts = value.split(`; ${name}=`);
-    if (parts.length === 2) return parts.pop()?.split(';').shift() || null;
-    return null;
-}
+import { useAuth } from "@/context/AuthContext";
 
 export default function DashboardLayout({
   children,
@@ -35,20 +28,17 @@ export default function DashboardLayout({
 }) {
   const router = useRouter();
   const pathname = usePathname();
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
+  const { isAuthenticated, logout } = useAuth();
   const woodTextureBg = PlaceHolderImages.find(p => p.id === 'wood-texture-bg');
   
   useEffect(() => {
-    const authStatus = getCookie("svlsm_auth") === "true";
-    if (!authStatus) {
+    if (isAuthenticated === false) {
       router.replace("/login");
-    } else {
-      setIsAuthenticated(true);
     }
-  }, [router]);
+  }, [isAuthenticated, router]);
   
   const handleLogout = () => {
-    document.cookie = "svlsm_auth=; path=/; max-age=0";
+    logout();
     router.replace("/login");
   };
 
