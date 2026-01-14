@@ -48,7 +48,7 @@ export default function DashboardLayout({
     { href: "/dashboard/gallery", label: "Gallery", icon: ImageIcon },
   ];
   
-  if (!isAuthenticated) {
+  if (isAuthenticated === null) {
     return (
         <div className="flex h-screen w-full items-center justify-center bg-background">
             <div className="flex flex-col items-center gap-4">
@@ -129,9 +129,6 @@ export default function DashboardLayout({
           )}
           <div className="absolute inset-0 bg-background/90 -z-10" />
 
-          <header className="sticky top-0 z-10 flex items-center p-4 border-b bg-background/50 backdrop-blur-sm md:hidden">
-            <SidebarTrigger />
-          </header>
           <main className="flex-1 p-4 sm:p-6 lg:p-8 md:pb-8 pb-24">
             {children}
           </main>
