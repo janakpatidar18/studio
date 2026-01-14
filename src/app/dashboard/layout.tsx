@@ -18,6 +18,7 @@ import { Home, Package, Warehouse, ImageIcon, LogOut } from "lucide-react";
 import Image from "next/image";
 import { PlaceHolderImages } from "@/lib/placeholder-images";
 import { InventoryProvider } from "@/context/InventoryContext";
+import { cn } from "@/lib/utils";
 
 function getCookie(name: string) {
     if (typeof window === "undefined") return null;
@@ -50,8 +51,8 @@ export default function DashboardLayout({
 
   const navItems = [
     { href: "/dashboard", label: "Inventory", icon: Home },
-    { href: "/dashboard/stock", label: "Stock Management", icon: Package },
-    { href: "/dashboard/gallery", label: "Door Gallery", icon: ImageIcon },
+    { href: "/dashboard/stock", label: "Stock", icon: Package },
+    { href: "/dashboard/gallery", label: "Gallery", icon: ImageIcon },
   ];
   
   if (getCookie("svlsm_auth") !== "true") {
@@ -110,9 +111,29 @@ export default function DashboardLayout({
           <header className="sticky top-0 z-10 flex items-center p-4 border-b bg-background/50 backdrop-blur-sm md:hidden">
             <SidebarTrigger />
           </header>
-          <main className="flex-1 p-4 sm:p-6 lg:p-8">
+          <main className="flex-1 p-4 sm:p-6 lg:p-8 md:pb-8 pb-24">
             {children}
           </main>
+          
+          <nav className="fixed bottom-0 left-0 right-0 z-50 p-2 border-t md:hidden bg-background/95 backdrop-blur-sm">
+            <div className="grid h-16 grid-cols-3 gap-2">
+              {navItems.map((item) => (
+                <Link href={item.href} key={item.href} passHref>
+                  <div
+                    className={cn(
+                      "flex flex-col items-center justify-center h-full gap-1 p-1 text-sm rounded-lg",
+                      pathname === item.href
+                        ? "bg-accent text-accent-foreground"
+                        : "text-muted-foreground"
+                    )}
+                  >
+                    <item.icon className="w-6 h-6" />
+                    <span className="text-xs font-medium">{item.label}</span>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </nav>
         </SidebarInset>
       </SidebarProvider>
     </InventoryProvider>
