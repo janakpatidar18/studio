@@ -35,8 +35,7 @@ export default function DashboardLayout({
   const router = useRouter();
   const pathname = usePathname();
   const woodTextureBg = PlaceHolderImages.find(p => p.id === 'wood-texture-bg');
-  const logo = PlaceHolderImages.find(p => p.id === 'user-logo');
-
+  
   useEffect(() => {
     const isAuthenticated = getCookie("svlsm_auth") === "true";
     if (!isAuthenticated) {
@@ -65,20 +64,8 @@ export default function DashboardLayout({
         <Sidebar>
           <SidebarHeader>
             <div className="flex items-center justify-center gap-2">
-              {logo ? (
-                <Image 
-                  src={logo.imageUrl}
-                  alt={logo.description}
-                  width={64}
-                  height={64}
-                  data-ai-hint={logo.imageHint}
-                />
-              ) : (
-                <>
-                  <Warehouse className="w-8 h-8 text-primary" />
-                  <h1 className="text-xl font-semibold font-headline">SVLSM</h1>
-                </>
-              )}
+              <Warehouse className="w-8 h-8 text-primary" />
+              <h1 className="text-xl font-semibold font-headline">SVLSM</h1>
             </div>
           </SidebarHeader>
           <SidebarContent>

@@ -9,6 +9,7 @@ import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import Image from "next/image";
 import { PlaceHolderImages } from "@/lib/placeholder-images";
+import { Warehouse } from "lucide-react";
 
 const CORRECT_PIN = "1234";
 
@@ -18,8 +19,7 @@ export default function LoginPage() {
   const router = useRouter();
   const { toast } = useToast();
   const woodTextureBg = PlaceHolderImages.find(p => p.id === 'wood-texture-bg');
-  const logo = PlaceHolderImages.find(p => p.id === 'user-logo');
-
+  
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
@@ -53,15 +53,7 @@ export default function LoginPage() {
       <div className="absolute inset-0 bg-background/80 backdrop-blur-sm -z-10" />
       <Card className="w-full max-w-md shadow-2xl">
         <CardHeader className="text-center p-8 flex flex-col items-center">
-          {logo && (
-            <Image 
-              src={logo.imageUrl} 
-              alt={logo.description} 
-              width={150} 
-              height={150}
-              data-ai-hint={logo.imageHint}
-            />
-          )}
+            <Warehouse className="w-24 h-24 text-primary mb-4" />
           <CardTitle className="text-5xl font-headline mt-4">SVLSM</CardTitle>
           <CardDescription className="text-xl pt-2">Stock Management Login</CardDescription>
         </CardHeader>
