@@ -9,7 +9,7 @@ import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import Image from "next/image";
 import { PlaceHolderImages } from "@/lib/placeholder-images";
-import { Warehouse, LogIn } from "lucide-react";
+import { LogIn } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 
 const CORRECT_PIN = "1234";
@@ -70,8 +70,7 @@ export default function LoginPage() {
       <div className="relative grid min-h-screen grid-cols-1 lg:grid-cols-2">
         <div className="hidden lg:flex flex-col items-start justify-center p-12 text-background">
           <div className="flex items-center gap-4">
-            <Warehouse className="w-16 h-16" />
-            <h1 className="text-6xl font-bold font-headline">SVLSM</h1>
+             <Image src="/logo.png" alt="SVLSM Logo" width={240} height={65} />
           </div>
           <p className="mt-6 text-2xl max-w-lg text-background/80">
             Precision Stock Management for Master Carpenters.
@@ -82,8 +81,7 @@ export default function LoginPage() {
             <Card className="w-full max-w-md shadow-2xl bg-card/80 backdrop-blur-lg">
                 <CardHeader className="text-center p-8">
                     <div className="flex items-center justify-center gap-2 lg:hidden mb-4">
-                         <Warehouse className="w-10 h-10 text-primary" />
-                        <h1 className="text-4xl font-bold font-headline">SVLSM</h1>
+                         <Image src="/logo.png" alt="SVLSM Logo" width={160} height={44} />
                     </div>
                     <CardTitle className="text-3xl font-bold">Welcome Back</CardTitle>
                     <CardDescription className="text-lg text-muted-foreground">Enter your PIN to access the dashboard.</CardDescription>

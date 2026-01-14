@@ -12,9 +12,8 @@ import {
   SidebarMenuButton,
   SidebarFooter,
   SidebarInset,
-  SidebarTrigger,
 } from "@/components/ui/sidebar";
-import { Home, Package, Warehouse, ImageIcon, LogOut } from "lucide-react";
+import { Home, Package, ImageIcon, LogOut } from "lucide-react";
 import Image from "next/image";
 import { PlaceHolderImages } from "@/lib/placeholder-images";
 import { InventoryProvider } from "@/context/InventoryContext";
@@ -83,9 +82,8 @@ export default function DashboardLayout({
       <SidebarProvider>
         <Sidebar>
           <SidebarHeader>
-            <div className="flex items-center justify-center gap-2">
-              <Warehouse className="w-8 h-8" />
-              <h1 className="text-2xl font-semibold font-headline">SVLSM</h1>
+            <div className="flex items-center justify-center p-4">
+              <Image src="/logo.png" alt="SVLSM Logo" width={128} height={35} />
             </div>
           </SidebarHeader>
           <SidebarContent>
