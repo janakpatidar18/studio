@@ -148,27 +148,27 @@ export default function StockManagementPage() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       <header>
-        <h1 className="text-3xl font-bold font-headline">Stock Management</h1>
-        <p className="text-muted-foreground">
+        <h1 className="text-4xl font-bold font-headline">Stock Management</h1>
+        <p className="text-lg text-muted-foreground">
           Record stock inputs and outputs, add new products and manage categories.
         </p>
       </header>
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-        <Card>
+      <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+        <Card className="shadow-lg">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <PlusCircle className="text-accent" />
+            <CardTitle className="flex items-center gap-3 text-2xl">
+              <PlusCircle className="text-accent w-7 h-7" />
               Add Stock
             </CardTitle>
-            <CardDescription>
+            <CardDescription className="text-base">
               Record new items or additional quantities coming into the inventory.
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <form onSubmit={(e) => handleSubmit(e, 'add')} className="space-y-4">
-              <div className="space-y-2">
+            <form onSubmit={(e) => handleSubmit(e, 'add')} className="space-y-6">
+              <div className="space-y-3">
                 <Label htmlFor="add-item">Item</Label>
                 <Select name="item" required>
                   <SelectTrigger id="add-item">
@@ -183,7 +183,7 @@ export default function StockManagementPage() {
                   </SelectContent>
                 </Select>
               </div>
-              <div className="space-y-2">
+              <div className="space-y-3">
                 <Label htmlFor="add-quantity">Quantity</Label>
                 <Input id="add-quantity" name="quantity" type="number" placeholder="0" min="1" required />
               </div>
@@ -191,19 +191,19 @@ export default function StockManagementPage() {
             </form>
           </CardContent>
         </Card>
-        <Card>
+        <Card className="shadow-lg">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <MinusCircle className="text-destructive" />
+            <CardTitle className="flex items-center gap-3 text-2xl">
+              <MinusCircle className="text-destructive w-7 h-7" />
               Sell / Use Stock
             </CardTitle>
-            <CardDescription>
+            <CardDescription className="text-base">
               Record items sold or used from the inventory.
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <form onSubmit={(e) => handleSubmit(e, 'sell')} className="space-y-4">
-              <div className="space-y-2">
+            <form onSubmit={(e) => handleSubmit(e, 'sell')} className="space-y-6">
+              <div className="space-y-3">
                 <Label htmlFor="sell-item">Item</Label>
                 <Select name="item" required>
                   <SelectTrigger id="sell-item">
@@ -218,7 +218,7 @@ export default function StockManagementPage() {
                   </SelectContent>
                 </Select>
               </div>
-              <div className="space-y-2">
+              <div className="space-y-3">
                 <Label htmlFor="sell-quantity">Quantity</Label>
                 <Input id="sell-quantity" name="quantity" type="number" placeholder="0" min="1" required />
               </div>
@@ -226,23 +226,23 @@ export default function StockManagementPage() {
             </form>
           </CardContent>
         </Card>
-        <Card className="md:col-span-2 lg:col-span-1">
+        <Card className="md:col-span-2 lg:col-span-1 shadow-lg">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <PackagePlus className="text-primary" />
+            <CardTitle className="flex items-center gap-3 text-2xl">
+              <PackagePlus className="text-primary w-7 h-7" />
               Add New Product
             </CardTitle>
-            <CardDescription>
+            <CardDescription className="text-base">
               Add a completely new product to the inventory.
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <form onSubmit={handleAddProduct} className="space-y-4">
-              <div className="space-y-2">
+            <form onSubmit={handleAddProduct} className="space-y-6">
+              <div className="space-y-3">
                 <Label htmlFor="product-name">Product Name</Label>
                 <Input id="product-name" name="product-name" type="text" placeholder="e.g., Cherry Wood" required />
               </div>
-              <div className="space-y-2">
+              <div className="space-y-3">
                 <Label htmlFor="product-type">Product Type</Label>
                 <Select name="product-type" required defaultValue="Material">
                   <SelectTrigger id="product-type">
@@ -255,11 +255,11 @@ export default function StockManagementPage() {
                   </SelectContent>
                 </Select>
               </div>
-              <div className="space-y-2">
+              <div className="space-y-3">
                 <Label htmlFor="selling-price">Selling Price</Label>
                 <Input id="selling-price" name="selling-price" type="number" placeholder="0.00" min="0" step="0.01" required />
               </div>
-              <div className="space-y-2">
+              <div className="space-y-3">
                 <Label htmlFor="opening-stock">Opening Stock</Label>
                 <Input id="opening-stock" name="opening-stock" type="number" placeholder="0" min="0" required />
               </div>
@@ -268,37 +268,37 @@ export default function StockManagementPage() {
           </CardContent>
         </Card>
         
-        <Card className="md:col-span-1">
+        <Card className="md:col-span-1 shadow-lg">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <FolderPlus className="text-primary" />
+            <CardTitle className="flex items-center gap-3 text-2xl">
+              <FolderPlus className="text-primary w-7 h-7" />
               Manage Categories
             </CardTitle>
-            <CardDescription>
+            <CardDescription className="text-base">
               Add or remove product categories.
             </CardDescription>
           </CardHeader>
-          <CardContent className="space-y-4">
+          <CardContent className="space-y-6">
               <div>
                   <Label htmlFor="new-category">Add New Category</Label>
-                  <div className="flex gap-2 mt-2">
+                  <div className="flex gap-2 mt-3">
                       <Input 
                           id="new-category"
                           value={newCategory}
                           onChange={(e) => setNewCategory(e.target.value)}
                           placeholder="e.g., Tools"
                       />
-                      <Button onClick={handleAddCategory}>Add</Button>
+                      <Button onClick={handleAddCategory} size="sm">Add</Button>
                   </div>
               </div>
-              <div className="space-y-2">
+              <div className="space-y-3">
                   <Label>Existing Categories</Label>
-                  <div className="space-y-2">
+                  <div className="space-y-3">
                     {categories.map(cat => (
-                        <div key={cat} className="flex items-center justify-between p-2 rounded-md bg-muted">
-                            <span className="text-sm font-medium">{cat}</span>
-                            <Button size="icon" variant="ghost" className="h-6 w-6" onClick={() => handleRemoveCategory(cat)}>
-                                <XCircle className="h-4 w-4 text-destructive" />
+                        <div key={cat} className="flex items-center justify-between p-3 rounded-md bg-muted">
+                            <span className="font-medium text-base">{cat}</span>
+                            <Button size="icon" variant="ghost" className="h-8 w-8" onClick={() => handleRemoveCategory(cat)}>
+                                <XCircle className="h-5 w-5 text-destructive" />
                             </Button>
                         </div>
                     ))}
@@ -307,28 +307,28 @@ export default function StockManagementPage() {
           </CardContent>
         </Card>
         
-        <Card className="md:col-span-2">
+        <Card className="md:col-span-2 shadow-lg">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Trash2 className="text-destructive"/>
+            <CardTitle className="flex items-center gap-3 text-2xl">
+              <Trash2 className="text-destructive w-7 h-7"/>
               Manage Products
             </CardTitle>
-            <CardDescription>
+            <CardDescription className="text-base">
               Delete products from the inventory.
             </CardDescription>
           </CardHeader>
           <CardContent>
-              <ul className="space-y-2">
+              <ul className="space-y-3">
                 {inventoryItems.map(item => (
-                  <li key={item.id} className="flex items-center justify-between p-2 rounded-md bg-muted">
+                  <li key={item.id} className="flex items-center justify-between p-4 rounded-md bg-muted">
                     <div>
-                      <p className="font-medium">{item.name}</p>
-                      <p className="text-sm text-muted-foreground">{item.type} - {item.quantity} in stock</p>
+                      <p className="font-medium text-base">{item.name}</p>
+                      <p className="text-base text-muted-foreground">{item.type} - {item.quantity} in stock</p>
                     </div>
                     <AlertDialog>
                       <AlertDialogTrigger asChild>
-                        <Button variant="destructive" size="icon" className="h-8 w-8">
-                          <Trash2 className="h-4 w-4"/>
+                        <Button variant="destructive" size="icon">
+                          <Trash2 className="h-5 w-5"/>
                         </Button>
                       </AlertDialogTrigger>
                       <AlertDialogContent>

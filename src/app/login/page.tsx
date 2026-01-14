@@ -50,29 +50,29 @@ export default function LoginPage() {
           />
       )}
       <div className="absolute inset-0 bg-background/80 backdrop-blur-sm -z-10" />
-      <Card className="w-full max-w-sm shadow-2xl">
-        <CardHeader className="text-center">
-          <CardTitle className="text-3xl font-headline">SVLSM</CardTitle>
-          <CardDescription>Stock Management Login</CardDescription>
+      <Card className="w-full max-w-md shadow-2xl">
+        <CardHeader className="text-center p-8">
+          <CardTitle className="text-5xl font-headline">SVLSM</CardTitle>
+          <CardDescription className="text-xl pt-2">Stock Management Login</CardDescription>
         </CardHeader>
         <form onSubmit={handleLogin}>
-          <CardContent className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="pin">PIN</Label>
+          <CardContent className="space-y-6 p-8 pt-0">
+            <div className="space-y-3">
+              <Label htmlFor="pin" className="text-lg">PIN</Label>
               <Input
                 id="pin"
                 type="password"
-                placeholder="****"
+                placeholder="* * * *"
                 value={pin}
                 onChange={(e) => setPin(e.target.value)}
                 maxLength={4}
                 required
-                className="text-center text-lg tracking-[1em]"
+                className="text-center text-4xl tracking-[1em]"
               />
             </div>
           </CardContent>
-          <CardFooter>
-            <Button type="submit" className="w-full" disabled={isLoading}>
+          <CardFooter className="p-8 pt-0">
+            <Button type="submit" className="w-full text-xl" size="lg" disabled={isLoading}>
               {isLoading ? "Verifying..." : "Login"}
             </Button>
           </CardFooter>

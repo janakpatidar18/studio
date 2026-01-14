@@ -31,20 +31,20 @@ export default function InventoryPage() {
       : inventoryItems.filter((item) => item.type === selectedCategory);
 
   return (
-    <div className="space-y-6">
-      <header className="flex flex-wrap items-center justify-between gap-4">
+    <div className="space-y-8">
+      <header className="flex flex-wrap items-center justify-between gap-6">
         <div>
-          <h1 className="text-3xl font-bold font-headline">
+          <h1 className="text-4xl font-bold font-headline">
             Inventory Overview
           </h1>
-          <p className="text-muted-foreground">
+          <p className="text-lg text-muted-foreground">
             Current status of your stock and machinery.
           </p>
         </div>
-        <div className="flex items-center gap-2">
-            <Label htmlFor="category-filter" className="text-sm font-medium">Filter by Category:</Label>
+        <div className="flex items-center gap-4">
+            <Label htmlFor="category-filter" className="text-base font-medium">Filter by Category:</Label>
             <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-                <SelectTrigger id="category-filter" className="w-[180px]">
+                <SelectTrigger id="category-filter" className="w-[240px]">
                     <SelectValue placeholder="Select a category" />
                 </SelectTrigger>
                 <SelectContent>
@@ -56,7 +56,7 @@ export default function InventoryPage() {
             </Select>
         </div>
       </header>
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
         {filteredItems.map((item: InventoryItem) => (
           <Card
             key={item.id}
@@ -65,7 +65,7 @@ export default function InventoryPage() {
             <CardHeader className="p-0">
               <div className="aspect-square relative">
                 <Image
-                  src={`https://picsum.photos/seed/${item.id}/400/400`}
+                  src={`https://picsum.photos/seed/${item.id}/600/600`}
                   alt={item.name}
                   fill
                   className="object-cover transition-transform duration-300 group-hover:scale-105"
@@ -74,26 +74,26 @@ export default function InventoryPage() {
                 />
               </div>
             </CardHeader>
-            <CardContent className="p-4 flex-grow">
-              <CardTitle className="text-lg leading-tight">
+            <CardContent className="p-6 flex-grow">
+              <CardTitle className="text-2xl leading-tight">
                 {item.name}
               </CardTitle>
               <Badge
                 variant={item.type === "Machinery" ? "secondary" : "outline"}
-                className="mt-2 gap-2"
+                className="mt-3 gap-2 px-3 py-1 text-sm"
               >
-                <item.icon className="w-3 h-3" />
+                <item.icon className="w-4 h-4" />
                 {item.type}
               </Badge>
             </CardContent>
-            <CardFooter className="p-0 border-t mt-auto">
+            <CardFooter className="p-0 border-t mt-auto text-lg">
               <div className="flex w-full text-center">
-                <div className="p-2 w-1/2">
-                  <p className="text-xs text-muted-foreground">Price</p>
+                <div className="p-4 w-1/2">
+                  <p className="text-sm text-muted-foreground">Price</p>
                   <p className="font-semibold">${item.sellingPrice.toFixed(2)}</p>
                 </div>
-                <div className="p-2 w-1/2 border-l">
-                  <p className="text-xs text-muted-foreground">Stock</p>
+                <div className="p-4 w-1/2 border-l">
+                  <p className="text-sm text-muted-foreground">Stock</p>
                   <p className="font-semibold">{item.quantity}</p>
                 </div>
               </div>
