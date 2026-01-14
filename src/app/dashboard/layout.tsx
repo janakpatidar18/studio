@@ -48,7 +48,7 @@ export default function DashboardLayout({
   
   const handleLogout = () => {
     document.cookie = "svlsm_auth=; path=/; max-age=0";
-    router.push("/login");
+    router.replace("/login");
   };
 
   const navItems = [

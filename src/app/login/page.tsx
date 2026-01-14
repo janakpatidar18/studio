@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -13,6 +13,14 @@ import { Warehouse } from "lucide-react";
 
 const CORRECT_PIN = "1234";
 
+function getCookie(name: string) {
+  if (typeof document === 'undefined') return null;
+  const value = `; ${document.cookie}`;
+  const parts = value.split(`; ${name}=`);
+  if (parts.length === 2) return parts.pop()?.split(';').shift() || null;
+  return null;
+}
+
 export default function LoginPage() {
   const [pin, setPin] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -20,6 +28,13 @@ export default function LoginPage() {
   const { toast } = useToast();
   const woodTextureBg = PlaceHolderImages.find(p => p.id === 'wood-texture-bg');
   
+  useEffect(() => {
+    // If user is already logged in, redirect to dashboard
+    if (getCookie("svlsm_auth") === "true") {
+      router.replace("/dashboard");
+    }
+  }, [router]);
+
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
@@ -27,7 +42,7 @@ export default function LoginPage() {
     setTimeout(() => {
       if (pin === CORRECT_PIN) {
         document.cookie = "svlsm_auth=true; path=/; max-age=86400"; // Expires in 24 hours
-        router.push("/dashboard");
+        router.replace("/dashboard");
       } else {
         toast({
           title: "Authentication Failed",
@@ -37,7 +52,7 @@ export default function LoginPage() {
         setIsLoading(false);
         setPin("");
       }
-    }, 1000);
+    }, 500);
   };
 
   return (
