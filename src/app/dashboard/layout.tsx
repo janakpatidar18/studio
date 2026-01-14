@@ -18,7 +18,6 @@ import { Home, Package, Warehouse, ImageIcon, LogOut } from "lucide-react";
 import Image from "next/image";
 import { PlaceHolderImages } from "@/lib/placeholder-images";
 import { InventoryProvider } from "@/context/InventoryContext";
-import { Logo } from "@/components/Logo";
 
 function getCookie(name: string) {
     if (typeof window === "undefined") return null;
@@ -65,7 +64,6 @@ export default function DashboardLayout({
         <Sidebar>
           <SidebarHeader>
             <div className="flex items-center justify-center gap-2">
-              <Logo className="w-8 h-8 text-primary" />
               <h1 className="text-xl font-semibold font-headline">SVLSM</h1>
             </div>
           </SidebarHeader>
