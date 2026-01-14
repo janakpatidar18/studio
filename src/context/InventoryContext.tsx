@@ -1,84 +1,109 @@
 "use client";
 
-import React, { createContext, useContext, useState, ReactNode } from 'react';
-import { inventoryItems as initialInventoryItems, InventoryItem } from '@/lib/data';
+import React, { createContext, useContext, ReactNode } from 'react';
+import { addDoc, collection, deleteDoc, doc, updateDoc } from 'firebase/firestore';
+import { useFirestore, useCollection } from '@/firebase';
+import { Category, InventoryItem } from '@/lib/data';
 import { Cog, Box } from 'lucide-react';
+import { useMemo } from 'react';
 
-type NewProductData = Omit<InventoryItem, 'id' | 'icon'> & { image: string };
+type NewProductData = Omit<InventoryItem, 'id' | 'icon'>;
 
 interface InventoryContextType {
   inventoryItems: InventoryItem[];
-  addProduct: (product: NewProductData) => void;
-  deleteProduct: (productId: string) => void;
-  updateStock: (itemName: string, quantity: number, type: 'add' | 'sell') => { success: boolean; message?: string };
-  categories: string[];
-  addCategory: (category: string) => { success: boolean, message?: string };
-  removeCategory: (category: string) => { success: boolean, message?: string };
+  addProduct: (product: NewProductData) => Promise<void>;
+  deleteProduct: (productId: string) => Promise<void>;
+  updateStock: (itemId: string, quantity: number, type: 'add' | 'sell') => Promise<{ success: boolean; message?: string }>;
+  categories: Category[];
+  addCategory: (categoryName: string) => Promise<{ success: boolean, message?: string }>;
+  removeCategory: (categoryId: string) => Promise<{ success: boolean, message?: string }>;
 }
 
 const InventoryContext = createContext<InventoryContextType | undefined>(undefined);
 
 export const InventoryProvider = ({ children }: { children: ReactNode }) => {
-  const [inventoryItems, setInventoryItems] = useState<InventoryItem[]>(initialInventoryItems);
-  const [categories, setCategories] = useState<string[]>([]);
+  const firestore = useFirestore();
 
-  const addProduct = (productData: NewProductData) => {
-    const newProduct: InventoryItem = {
-      id: (inventoryItems.length + 1 + Math.random()).toString(),
-      ...productData,
-      icon: productData.type === 'Machinery' ? Cog : Box,
-    };
-    setInventoryItems(prevItems => [...prevItems, newProduct]);
+  const inventoryQuery = useMemo(() => firestore ? collection(firestore, 'inventory') : null, [firestore]);
+  const { data: inventoryItems, loading: inventoryLoading, error: inventoryError } = useCollection<InventoryItem>(inventoryQuery);
+  
+  const categoriesQuery = useMemo(() => firestore ? collection(firestore, 'categories') : null, [firestore]);
+  const { data: categories, loading: categoriesLoading, error: categoriesError } = useCollection<Category>(categoriesQuery);
+
+  const addProduct = async (productData: NewProductData) => {
+    if (!firestore) return;
+    const inventoryCollection = collection(firestore, 'inventory');
+    await addDoc(inventoryCollection, productData);
   };
 
-  const deleteProduct = (productId: string) => {
-    setInventoryItems(prevItems => prevItems.filter(item => item.id !== productId));
+  const deleteProduct = async (productId: string) => {
+    if (!firestore) return;
+    const productDoc = doc(firestore, 'inventory', productId);
+    await deleteDoc(productDoc);
   };
 
-  const updateStock = (itemName: string, quantity: number, type: 'add' | 'sell') => {
-    const itemToUpdate = inventoryItems.find(item => item.name === itemName);
+  const updateStock = async (itemId: string, quantity: number, type: 'add' | 'sell') => {
+    if (!firestore) return { success: false, message: 'Database not connected.' };
+    
+    const itemToUpdate = inventoryItems?.find(item => item.id === itemId);
     if (!itemToUpdate) {
       return { success: false, message: 'Item not found.' };
     }
 
     if (type === 'sell' && itemToUpdate.quantity < quantity) {
-        return { success: false, message: `Not enough stock for ${itemName}. Only ${itemToUpdate.quantity} available.` };
+        return { success: false, message: `Not enough stock for ${itemToUpdate.name}. Only ${itemToUpdate.quantity} available.` };
     }
+    
+    const productDoc = doc(firestore, 'inventory', itemId);
+    const newQuantity = type === 'add' ? itemToUpdate.quantity + quantity : itemToUpdate.quantity - quantity;
+    await updateDoc(productDoc, { quantity: newQuantity });
 
-    setInventoryItems(prevItems =>
-      prevItems.map(item => {
-        if (item.name === itemName) {
-          return {
-            ...item,
-            quantity: type === 'add' ? item.quantity + quantity : item.quantity - quantity,
-          };
-        }
-        return item;
-      })
-    );
     return { success: true };
   };
   
-  const addCategory = (category: string) => {
-    if (categories.includes(category)) {
+  const addCategory = async (categoryName: string) => {
+    if (!firestore) return { success: false, message: 'Database not connected.' };
+
+    if (categories?.some(cat => cat.name.toLowerCase() === categoryName.toLowerCase())) {
       return { success: false, message: 'Category already exists.' };
     }
-    setCategories(prev => [...prev, category]);
+    const categoriesCollection = collection(firestore, 'categories');
+    await addDoc(categoriesCollection, { name: categoryName });
     return { success: true };
   };
 
-  const removeCategory = (categoryToRemove: string) => {
-    const isCategoryInUse = inventoryItems.some(item => item.type === categoryToRemove);
+  const removeCategory = async (categoryId: string) => {
+    if (!firestore) return { success: false, message: 'Database not connected.' };
+    
+    const categoryToRemove = categories?.find(c => c.id === categoryId);
+    const isCategoryInUse = inventoryItems?.some(item => item.type === categoryToRemove?.name);
+
     if (isCategoryInUse) {
       return { success: false, message: `Category is in use and cannot be removed.` };
     }
-    setCategories(prev => prev.filter(c => c !== categoryToRemove));
+    const categoryDoc = doc(firestore, 'categories', categoryId);
+    await deleteDoc(categoryDoc);
     return { success: true };
   };
 
+  const enrichedInventory = useMemo(() => {
+    return inventoryItems?.map(item => ({
+      ...item,
+      icon: item.type === 'Machinery' ? Cog : Box
+    })) ?? [];
+  }, [inventoryItems]);
+
 
   return (
-    <InventoryContext.Provider value={{ inventoryItems, addProduct, deleteProduct, updateStock, categories, addCategory, removeCategory }}>
+    <InventoryContext.Provider value={{ 
+        inventoryItems: enrichedInventory, 
+        addProduct, 
+        deleteProduct, 
+        updateStock, 
+        categories: categories ?? [], 
+        addCategory, 
+        removeCategory 
+    }}>
       {children}
     </InventoryContext.Provider>
   );

@@ -18,8 +18,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
-import { InventoryItem } from "@/lib/data";
-import { Box, Cog, MinusCircle, PlusCircle, PackagePlus, Trash2, FolderPlus, XCircle, ImagePlus } from "lucide-react";
+import { FolderPlus, MinusCircle, PackagePlus, PlusCircle, Trash2, XCircle } from "lucide-react";
 import { useState } from "react";
 import {
   AlertDialog,
@@ -49,13 +48,14 @@ export default function StockManagementPage() {
   const [newCategory, setNewCategory] = useState('');
   const [imagePreview, setImagePreview] = useState<string | null>(null);
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>, type: 'add' | 'sell') => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>, type: 'add' | 'sell') => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
-    const itemName = formData.get('item') as string;
+    const itemId = formData.get('item') as string;
     const quantity = Number(formData.get('quantity'));
+    const itemName = inventoryItems.find(i => i.id === itemId)?.name;
 
-    if (!itemName || !quantity) {
+    if (!itemId || !quantity) {
         toast({
             title: "Invalid Input",
             description: "Please select an item and enter a quantity.",
@@ -64,7 +64,7 @@ export default function StockManagementPage() {
         return;
     }
 
-    const result = updateStock(itemName, quantity, type);
+    const result = await updateStock(itemId, quantity, type);
 
     if (result.success) {
         toast({
@@ -81,11 +81,11 @@ export default function StockManagementPage() {
     }
   };
 
-  const handleAddProduct = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleAddProduct = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
     const name = formData.get('product-name') as string;
-    const type = formData.get('product-type') as 'Material' | 'Machinery';
+    const type = formData.get('product-type') as string;
     const quantity = Number(formData.get('opening-stock'));
     const sellingPrice = Number(formData.get('selling-price'));
     const image = imagePreview;
@@ -99,7 +99,7 @@ export default function StockManagementPage() {
       return;
     }
     
-    addProduct({
+    await addProduct({
         name,
         type,
         quantity,
@@ -126,8 +126,8 @@ export default function StockManagementPage() {
     }
   };
   
-  const handleDeleteProduct = (productId: string) => {
-    deleteProduct(productId);
+  const handleDeleteProduct = async (productId: string) => {
+    await deleteProduct(productId);
     toast({
       title: "Product Deleted",
       description: "The product has been removed from the inventory.",
@@ -135,9 +135,9 @@ export default function StockManagementPage() {
     });
   };
 
-  const handleAddCategory = () => {
+  const handleAddCategory = async () => {
     if (newCategory.trim()) {
-      const result = addCategory(newCategory.trim());
+      const result = await addCategory(newCategory.trim());
       if (result.success) {
         setNewCategory('');
         toast({
@@ -154,12 +154,13 @@ export default function StockManagementPage() {
     }
   };
 
-  const handleRemoveCategory = (categoryToRemove: string) => {
-    const result = removeCategory(categoryToRemove);
+  const handleRemoveCategory = async (categoryToRemove: string) => {
+    const result = await removeCategory(categoryToRemove);
     if(result.success) {
+      const categoryName = categories.find(c => c.id === categoryToRemove)?.name;
       toast({
         title: 'Category Removed',
-        description: `Category "${categoryToRemove}" has been removed.`,
+        description: `Category "${categoryName}" has been removed.`,
         variant: 'destructive',
       });
     } else {
@@ -200,7 +201,7 @@ export default function StockManagementPage() {
                   </SelectTrigger>
                   <SelectContent>
                     {inventoryItems.map((item) => (
-                      <SelectItem key={item.id} value={item.name}>
+                      <SelectItem key={item.id} value={item.id}>
                         {item.name}
                       </SelectItem>
                     ))}
@@ -235,7 +236,7 @@ export default function StockManagementPage() {
                   </SelectTrigger>
                   <SelectContent>
                     {inventoryItems.map((item) => (
-                      <SelectItem key={item.id} value={item.name}>
+                      <SelectItem key={item.id} value={item.id}>
                         {item.name}
                       </SelectItem>
                     ))}
@@ -273,13 +274,13 @@ export default function StockManagementPage() {
               </div>
               <div className="space-y-3">
                 <Label htmlFor="product-type">Product Type</Label>
-                <Select name="product-type" required defaultValue="Material">
+                <Select name="product-type" required>
                   <SelectTrigger id="product-type">
                     <SelectValue placeholder="Select a type" />
                   </SelectTrigger>
                   <SelectContent>
                     {categories.map((cat) => (
-                       <SelectItem key={cat} value={cat}>{cat}</SelectItem>
+                       <SelectItem key={cat.id} value={cat.name}>{cat.name}</SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
@@ -324,9 +325,9 @@ export default function StockManagementPage() {
                   <Label>Existing Categories</Label>
                   <div className="space-y-3">
                     {categories.map(cat => (
-                        <div key={cat} className="flex items-center justify-between p-3 rounded-md bg-muted">
-                            <span className="font-medium text-base">{cat}</span>
-                            <Button size="icon" variant="ghost" className="h-8 w-8" onClick={() => handleRemoveCategory(cat)}>
+                        <div key={cat.id} className="flex items-center justify-between p-3 rounded-md bg-muted">
+                            <span className="font-medium text-base">{cat.name}</span>
+                            <Button size="icon" variant="ghost" className="h-8 w-8" onClick={() => handleRemoveCategory(cat.id)}>
                                 <XCircle className="h-5 w-5 text-destructive" />
                             </Button>
                         </div>

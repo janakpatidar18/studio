@@ -1,0 +1,19 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // By default, deny all reads and writes
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Allow authenticated users to read and write to the inventory and categories collections
+    match /inventory/{itemId} {
+      allow read, create, update, delete: if request.auth != null;
+    }
+
+    match /categories/{categoryId} {
+      allow read, create, delete: if request.auth != null;
+    }
+  }
+}

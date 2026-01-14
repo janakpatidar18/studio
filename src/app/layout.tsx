@@ -1,13 +1,21 @@
-import type {Metadata} from 'next';
+"use client";
+import type { Metadata } from 'next';
 import './globals.css';
 import { Toaster } from "@/components/ui/toaster";
 import { AuthProvider } from '@/context/AuthContext';
+import { FirebaseProvider } from '@/firebase/provider';
+import { initializeFirebase } from '@/firebase';
+import { FirebaseErrorListener } from '@/components/FirebaseErrorListener';
 
+const firebaseApp = initializeFirebase();
+
+/*
 export const metadata: Metadata = {
   title: 'SVLSM Stock Manager',
   description: 'Manage your stock with ease.',
   manifest: '/manifest.json',
 };
+*/
 
 export default function RootLayout({
   children,
@@ -17,6 +25,9 @@ export default function RootLayout({
   return (
     <html lang="en" className="dark">
       <head>
+        <title>SVLSM Stock Manager</title>
+        <meta name="description" content="Manage your stock with ease." />
+        <link rel="manifest" href="/manifest.json" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
         <link href="https://fonts.googleapis.com/css2?family=Arimo&display=swap" rel="stylesheet" />
@@ -25,10 +36,13 @@ export default function RootLayout({
         <link rel="icon" href="/logo.png" type="image/png" />
       </head>
       <body className="font-body antialiased">
-        <AuthProvider>
-          {children}
-          <Toaster />
-        </AuthProvider>
+        <FirebaseProvider firebaseApp={firebaseApp}>
+          <AuthProvider>
+            {children}
+            <Toaster />
+            <FirebaseErrorListener />
+          </AuthProvider>
+        </FirebaseProvider>
       </body>
     </html>
   );
