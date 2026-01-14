@@ -53,7 +53,7 @@ export default function StockManagementPage() {
     const formData = new FormData(e.currentTarget);
     const itemId = formData.get('item') as string;
     const quantity = Number(formData.get('quantity'));
-    const itemName = inventoryItems.find(i => i.id === itemId)?.name;
+    const itemName = inventoryItems?.find(i => i.id === itemId)?.name;
 
     if (!itemId || !quantity) {
         toast({
@@ -157,7 +157,7 @@ export default function StockManagementPage() {
   const handleRemoveCategory = async (categoryToRemove: string) => {
     const result = await removeCategory(categoryToRemove);
     if(result.success) {
-      const categoryName = categories.find(c => c.id === categoryToRemove)?.name;
+      const categoryName = categories?.find(c => c.id === categoryToRemove)?.name;
       toast({
         title: 'Category Removed',
         description: `Category "${categoryName}" has been removed.`,
@@ -200,7 +200,7 @@ export default function StockManagementPage() {
                     <SelectValue placeholder="Select an item" />
                   </SelectTrigger>
                   <SelectContent>
-                    {inventoryItems.map((item) => (
+                    {inventoryItems?.map((item) => (
                       <SelectItem key={item.id} value={item.id}>
                         {item.name}
                       </SelectItem>
@@ -235,7 +235,7 @@ export default function StockManagementPage() {
                     <SelectValue placeholder="Select an item" />
                   </SelectTrigger>
                   <SelectContent>
-                    {inventoryItems.map((item) => (
+                    {inventoryItems?.map((item) => (
                       <SelectItem key={item.id} value={item.id}>
                         {item.name}
                       </SelectItem>
@@ -279,7 +279,7 @@ export default function StockManagementPage() {
                     <SelectValue placeholder="Select a type" />
                   </SelectTrigger>
                   <SelectContent>
-                    {categories.map((cat) => (
+                    {categories?.map((cat) => (
                        <SelectItem key={cat.id} value={cat.name}>{cat.name}</SelectItem>
                     ))}
                   </SelectContent>
@@ -324,7 +324,7 @@ export default function StockManagementPage() {
               <div className="space-y-3">
                   <Label>Existing Categories</Label>
                   <div className="space-y-3">
-                    {categories.map(cat => (
+                    {categories?.map(cat => (
                         <div key={cat.id} className="flex items-center justify-between p-3 rounded-md bg-muted">
                             <span className="font-medium text-base">{cat.name}</span>
                             <Button size="icon" variant="ghost" className="h-8 w-8" onClick={() => handleRemoveCategory(cat.id)}>
@@ -349,7 +349,7 @@ export default function StockManagementPage() {
           </CardHeader>
           <CardContent>
               <ul className="space-y-3">
-                {inventoryItems.map(item => (
+                {inventoryItems?.map(item => (
                   <li key={item.id} className="flex items-center justify-between p-4 rounded-md bg-muted">
                     <div>
                       <p className="font-medium text-base">{item.name}</p>

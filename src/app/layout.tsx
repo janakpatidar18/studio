@@ -7,7 +7,7 @@ import { FirebaseProvider } from '@/firebase/provider';
 import { initializeFirebase } from '@/firebase';
 import { FirebaseErrorListener } from '@/components/FirebaseErrorListener';
 
-const firebaseApp = initializeFirebase();
+const { firebaseApp, auth, firestore } = initializeFirebase();
 
 /*
 export const metadata: Metadata = {
@@ -36,7 +36,7 @@ export default function RootLayout({
         <link rel="icon" href="/logo.png" type="image/png" />
       </head>
       <body className="font-body antialiased">
-        <FirebaseProvider firebaseApp={firebaseApp}>
+        <FirebaseProvider value={{ firebaseApp, auth, firestore }}>
           <AuthProvider>
             {children}
             <Toaster />

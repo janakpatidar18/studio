@@ -24,14 +24,15 @@ export default function GalleryPage() {
 
     const doorImages = inventoryItems?.filter(p => p.type === 'Door') ?? [];
     const decorImages = inventoryItems?.filter(p => p.type === 'Sawn Timber') ?? [];
+    const allImages = [...doorImages, ...decorImages];
 
   return (
     <div className="space-y-8">
       <header className="flex flex-wrap items-center justify-between gap-6">
         <div>
-            <h1 className="text-4xl font-bold font-headline">Door Gallery</h1>
+            <h1 className="text-4xl font-bold font-headline">Product Gallery</h1>
             <p className="text-lg text-muted-foreground">
-                A showcase of doors made in-house.
+                A showcase of products made in-house.
             </p>
         </div>
         <Button onClick={handleUpload}>
@@ -47,7 +48,7 @@ export default function GalleryPage() {
                 </CardContent>
             </Card>
         ))}
-        {doorImages.map((image) => (
+        {inventoryItems?.map((image) => (
             <Card key={image.id} className="overflow-hidden group shadow-lg">
                 <CardContent className="p-0">
                     <div className="aspect-[3/4] relative">
@@ -57,27 +58,11 @@ export default function GalleryPage() {
                             fill
                             className="object-cover transition-transform duration-300 group-hover:scale-105"
                             sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
-                            data-ai-hint="door wood"
+                            data-ai-hint="product wood"
                          />
                     </div>
                 </CardContent>
             </Card>
-        ))}
-        {decorImages.map((image) => (
-             <Card key={image.id} className="overflow-hidden group shadow-lg">
-             <CardContent className="p-0">
-                 <div className="aspect-[2/3] sm:aspect-[3/2] relative">
-                      <Image 
-                         src={image.image!}
-                         alt={image.name}
-                         fill
-                         className="object-cover transition-transform duration-300 group-hover:scale-105"
-                         sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
-                         data-ai-hint="timber wood"
-                      />
-                 </div>
-             </CardContent>
-         </Card>
         ))}
       </div>
     </div>

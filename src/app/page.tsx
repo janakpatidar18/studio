@@ -6,16 +6,18 @@ import { useAuth } from "@/context/AuthContext";
 
 export default function Home() {
   const router = useRouter();
-  const { isAuthenticated } = useAuth();
+  const { user, loading } = useAuth();
 
   useEffect(() => {
-    if (isAuthenticated === true) {
-      router.replace("/dashboard");
-    } else if (isAuthenticated === false) {
-      router.replace("/login");
+    // Wait until loading is false before redirecting
+    if (!loading) {
+      if (user) {
+        router.replace("/dashboard");
+      } else {
+        router.replace("/login");
+      }
     }
-    // Intentionally run only when isAuthenticated changes from null
-  }, [isAuthenticated, router]);
+  }, [user, loading, router]);
 
   return (
     <div className="flex h-screen w-full items-center justify-center bg-background">

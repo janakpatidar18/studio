@@ -20,6 +20,9 @@ export const FirebaseProvider = ({
   children: React.ReactNode;
   value: FirebaseContextValue;
 }) => {
+  if (!value.firebaseApp) {
+    return <>{children}</>;
+  }
   return (
     <FirebaseContext.Provider value={value}>{children}</FirebaseContext.Provider>
   );
@@ -33,6 +36,6 @@ export const useFirebase = () => {
   return context;
 };
 
-export const useFirebaseApp = () => useFirebase().firebaseApp;
-export const useAuth = () => useFirebase().auth;
-export const useFirestore = () => useFirebase().firestore;
+export const useFirebaseApp = () => useFirebase()?.firebaseApp;
+export const useAuth = () => useFirebase()?.auth;
+export const useFirestore = () => useFirebase()?.firestore;

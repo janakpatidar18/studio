@@ -29,7 +29,7 @@ export default function InventoryPage() {
   const filteredItems =
     selectedCategory === "All"
       ? inventoryItems
-      : inventoryItems.filter((item) => item.type === selectedCategory);
+      : inventoryItems?.filter((item) => item.type === selectedCategory);
   
   const isLoading = !inventoryItems;
 
@@ -52,7 +52,7 @@ export default function InventoryPage() {
                 </SelectTrigger>
                 <SelectContent>
                     <SelectItem value="All">All Categories</SelectItem>
-                    {categories.map((cat) => (
+                    {categories?.map((cat) => (
                         <SelectItem key={cat.id} value={cat.name}>{cat.name}</SelectItem>
                     ))}
                 </SelectContent>
@@ -83,7 +83,7 @@ export default function InventoryPage() {
               </CardFooter>
           </Card>
         ))}
-        {!isLoading && filteredItems.map((item: InventoryItem) => (
+        {!isLoading && filteredItems?.map((item: InventoryItem) => (
           <Card
             key={item.id}
             className="overflow-hidden group shadow-lg flex flex-col"
@@ -104,13 +104,12 @@ export default function InventoryPage() {
               <CardTitle className="text-2xl leading-tight">
                 {item.name}
               </CardTitle>
-              {item.icon && <Badge
+              <Badge
                 variant={item.type === "Machinery" ? "secondary" : "outline"}
-                className="mt-3 gap-2 px-3 py-1 text-sm"
+                className="mt-3"
               >
-                <item.icon className="w-4 h-4" />
                 {item.type}
-              </Badge>}
+              </Badge>
             </CardContent>
             <CardFooter className="p-0 border-t mt-auto text-lg">
               <div className="flex w-full text-center">

@@ -1,45 +1,71 @@
 "use client";
 
 import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
+import { onAuthStateChanged, signInAnonymously, signOut, User } from 'firebase/auth';
+import { useAuth as useFirebaseAuth } from '@/firebase';
 
 interface AuthContextType {
-  isAuthenticated: boolean | null;
-  login: () => void;
-  logout: () => void;
+  user: User | null;
+  loading: boolean;
+  login: () => Promise<User | null>;
+  logout: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
+  const auth = useFirebaseAuth();
+  const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // This effect now correctly handles initial state, preventing loops.
-    try {
-      const storedAuth = sessionStorage.getItem('svlsm_auth');
-      if (storedAuth === 'true') {
-        setIsAuthenticated(true);
-      } else {
-        setIsAuthenticated(false);
-      }
-    } catch (error) {
-        // If sessionStorage is not available, default to not authenticated.
-        setIsAuthenticated(false);
+    // onAuthStateChanged can be slow to initialize, so we use a flag to prevent
+    // the app from redirecting to the login page when the user is already logged in.
+    if (!auth) {
+      return;
     }
-  }, []);
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      setUser(user);
+      setLoading(false);
+    });
+    return () => unsubscribe();
+  }, [auth]);
 
-  const login = () => {
-    sessionStorage.setItem('svlsm_auth', 'true');
-    setIsAuthenticated(true);
+  const login = async () => {
+    if (!auth) {
+      throw new Error('Auth service not available');
+    }
+    setLoading(true);
+    try {
+      const userCredential = await signInAnonymously(auth);
+      setUser(userCredential.user);
+      setLoading(false);
+      return userCredential.user;
+    } catch (error) {
+      console.error("Anonymous sign-in error:", error);
+      setLoading(false);
+      throw error;
+    }
   };
 
-  const logout = () => {
-    sessionStorage.removeItem('svlsm_auth');
-    setIsAuthenticated(false);
+  const logout = async () => {
+    if (!auth) {
+      throw new Error('Auth service not available');
+    }
+    setLoading(true);
+    try {
+      await signOut(auth);
+      setUser(null);
+      setLoading(false);
+    } catch (error) {
+      console.error("Sign-out error:", error);
+      setLoading(false);
+      throw error;
+    }
   };
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, login, logout }}>
+    <AuthContext.Provider value={{ user, loading, login, logout }}>
       {children}
     </AuthContext.Provider>
   );

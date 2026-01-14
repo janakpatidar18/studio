@@ -1,20 +1,21 @@
 "use client";
 
 import React, { createContext, useContext, ReactNode } from 'react';
-import { addDoc, collection, deleteDoc, doc, updateDoc } from 'firebase/firestore';
+import { addDoc, collection, deleteDoc, doc, updateDoc, writeBatch } from 'firebase/firestore';
 import { useFirestore, useCollection } from '@/firebase';
 import { Category, InventoryItem } from '@/lib/data';
-import { Cog, Box } from 'lucide-react';
 import { useMemo } from 'react';
+import { errorEmitter } from '@/firebase/error-emitter';
+import { FirestorePermissionError } from '@/firebase/errors';
 
-type NewProductData = Omit<InventoryItem, 'id' | 'icon'>;
+type NewProductData = Omit<InventoryItem, 'id'>;
 
 interface InventoryContextType {
-  inventoryItems: InventoryItem[];
+  inventoryItems: InventoryItem[] | null;
   addProduct: (product: NewProductData) => Promise<void>;
   deleteProduct: (productId: string) => Promise<void>;
   updateStock: (itemId: string, quantity: number, type: 'add' | 'sell') => Promise<{ success: boolean; message?: string }>;
-  categories: Category[];
+  categories: Category[] | null;
   addCategory: (categoryName: string) => Promise<{ success: boolean, message?: string }>;
   removeCategory: (categoryId: string) => Promise<{ success: boolean, message?: string }>;
 }
@@ -33,19 +34,32 @@ export const InventoryProvider = ({ children }: { children: ReactNode }) => {
   const addProduct = async (productData: NewProductData) => {
     if (!firestore) return;
     const inventoryCollection = collection(firestore, 'inventory');
-    await addDoc(inventoryCollection, productData);
+    addDoc(inventoryCollection, productData).catch(async (serverError) => {
+        const permissionError = new FirestorePermissionError({
+            path: inventoryCollection.path,
+            operation: 'create',
+            requestResourceData: productData,
+        });
+        errorEmitter.emit('permission-error', permissionError);
+    });
   };
 
   const deleteProduct = async (productId: string) => {
     if (!firestore) return;
     const productDoc = doc(firestore, 'inventory', productId);
-    await deleteDoc(productDoc);
+    deleteDoc(productDoc).catch(async (serverError) => {
+        const permissionError = new FirestorePermissionError({
+            path: productDoc.path,
+            operation: 'delete',
+        });
+        errorEmitter.emit('permission-error', permissionError);
+    });
   };
 
   const updateStock = async (itemId: string, quantity: number, type: 'add' | 'sell') => {
-    if (!firestore) return { success: false, message: 'Database not connected.' };
+    if (!firestore || !inventoryItems) return { success: false, message: 'Database not connected or inventory not loaded.' };
     
-    const itemToUpdate = inventoryItems?.find(item => item.id === itemId);
+    const itemToUpdate = inventoryItems.find(item => item.id === itemId);
     if (!itemToUpdate) {
       return { success: false, message: 'Item not found.' };
     }
@@ -56,7 +70,16 @@ export const InventoryProvider = ({ children }: { children: ReactNode }) => {
     
     const productDoc = doc(firestore, 'inventory', itemId);
     const newQuantity = type === 'add' ? itemToUpdate.quantity + quantity : itemToUpdate.quantity - quantity;
-    await updateDoc(productDoc, { quantity: newQuantity });
+    
+    const updateData = { quantity: newQuantity };
+    updateDoc(productDoc, updateData).catch(async (serverError) => {
+        const permissionError = new FirestorePermissionError({
+            path: productDoc.path,
+            operation: 'update',
+            requestResourceData: updateData,
+        });
+        errorEmitter.emit('permission-error', permissionError);
+    });
 
     return { success: true };
   };
@@ -68,39 +91,45 @@ export const InventoryProvider = ({ children }: { children: ReactNode }) => {
       return { success: false, message: 'Category already exists.' };
     }
     const categoriesCollection = collection(firestore, 'categories');
-    await addDoc(categoriesCollection, { name: categoryName });
+    const categoryData = { name: categoryName };
+    addDoc(categoriesCollection, categoryData).catch(async (serverError) => {
+        const permissionError = new FirestorePermissionError({
+            path: categoriesCollection.path,
+            operation: 'create',
+            requestResourceData: categoryData,
+        });
+        errorEmitter.emit('permission-error', permissionError);
+    });
     return { success: true };
   };
 
   const removeCategory = async (categoryId: string) => {
-    if (!firestore) return { success: false, message: 'Database not connected.' };
+    if (!firestore || !categories || !inventoryItems) return { success: false, message: 'Database not connected or data not loaded.' };
     
-    const categoryToRemove = categories?.find(c => c.id === categoryId);
-    const isCategoryInUse = inventoryItems?.some(item => item.type === categoryToRemove?.name);
+    const categoryToRemove = categories.find(c => c.id === categoryId);
+    const isCategoryInUse = inventoryItems.some(item => item.type === categoryToRemove?.name);
 
     if (isCategoryInUse) {
       return { success: false, message: `Category is in use and cannot be removed.` };
     }
     const categoryDoc = doc(firestore, 'categories', categoryId);
-    await deleteDoc(categoryDoc);
+    deleteDoc(categoryDoc).catch(async (serverError) => {
+        const permissionError = new FirestorePermissionError({
+            path: categoryDoc.path,
+            operation: 'delete',
+        });
+        errorEmitter.emit('permission-error', permissionError);
+    });
     return { success: true };
   };
 
-  const enrichedInventory = useMemo(() => {
-    return inventoryItems?.map(item => ({
-      ...item,
-      icon: item.type === 'Machinery' ? Cog : Box
-    })) ?? [];
-  }, [inventoryItems]);
-
-
   return (
     <InventoryContext.Provider value={{ 
-        inventoryItems: enrichedInventory, 
+        inventoryItems, 
         addProduct, 
         deleteProduct, 
         updateStock, 
-        categories: categories ?? [], 
+        categories, 
         addCategory, 
         removeCategory 
     }}>

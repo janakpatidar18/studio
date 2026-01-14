@@ -12,8 +12,9 @@ import {
   SidebarMenuButton,
   SidebarFooter,
   SidebarInset,
+  SidebarTrigger
 } from "@/components/ui/sidebar";
-import { Home, Package, ImageIcon, LogOut } from "lucide-react";
+import { Home, Package, ImageIcon, LogOut, PanelLeft } from "lucide-react";
 import Image from "next/image";
 import { PlaceHolderImages } from "@/lib/placeholder-images";
 import { InventoryProvider } from "@/context/InventoryContext";
@@ -27,17 +28,17 @@ export default function DashboardLayout({
 }) {
   const router = useRouter();
   const pathname = usePathname();
-  const { isAuthenticated, logout } = useAuth();
+  const { user, loading, logout } = useAuth();
   const woodTextureBg = PlaceHolderImages.find(p => p.id === 'wood-texture-bg');
   
   useEffect(() => {
-    if (isAuthenticated === false) {
+    if (!loading && !user) {
       router.replace("/login");
     }
-  }, [isAuthenticated, router]);
+  }, [user, loading, router]);
   
-  const handleLogout = () => {
-    logout();
+  const handleLogout = async () => {
+    await logout();
     router.replace("/login");
   };
 
@@ -47,7 +48,7 @@ export default function DashboardLayout({
     { href: "/dashboard/gallery", label: "Gallery", icon: ImageIcon },
   ];
   
-  if (isAuthenticated === null) {
+  if (loading || !user) {
     return (
         <div className="flex h-screen w-full items-center justify-center bg-background">
             <div className="flex flex-col items-center gap-4">
@@ -126,6 +127,16 @@ export default function DashboardLayout({
             />
           )}
           <div className="absolute inset-0 bg-background/90 -z-10" />
+
+          <header className="sticky top-0 z-10 flex h-16 items-center gap-4 border-b bg-background/80 px-4 backdrop-blur-sm md:hidden">
+            <SidebarTrigger className="h-8 w-8">
+              <PanelLeft className="h-5 w-5" />
+              <span className="sr-only">Toggle Menu</span>
+            </SidebarTrigger>
+            <div className="flex-1">
+              <Image src="/logo.png" alt="SVLSM Logo" width={120} height={33} />
+            </div>
+          </header>
 
           <main className="flex-1 p-4 sm:p-6 lg:p-8 md:pb-8 pb-24">
             {children}
