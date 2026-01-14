@@ -19,10 +19,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // onAuthStateChanged can be slow to initialize, so we use a flag to prevent
-    // the app from redirecting to the login page when the user is already logged in.
     if (!auth) {
-      setLoading(false); // If auth is not ready, stop loading.
+      setLoading(false);
       return;
     }
     const unsubscribe = onAuthStateChanged(auth, (user) => {
@@ -34,7 +32,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const login = async () => {
     if (!auth) {
-      throw new Error('Authentication service is not available. Please ensure Firebase is configured correctly.');
+      throw new Error('Authentication service is not available.');
     }
     setLoading(true);
     try {
