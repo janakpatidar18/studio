@@ -1,5 +1,4 @@
 "use client";
-import type { Metadata } from 'next';
 import './globals.css';
 import { Toaster } from "@/components/ui/toaster";
 import { AuthProvider } from '@/context/AuthContext';
@@ -7,15 +6,8 @@ import { FirebaseProvider } from '@/firebase/provider';
 import { initializeFirebase } from '@/firebase';
 import { FirebaseErrorListener } from '@/components/FirebaseErrorListener';
 
+// Initialize Firebase services once.
 const { firebaseApp, auth, firestore } = initializeFirebase();
-
-/*
-export const metadata: Metadata = {
-  title: 'SVLSM Stock Manager',
-  description: 'Manage your stock with ease.',
-  manifest: '/manifest.json',
-};
-*/
 
 export default function RootLayout({
   children,
