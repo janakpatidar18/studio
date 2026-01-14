@@ -17,6 +17,7 @@ import {
 import { Home, Package, Warehouse, ImageIcon, LogOut } from "lucide-react";
 import Image from "next/image";
 import { PlaceHolderImages } from "@/lib/placeholder-images";
+import { InventoryProvider } from "@/context/InventoryContext";
 
 function getCookie(name: string) {
     if (typeof window === "undefined") return null;
@@ -58,61 +59,63 @@ export default function DashboardLayout({
   }
 
   return (
-    <SidebarProvider>
-      <Sidebar>
-        <SidebarHeader>
-          <div className="flex items-center gap-2">
-            <Warehouse className="w-8 h-8 text-primary" />
-            <h1 className="text-xl font-semibold font-headline">SVLSM</h1>
-          </div>
-        </SidebarHeader>
-        <SidebarContent>
-          <SidebarMenu>
-            {navItems.map((item) => (
-              <SidebarMenuItem key={item.href}>
-                <Link href={item.href} passHref>
-                  <SidebarMenuButton
-                    isActive={pathname === item.href}
-                    tooltip={{ children: item.label }}
-                  >
-                    <item.icon />
-                    <span>{item.label}</span>
-                  </SidebarMenuButton>
-                </Link>
-              </SidebarMenuItem>
-            ))}
-          </SidebarMenu>
-        </SidebarContent>
-        <SidebarFooter>
+    <InventoryProvider>
+      <SidebarProvider>
+        <Sidebar>
+          <SidebarHeader>
+            <div className="flex items-center gap-2">
+              <Warehouse className="w-8 h-8 text-primary" />
+              <h1 className="text-xl font-semibold font-headline">SVLSM</h1>
+            </div>
+          </SidebarHeader>
+          <SidebarContent>
             <SidebarMenu>
-                <SidebarMenuItem>
-                    <SidebarMenuButton onClick={handleLogout} tooltip={{children: 'Logout'}}>
-                        <LogOut />
-                        <span>Logout</span>
+              {navItems.map((item) => (
+                <SidebarMenuItem key={item.href}>
+                  <Link href={item.href} passHref>
+                    <SidebarMenuButton
+                      isActive={pathname === item.href}
+                      tooltip={{ children: item.label }}
+                    >
+                      <item.icon />
+                      <span>{item.label}</span>
                     </SidebarMenuButton>
+                  </Link>
                 </SidebarMenuItem>
+              ))}
             </SidebarMenu>
-        </SidebarFooter>
-      </Sidebar>
-      <SidebarInset className="relative">
-        {woodTextureBg && (
-          <Image
-            src={woodTextureBg.imageUrl}
-            alt={woodTextureBg.description}
-            fill
-            className="object-cover -z-20"
-            data-ai-hint={woodTextureBg.imageHint}
-          />
-        )}
-        <div className="absolute inset-0 bg-background/90 -z-10" />
+          </SidebarContent>
+          <SidebarFooter>
+              <SidebarMenu>
+                  <SidebarMenuItem>
+                      <SidebarMenuButton onClick={handleLogout} tooltip={{children: 'Logout'}}>
+                          <LogOut />
+                          <span>Logout</span>
+                      </SidebarMenuButton>
+                  </SidebarMenuItem>
+              </SidebarMenu>
+          </SidebarFooter>
+        </Sidebar>
+        <SidebarInset className="relative">
+          {woodTextureBg && (
+            <Image
+              src={woodTextureBg.imageUrl}
+              alt={woodTextureBg.description}
+              fill
+              className="object-cover -z-20"
+              data-ai-hint={woodTextureBg.imageHint}
+            />
+          )}
+          <div className="absolute inset-0 bg-background/90 -z-10" />
 
-        <header className="sticky top-0 z-10 flex items-center p-4 border-b bg-background/50 backdrop-blur-sm md:hidden">
-          <SidebarTrigger />
-        </header>
-        <main className="flex-1 p-4 sm:p-6 lg:p-8">
-          {children}
-        </main>
-      </SidebarInset>
-    </SidebarProvider>
+          <header className="sticky top-0 z-10 flex items-center p-4 border-b bg-background/50 backdrop-blur-sm md:hidden">
+            <SidebarTrigger />
+          </header>
+          <main className="flex-1 p-4 sm:p-6 lg:p-8">
+            {children}
+          </main>
+        </SidebarInset>
+      </SidebarProvider>
+    </InventoryProvider>
   );
 }

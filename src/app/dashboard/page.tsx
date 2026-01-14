@@ -1,3 +1,5 @@
+"use client";
+
 import {
   Card,
   CardContent,
@@ -14,9 +16,12 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { inventoryItems, InventoryItem } from "@/lib/data";
+import { InventoryItem } from "@/lib/data";
+import { useInventory } from "@/context/InventoryContext";
 
 export default function InventoryPage() {
+  const { inventoryItems } = useInventory();
+  
   return (
     <div className="space-y-6">
       <header>

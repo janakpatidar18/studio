@@ -18,7 +18,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
-import { inventoryItems as initialInventoryItems, InventoryItem } from "@/lib/data";
+import { InventoryItem } from "@/lib/data";
 import { Box, Cog, MinusCircle, PlusCircle, PackagePlus, Trash2, FolderPlus, XCircle } from "lucide-react";
 import { useState } from "react";
 import {
@@ -32,12 +32,19 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
+import { useInventory } from "@/context/InventoryContext";
 
 
 export default function StockManagementPage() {
   const { toast } = useToast();
-  const [inventoryItems, setInventoryItems] = useState(initialInventoryItems);
-  const [categories, setCategories] = useState<string[]>(['Material', 'Machinery']);
+  const { 
+    inventoryItems, 
+    addProduct, 
+    deleteProduct, 
+    categories,
+    addCategory,
+    removeCategory 
+  } = useInventory();
   const [newCategory, setNewCategory] = useState('');
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>, type: 'add' | 'sell') => {
@@ -61,60 +68,63 @@ export default function StockManagementPage() {
     const quantity = Number(formData.get('opening-stock'));
     const sellingPrice = Number(formData.get('selling-price'));
     
-    const newProduct: InventoryItem = {
-        id: (inventoryItems.length + 1).toString(),
+    addProduct({
         name,
         type,
-        icon: type === 'Machinery' ? Cog : Box,
         quantity,
         sellingPrice,
-    };
-
-    setInventoryItems(prevItems => [...prevItems, newProduct]);
+    });
     
     toast({
         title: "Product Added",
-        description: `${name} has been added to the inventory. (This is a demo)`,
+        description: `${name} has been added to the inventory.`,
     });
     (e.target as HTMLFormElement).reset();
   };
   
   const handleDeleteProduct = (productId: string) => {
-    setInventoryItems(prevItems => prevItems.filter(item => item.id !== productId));
+    deleteProduct(productId);
     toast({
       title: "Product Deleted",
-      description: "The product has been removed from the inventory. (This is a demo)",
+      description: "The product has been removed from the inventory.",
       variant: 'destructive'
     });
   };
 
   const handleAddCategory = () => {
-    if (newCategory.trim() && !categories.includes(newCategory.trim())) {
-      setCategories(prev => [...prev, newCategory.trim()]);
-      setNewCategory('');
-      toast({
-        title: 'Category Added',
-        description: `Category "${newCategory.trim()}" has been added.`,
-      });
+    if (newCategory.trim()) {
+      const result = addCategory(newCategory.trim());
+      if (result.success) {
+        setNewCategory('');
+        toast({
+          title: 'Category Added',
+          description: `Category "${newCategory.trim()}" has been added.`,
+        });
+      } else {
+        toast({
+          title: 'Error',
+          description: result.message,
+          variant: 'destructive'
+        })
+      }
     }
   };
 
   const handleRemoveCategory = (categoryToRemove: string) => {
-    const isCategoryInUse = inventoryItems.some(item => item.type === categoryToRemove);
-    if(isCategoryInUse) {
+    const result = removeCategory(categoryToRemove);
+    if(result.success) {
       toast({
-        title: 'Cannot Remove Category',
-        description: `Category "${categoryToRemove}" is currently in use by an inventory item.`,
+        title: 'Category Removed',
+        description: `Category "${categoryToRemove}" has been removed.`,
         variant: 'destructive',
       });
-      return;
+    } else {
+       toast({
+        title: 'Cannot Remove Category',
+        description: result.message,
+        variant: 'destructive',
+      });
     }
-    setCategories(prev => prev.filter(c => c !== categoryToRemove));
-    toast({
-      title: 'Category Removed',
-      description: `Category "${categoryToRemove}" has been removed.`,
-      variant: 'destructive',
-    });
   };
 
   return (
