@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import {
@@ -35,11 +35,13 @@ export default function DashboardLayout({
 }) {
   const router = useRouter();
   const pathname = usePathname();
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
   const woodTextureBg = PlaceHolderImages.find(p => p.id === 'wood-texture-bg');
   
   useEffect(() => {
-    const isAuthenticated = getCookie("svlsm_auth") === "true";
-    if (!isAuthenticated) {
+    const authStatus = getCookie("svlsm_auth") === "true";
+    setIsAuthenticated(authStatus);
+    if (!authStatus) {
       router.replace("/login");
     }
   }, [router]);
@@ -55,7 +57,7 @@ export default function DashboardLayout({
     { href: "/dashboard/gallery", label: "Gallery", icon: ImageIcon },
   ];
   
-  if (getCookie("svlsm_auth") !== "true") {
+  if (isAuthenticated === null) {
     return <div className="flex h-screen w-full items-center justify-center bg-background"><p>Loading...</p></div>;
   }
 
@@ -65,6 +67,7 @@ export default function DashboardLayout({
         <Sidebar>
           <SidebarHeader>
             <div className="flex items-center justify-center gap-2">
+              <Warehouse />
               <h1 className="text-xl font-semibold font-headline">SVLSM</h1>
             </div>
           </SidebarHeader>
