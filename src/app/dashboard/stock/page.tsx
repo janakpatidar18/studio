@@ -19,7 +19,7 @@ import {
 } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { InventoryItem } from "@/lib/data";
-import { Box, Cog, MinusCircle, PlusCircle, PackagePlus, Trash2, FolderPlus, XCircle } from "lucide-react";
+import { Box, Cog, MinusCircle, PlusCircle, PackagePlus, Trash2, FolderPlus, XCircle, ImagePlus } from "lucide-react";
 import { useState } from "react";
 import {
   AlertDialog,
@@ -47,6 +47,7 @@ export default function StockManagementPage() {
     removeCategory 
   } = useInventory();
   const [newCategory, setNewCategory] = useState('');
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>, type: 'add' | 'sell') => {
     e.preventDefault();
@@ -87,12 +88,23 @@ export default function StockManagementPage() {
     const type = formData.get('product-type') as 'Material' | 'Machinery';
     const quantity = Number(formData.get('opening-stock'));
     const sellingPrice = Number(formData.get('selling-price'));
+    const image = imagePreview;
+
+    if (!image) {
+      toast({
+        title: "Image Required",
+        description: "Please upload an image for the product.",
+        variant: "destructive",
+      });
+      return;
+    }
     
     addProduct({
         name,
         type,
         quantity,
         sellingPrice,
+        image,
     });
     
     toast({
@@ -100,6 +112,18 @@ export default function StockManagementPage() {
         description: `${name} has been added to the inventory.`,
     });
     (e.target as HTMLFormElement).reset();
+    setImagePreview(null);
+  };
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImagePreview(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
   };
   
   const handleDeleteProduct = (productId: string) => {
@@ -238,6 +262,11 @@ export default function StockManagementPage() {
           </CardHeader>
           <CardContent>
             <form onSubmit={handleAddProduct} className="space-y-6">
+               <div className="space-y-3">
+                <Label htmlFor="product-image">Product Image</Label>
+                <Input id="product-image" name="product-image" type="file" accept="image/*" onChange={handleImageChange} required className="h-auto p-0 file:h-12 file:px-4 file:border-0"/>
+                {imagePreview && <img src={imagePreview} alt="Image preview" className="mt-4 w-full h-auto rounded-md" />}
+              </div>
               <div className="space-y-3">
                 <Label htmlFor="product-name">Product Name</Label>
                 <Input id="product-name" name="product-name" type="text" placeholder="e.g., Cherry Wood" required />

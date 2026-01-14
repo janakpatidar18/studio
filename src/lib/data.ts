@@ -1,6 +1,6 @@
 import { Cog, Box } from 'lucide-react';
 
-export const inventoryItems = [
+export const inventoryItems: (Omit<InventoryItem, 'image'> & { image?: string })[] = [
   {
     id: '1',
     name: 'Oak Planks',
@@ -43,4 +43,12 @@ export const inventoryItems = [
   },
 ];
 
-export type InventoryItem = typeof inventoryItems[0];
+export type InventoryItem = {
+    id: string;
+    name: string;
+    type: string;
+    icon: React.ElementType;
+    quantity: number;
+    sellingPrice: number;
+    image?: string;
+};

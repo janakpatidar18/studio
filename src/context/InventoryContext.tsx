@@ -4,7 +4,7 @@ import React, { createContext, useContext, useState, ReactNode } from 'react';
 import { inventoryItems as initialInventoryItems, InventoryItem } from '@/lib/data';
 import { Cog, Box } from 'lucide-react';
 
-type NewProductData = Omit<InventoryItem, 'id' | 'icon'>;
+type NewProductData = Omit<InventoryItem, 'id' | 'icon'> & { image: string };
 
 interface InventoryContextType {
   inventoryItems: InventoryItem[];

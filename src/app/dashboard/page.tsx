@@ -65,7 +65,7 @@ export default function InventoryPage() {
             <CardHeader className="p-0">
               <div className="aspect-square relative">
                 <Image
-                  src={`https://picsum.photos/seed/${item.id}/600/600`}
+                  src={item.image ?? `https://picsum.photos/seed/${item.id}/600/600`}
                   alt={item.name}
                   fill
                   className="object-cover transition-transform duration-300 group-hover:scale-105"
