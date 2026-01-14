@@ -27,7 +27,8 @@ export default function LoginPage() {
     setTimeout(() => {
       if (pin === CORRECT_PIN) {
         document.cookie = "svlsm_auth=true; path=/; max-age=86400"; // Expires in 24 hours
-        router.replace("/dashboard");
+        // Use window.location.href for a full page reload which helps in picking up the cookie
+        window.location.href = "/dashboard";
       } else {
         toast({
           title: "Authentication Failed",
@@ -35,6 +36,7 @@ export default function LoginPage() {
           variant: "destructive",
         });
         setIsLoading(false);
+        setPin("");
       }
     }, 1000);
   };
