@@ -1,66 +1,54 @@
+
 "use client";
 
 import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
-import { onAuthStateChanged, signInAnonymously, signOut, User } from 'firebase/auth';
-import { useAuth as useFirebaseAuth } from '@/firebase';
+
+// A simple user object for the PIN-based auth
+type SimpleUser = {
+  isAuthenticated: boolean;
+};
 
 interface AuthContextType {
-  user: User | null;
+  user: SimpleUser | null;
   loading: boolean;
-  login: () => Promise<User | null>;
-  logout: () => Promise<void>;
+  login: (pin: string) => boolean;
+  logout: () => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+const CORRECT_PIN = "1234";
+
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
-  const auth = useFirebaseAuth();
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<SimpleUser | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!auth) {
-      setLoading(false);
-      return;
-    }
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      setUser(user);
-      setLoading(false);
-    });
-    return () => unsubscribe();
-  }, [auth]);
-
-  const login = async () => {
-    if (!auth) {
-      throw new Error('Authentication service is not available.');
-    }
-    setLoading(true);
     try {
-      const userCredential = await signInAnonymously(auth);
-      setUser(userCredential.user);
-      setLoading(false);
-      return userCredential.user;
+      const storedUser = sessionStorage.getItem('user-auth');
+      if (storedUser) {
+        setUser(JSON.parse(storedUser));
+      }
     } catch (error) {
-      console.error("Anonymous sign-in error:", error);
-      setLoading(false);
-      throw error;
+      console.error("Could not parse user from session storage", error);
     }
+    setLoading(false);
+  }, []);
+
+
+  const login = (pin: string) => {
+    if (pin === CORRECT_PIN) {
+      const authenticatedUser: SimpleUser = { isAuthenticated: true };
+      sessionStorage.setItem('user-auth', JSON.stringify(authenticatedUser));
+      setUser(authenticatedUser);
+      return true;
+    }
+    return false;
   };
 
-  const logout = async () => {
-    if (!auth) {
-      throw new Error('Authentication service is not available.');
-    }
-    setLoading(true);
-    try {
-      await signOut(auth);
-      setUser(null);
-      setLoading(false);
-    } catch (error) {
-      console.error("Sign-out error:", error);
-      setLoading(false);
-      throw error;
-    }
+  const logout = () => {
+    sessionStorage.removeItem('user-auth');
+    setUser(null);
   };
 
   return (

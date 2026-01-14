@@ -1,3 +1,4 @@
+
 "use client";
 import React, { useEffect } from "react";
 import Link from "next/link";
@@ -37,8 +38,8 @@ export default function DashboardLayout({
     }
   }, [user, loading, router]);
   
-  const handleLogout = async () => {
-    await logout();
+  const handleLogout = () => {
+    logout();
     router.replace("/login");
   };
 
