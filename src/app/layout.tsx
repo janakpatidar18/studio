@@ -1,13 +1,7 @@
+
 "use client";
 import './globals.css';
-import { Toaster } from "@/components/ui/toaster";
-import { AuthProvider } from '@/context/AuthContext';
-import { FirebaseProvider } from '@/firebase/provider';
-import { initializeFirebase } from '@/firebase';
-import { FirebaseErrorListener } from '@/components/FirebaseErrorListener';
-
-// Initialize Firebase services once.
-const { firebaseApp, auth, firestore } = initializeFirebase();
+import { FirebaseClientProvider } from '@/firebase/client-provider';
 
 export default function RootLayout({
   children,
@@ -28,13 +22,9 @@ export default function RootLayout({
         <link rel="icon" href="/logo.png" type="image/png" />
       </head>
       <body className="font-body antialiased">
-        <FirebaseProvider value={{ firebaseApp, auth, firestore }}>
-          <AuthProvider>
-            {children}
-            <Toaster />
-            <FirebaseErrorListener />
-          </AuthProvider>
-        </FirebaseProvider>
+        <FirebaseClientProvider>
+          {children}
+        </FirebaseClientProvider>
       </body>
     </html>
   );
