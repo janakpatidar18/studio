@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -9,16 +9,9 @@ import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import Image from "next/image";
 import { PlaceHolderImages } from "@/lib/placeholder-images";
+import { Warehouse } from "lucide-react";
 
 const CORRECT_PIN = "1234";
-
-function getCookie(name: string) {
-  if (typeof window === "undefined") return null;
-  const value = `; ${document.cookie}`;
-  const parts = value.split(`; ${name}=`);
-  if (parts.length === 2) return parts.pop()?.split(";").shift() || null;
-  return null;
-}
 
 export default function LoginPage() {
   const [pin, setPin] = useState("");
@@ -27,13 +20,6 @@ export default function LoginPage() {
   const { toast } = useToast();
   const woodTextureBg = PlaceHolderImages.find(p => p.id === 'wood-texture-bg');
   
-  useEffect(() => {
-    const isAuthenticated = getCookie("svlsm_auth") === "true";
-    if (isAuthenticated) {
-      router.replace("/dashboard");
-    }
-  }, [router]);
-
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
@@ -67,8 +53,9 @@ export default function LoginPage() {
       <div className="absolute inset-0 bg-background/80 backdrop-blur-sm -z-10" />
       <Card className="w-full max-w-md shadow-2xl">
         <CardHeader className="text-center p-8 flex flex-col items-center">
-          <CardTitle className="text-5xl font-headline mt-4">SVLSM</CardTitle>
-          <CardDescription className="text-xl pt-2">Stock Management Login</CardDescription>
+            <Warehouse className="w-16 h-16 text-primary" />
+            <CardTitle className="text-5xl font-headline mt-4">SVLSM</CardTitle>
+            <CardDescription className="text-xl pt-2">Stock Management Login</CardDescription>
         </CardHeader>
         <form onSubmit={handleLogin}>
           <CardContent className="space-y-6 p-8 pt-0">
@@ -82,12 +69,12 @@ export default function LoginPage() {
                 onChange={(e) => setPin(e.target.value)}
                 maxLength={4}
                 required
-                className="text-center text-4xl tracking-[1em]"
+                className="text-center text-4xl tracking-[1em] h-20 text-3xl"
               />
             </div>
           </CardContent>
           <CardFooter className="p-8 pt-0">
-            <Button type="submit" className="w-full text-xl" size="lg" disabled={isLoading}>
+            <Button type="submit" className="w-full text-2xl" size="lg" disabled={isLoading}>
               {isLoading ? "Verifying..." : "Login"}
             </Button>
           </CardFooter>

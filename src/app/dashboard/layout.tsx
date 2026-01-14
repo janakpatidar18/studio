@@ -21,10 +21,10 @@ import { InventoryProvider } from "@/context/InventoryContext";
 import { cn } from "@/lib/utils";
 
 function getCookie(name: string) {
-    if (typeof window === "undefined") return null;
+    if (typeof document === 'undefined') return null;
     const value = `; ${document.cookie}`;
     const parts = value.split(`; ${name}=`);
-    if (parts.length === 2) return parts.pop()?.split(";").shift() || null;
+    if (parts.length === 2) return parts.pop()?.split(';').shift() || null;
     return null;
 }
 
@@ -35,15 +35,18 @@ export default function DashboardLayout({
 }) {
   const router = useRouter();
   const pathname = usePathname();
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const woodTextureBg = PlaceHolderImages.find(p => p.id === 'wood-texture-bg');
   
   useEffect(() => {
     const authStatus = getCookie("svlsm_auth") === "true";
-    setIsAuthenticated(authStatus);
     if (!authStatus) {
       router.replace("/login");
+    } else {
+      setIsAuthenticated(true);
     }
+    setIsLoading(false);
   }, [router]);
   
   const handleLogout = () => {
@@ -57,8 +60,34 @@ export default function DashboardLayout({
     { href: "/dashboard/gallery", label: "Gallery", icon: ImageIcon },
   ];
   
-  if (isAuthenticated === null || !isAuthenticated) {
-    return <div className="flex h-screen w-full items-center justify-center bg-background"><p>Loading...</p></div>;
+  if (isLoading || !isAuthenticated) {
+    return (
+        <div className="flex h-screen w-full items-center justify-center bg-background">
+            <div className="flex flex-col items-center gap-4">
+                <svg
+                    className="h-12 w-12 animate-spin text-primary"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                >
+                    <circle
+                        className="opacity-25"
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="currentColor"
+                        strokeWidth="4"
+                    ></circle>
+                    <path
+                        className="opacity-75"
+                        fill="currentColor"
+                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                    ></path>
+                </svg>
+                <p className="text-muted-foreground">Loading...</p>
+            </div>
+        </div>
+    );
   }
 
   return (
@@ -67,8 +96,8 @@ export default function DashboardLayout({
         <Sidebar>
           <SidebarHeader>
             <div className="flex items-center justify-center gap-2">
-              <Warehouse />
-              <h1 className="text-xl font-semibold font-headline">SVLSM</h1>
+              <Warehouse className="w-8 h-8" />
+              <h1 className="text-2xl font-semibold font-headline">SVLSM</h1>
             </div>
           </SidebarHeader>
           <SidebarContent>
@@ -79,8 +108,9 @@ export default function DashboardLayout({
                     <SidebarMenuButton
                       isActive={pathname === item.href}
                       tooltip={{ children: item.label }}
+                      className="text-lg h-14"
                     >
-                      <item.icon />
+                      <item.icon className="w-6 h-6" />
                       <span>{item.label}</span>
                     </SidebarMenuButton>
                   </Link>
@@ -91,8 +121,8 @@ export default function DashboardLayout({
           <SidebarFooter>
               <SidebarMenu>
                   <SidebarMenuItem>
-                      <SidebarMenuButton onClick={handleLogout} tooltip={{children: 'Logout'}}>
-                          <LogOut />
+                      <SidebarMenuButton onClick={handleLogout} tooltip={{children: 'Logout'}} className="text-lg h-14">
+                          <LogOut className="w-6 h-6" />
                           <span>Logout</span>
                       </SidebarMenuButton>
                   </SidebarMenuItem>
