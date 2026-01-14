@@ -20,7 +20,7 @@ const InventoryContext = createContext<InventoryContextType | undefined>(undefin
 
 export const InventoryProvider = ({ children }: { children: ReactNode }) => {
   const [inventoryItems, setInventoryItems] = useState<InventoryItem[]>(initialInventoryItems);
-  const [categories, setCategories] = useState<string[]>(['Material', 'Machinery']);
+  const [categories, setCategories] = useState<string[]>([]);
 
   const addProduct = (productData: NewProductData) => {
     const newProduct: InventoryItem = {

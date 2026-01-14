@@ -5,36 +5,6 @@
       "description": "A dark wood texture background.",
       "imageUrl": "https://images.unsplash.com/photo-1611600700192-d87eaeed4f81?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHx3b29kJTIwdGV4dHVyZXxlbnwwfHx8fDE3NjgzNjQwMTN8MA&ixlib=rb-4.1.0&q=80&w=1080",
       "imageHint": "wood texture"
-    },
-    {
-      "id": "sawn-wood-1",
-      "description": "Sawn wood planks.",
-      "imageUrl": "https://images.unsplash.com/photo-1583651981196-fdbaa5f8b662?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxMHx8c2F3biUyMHdvb2R8ZW58MHx8fHwxNzY4MzgxNzY0fDA&ixlib=rb-4.1.0&q=80&w=1080",
-      "imageHint": "sawn wood"
-    },
-    {
-      "id": "door-1",
-      "description": "A custom wooden door.",
-      "imageUrl": "https://images.unsplash.com/photo-1612254296674-7b7f283c4220?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw5fHx3b29kZW4lMjBkb29yfGVufDB8fHx8MTc2ODM4MTc2NHww&ixlib=rb-4.1.0&q=80&w=1080",
-      "imageHint": "wooden door"
-    },
-    {
-      "id": "door-2",
-      "description": "Another custom wooden door.",
-      "imageUrl": "https://images.unsplash.com/photo-1536160885591-301854e2ed04?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHx3b29kZW4lMjBkb29yfGVufDB8fHx8MTc2ODM4MTc2NHww&ixlib=rb-4.1.0&q=80&w=1080",
-      "imageHint": "wooden door"
-    },
-    {
-      "id": "door-3",
-      "description": "A modern wooden door.",
-      "imageUrl": "https://images.unsplash.com/photo-1547304206-e2e68bae3729?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw2fHxtb2Rlcm4lMjBkb29yfGVufDB8fHx8MTc2ODM4MTc2NHww&ixlib=rb-4.1.0&q=80&w=1080",
-      "imageHint": "modern door"
-    },
-    {
-      "id": "door-4",
-      "description": "A rustic wooden door.",
-      "imageUrl": "https://images.unsplash.com/photo-1660186483063-c758e9749a42?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw4fHxydXN0aWMlMjBkb29yfGVufDB8fHx8MTc2ODM4MTc2NHww&ixlib=rb-4.1.0&q=80&w=1080",
-      "imageHint": "rustic door"
     }
   ]
 }
