@@ -13,60 +13,81 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 
+// Helper to convert file to data URI
+const toBase64 = (file: File): Promise<string> => new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+        const img = new (window.Image)();
+        img.onload = () => {
+            const canvas = document.createElement('canvas');
+            const MAX_WIDTH = 1200;
+            const MAX_HEIGHT = 1200;
+            let width = img.width;
+            let height = img.height;
+
+            if (width > height) {
+                if (width > MAX_WIDTH) {
+                    height *= MAX_WIDTH / width;
+                    width = MAX_WIDTH;
+                }
+            } else {
+                if (height > MAX_HEIGHT) {
+                    width *= MAX_HEIGHT / height;
+                    height = MAX_HEIGHT;
+                }
+            }
+
+            canvas.width = width;
+            canvas.height = height;
+            const ctx = canvas.getContext('2d');
+            if (ctx) {
+                ctx.drawImage(img, 0, 0, width, height);
+                const dataUrl = canvas.toDataURL('image/jpeg', 0.8);
+                resolve(dataUrl);
+            } else {
+                reject(new Error('Failed to get canvas context.'));
+            }
+        };
+        img.onerror = reject;
+        img.src = reader.result as string;
+    };
+    reader.onerror = error => reject(error);
+    reader.readAsDataURL(file);
+});
+
+
 function AddToGalleryDialog({ children }: { children: React.ReactNode }) {
     const { addGalleryImage } = useInventory();
     const { toast } = useToast();
+    const [imageFile, setImageFile] = useState<File | null>(null);
     const [imagePreview, setImagePreview] = useState<string | null>(null);
     const [open, setOpen] = useState(false);
 
     const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        if (e.target.files && e.target.files[0]) {
-            const file = e.target.files[0];
+        const file = e.target.files?.[0];
+        if (file) {
+            setImageFile(file);
             const reader = new FileReader();
             reader.onload = (event) => {
-                const img = new Image();
-                img.onload = () => {
-                    const canvas = document.createElement('canvas');
-                    const MAX_WIDTH = 1200;
-                    const MAX_HEIGHT = 1200;
-                    let width = img.width;
-                    let height = img.height;
-
-                    if (width > height) {
-                        if (width > MAX_WIDTH) {
-                            height *= MAX_WIDTH / width;
-                            width = MAX_WIDTH;
-                        }
-                    } else {
-                        if (height > MAX_HEIGHT) {
-                            width *= MAX_HEIGHT / height;
-                            height = MAX_HEIGHT;
-                        }
-                    }
-
-                    canvas.width = width;
-                    canvas.height = height;
-                    const ctx = canvas.getContext('2d');
-                    if (ctx) {
-                        ctx.drawImage(img, 0, 0, width, height);
-                        const dataUrl = canvas.toDataURL('image/jpeg', 0.8); // 80% quality JPEG
-                        setImagePreview(dataUrl);
-                    }
-                };
-                img.src = event.target?.result as string;
+                setImagePreview(event.target?.result as string);
             };
             reader.readAsDataURL(file);
         }
     };
+    
+    const resetForm = () => {
+        setImageFile(null);
+        setImagePreview(null);
+        setOpen(false);
+    }
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         const formData = new FormData(e.currentTarget);
         const title = formData.get("title") as string;
         const description = formData.get("description") as string;
-        const image = imagePreview;
 
-        if (!image) {
+        if (!imageFile) {
             toast({
                 title: "Image Required",
                 description: "Please upload an image for the gallery.",
@@ -84,20 +105,34 @@ function AddToGalleryDialog({ children }: { children: React.ReactNode }) {
             return;
         }
 
-        await addGalleryImage({ title, description, image });
+        try {
+            const image = await toBase64(imageFile);
+            await addGalleryImage({ title, description, image });
 
-        toast({
-            title: "Image Added",
-            description: "The image has been successfully added to the gallery.",
-        });
+            toast({
+                title: "Image Added",
+                description: "The image has been successfully added to the gallery.",
+            });
+            
+            (e.target as HTMLFormElement).reset();
+            resetForm();
 
-        (e.target as HTMLFormElement).reset();
-        setImagePreview(null);
-        setOpen(false);
+        } catch (error) {
+             toast({
+                title: "Error Processing Image",
+                description: "There was a problem processing your image. Please try again.",
+                variant: "destructive",
+            });
+        }
     };
 
     return (
-        <Dialog open={open} onOpenChange={setOpen}>
+        <Dialog open={open} onOpenChange={(isOpen) => {
+            if (!isOpen) {
+                resetForm();
+            }
+            setOpen(isOpen);
+        }}>
             <DialogTrigger asChild>
                 {children}
             </DialogTrigger>
@@ -112,7 +147,12 @@ function AddToGalleryDialog({ children }: { children: React.ReactNode }) {
                         {imagePreview && (
                             <div className="relative mt-4">
                                 <Image src={imagePreview} alt="Image preview" width={400} height={300} className="w-full h-auto rounded-md object-contain" />
-                                <Button type="button" variant="ghost" size="icon" className="absolute top-2 right-2 h-7 w-7 bg-background/50 hover:bg-background/80" onClick={() => setImagePreview(null)}>
+                                <Button type="button" variant="ghost" size="icon" className="absolute top-2 right-2 h-7 w-7 bg-background/50 hover:bg-background/80" onClick={() => {
+                                    setImagePreview(null);
+                                    setImageFile(null);
+                                    const input = document.getElementById('gallery-image') as HTMLInputElement;
+                                    if(input) input.value = '';
+                                }}>
                                     <X className="w-4 h-4" />
                                 </Button>
                             </div>
