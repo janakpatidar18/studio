@@ -41,9 +41,13 @@ const DEFAULT_CATEGORIES: Omit<Category, 'id'>[] = [
 ];
 
 const DEFAULT_GALLERY_CATEGORIES: Omit<GalleryCategory, 'id'>[] = [
-    { name: 'Doors' },
-    { name: 'Furniture' },
-    { name: 'Custom Work' },
+    { name: 'Pannel Doors' },
+    { name: 'CNC Carving Doors' },
+    { name: 'Pooja Room Doors' },
+    { name: 'Double Doors' },
+    { name: 'Double Main Door ( with safety door )' },
+    { name: 'Choukat' },
+    { name: 'Others' },
 ];
 
 const DEFAULT_INVENTORY: Omit<InventoryItem, 'id'>[] = [
