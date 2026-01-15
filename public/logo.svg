@@ -1,14 +1,17 @@
-<svg width="200" height="50" xmlns="http://www.w3.org/2000/svg">
-  <style>
+<svg width="256" height="70" viewBox="0 0 256 70" fill="none" xmlns="http://www.w3.org/2000/svg">
+<style>
     .text {
-      font-family: "Arimo", sans-serif;
-      font-size: 28px;
-      font-weight: bold;
-      fill: hsl(var(--sidebar-foreground));
+        font-family: 'Arimo', sans-serif;
+        font-size: 40px;
+        font-weight: 700;
+        fill: hsl(26, 83%, 96%);
     }
-    .dark .text {
-       fill: hsl(var(--foreground));
+    .line {
+        stroke: hsl(30, 55%, 45%);
+        stroke-width: 4;
     }
-  </style>
-  <text x="10" y="35" class="text">SVLSM</text>
+</style>
+<text x="10" y="48" class="text">SVLSM</text>
+<path d="M160 15 L160 55" class="line" />
+<text x="175" y="48" class="text" font-size="20" font-weight="400">Design</text>
 </svg>
