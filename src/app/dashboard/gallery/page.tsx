@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { useInventory } from "@/context/InventoryContext";
-import { Edit, PlusCircle, Trash2, Upload, X } from "lucide-react";
+import { Edit, PlusCircle, Trash2, Upload, X, Download } from "lucide-react";
 import Image from "next/image";
 import { useToast } from "@/hooks/use-toast";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -346,37 +346,48 @@ export default function GalleryPage() {
                                     data-ai-hint="product wood"
                                 />
                             </div>
-                            {isEditMode && (
-                                <div className="absolute top-2 right-2 z-10 flex gap-2">
-                                    <EditGalleryImageDialog image={image}>
-                                        <Button variant="secondary" size="icon" className="h-9 w-9">
-                                            <Edit className="w-4 h-4" />
-                                        </Button>
-                                    </EditGalleryImageDialog>
-                                    <AlertDialog>
-                                        <AlertDialogTrigger asChild>
-                                            <Button variant="destructive" size="icon" className="h-9 w-9">
-                                                <Trash2 className="w-4 h-4" />
+                            <div className="absolute top-2 right-2 z-10 flex flex-col gap-2">
+                                <a
+                                    href={image.image}
+                                    download={`${image.title.replace(/\s+/g, '_')}.jpg`}
+                                >
+                                    <Button variant="secondary" size="icon" className="h-9 w-9">
+                                        <Download className="w-4 h-4" />
+                                        <span className="sr-only">Download Image</span>
+                                    </Button>
+                                </a>
+                                {isEditMode && (
+                                    <>
+                                        <EditGalleryImageDialog image={image}>
+                                            <Button variant="secondary" size="icon" className="h-9 w-9">
+                                                <Edit className="w-4 h-4" />
                                             </Button>
-                                        </AlertDialogTrigger>
-                                        <AlertDialogContent>
-                                            <AlertDialogHeader>
-                                            <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-                                            <AlertDialogDescription>
-                                                This action cannot be undone. This will permanently delete the
-                                                image "{image.title}" from your gallery.
-                                            </AlertDialogDescription>
-                                            </AlertDialogHeader>
-                                            <AlertDialogFooter>
-                                            <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                            <AlertDialogAction onClick={() => handleDelete(image.id, image.title)}>
-                                                Delete
-                                            </AlertDialogAction>
-                                            </AlertDialogFooter>
-                                        </AlertDialogContent>
-                                    </AlertDialog>
-                                </div>
-                            )}
+                                        </EditGalleryImageDialog>
+                                        <AlertDialog>
+                                            <AlertDialogTrigger asChild>
+                                                <Button variant="destructive" size="icon" className="h-9 w-9">
+                                                    <Trash2 className="w-4 h-4" />
+                                                </Button>
+                                            </AlertDialogTrigger>
+                                            <AlertDialogContent>
+                                                <AlertDialogHeader>
+                                                <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                                                <AlertDialogDescription>
+                                                    This action cannot be undone. This will permanently delete the
+                                                    image "{image.title}" from your gallery.
+                                                </AlertDialogDescription>
+                                                </AlertDialogHeader>
+                                                <AlertDialogFooter>
+                                                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                                <AlertDialogAction onClick={() => handleDelete(image.id, image.title)}>
+                                                    Delete
+                                                </AlertDialogAction>
+                                                </AlertDialogFooter>
+                                            </AlertDialogContent>
+                                        </AlertDialog>
+                                    </>
+                                )}
+                            </div>
                         </CardHeader>
                         <CardContent className="p-4 flex-grow" onClick={() => !isEditMode && setSelectedImage(image.image)}>
                              <CardTitle className="text-base sm:text-lg leading-tight font-semibold cursor-pointer">{image.title}</CardTitle>
@@ -418,6 +429,8 @@ export default function GalleryPage() {
         </>
     );
 }
+
+    
 
     
 
