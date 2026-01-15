@@ -10,12 +10,14 @@ import { errorEmitter } from '@/firebase/error-emitter';
 import { FirestorePermissionError } from '@/firebase/errors';
 
 type NewProductData = Omit<InventoryItem, 'id'>;
+type UpdateProductData = Partial<Omit<InventoryItem, 'id'>>;
 type NewGalleryImageData = Omit<GalleryImage, 'id' | 'createdAt'>
 type UpdateGalleryImageData = Partial<Omit<GalleryImage, 'id' | 'image' | 'createdAt'>>;
 
 interface InventoryContextType {
   inventoryItems: InventoryItem[] | null;
   addProduct: (product: NewProductData) => Promise<void>;
+  updateProduct: (productId: string, productData: UpdateProductData) => Promise<void>;
   deleteProduct: (productId: string) => Promise<void>;
   updateStock: (itemId: string, quantity: number, type: 'add' | 'sell') => Promise<{ success: boolean; message?: string }>;
   categories: Category[] | null;
@@ -122,6 +124,19 @@ export const InventoryProvider = ({ children }: { children: ReactNode }) => {
             requestResourceData: productData,
         });
         errorEmitter.emit('permission-error', permissionError);
+    });
+  };
+
+  const updateProduct = async (productId: string, productData: UpdateProductData) => {
+    if (!firestore) return;
+    const productDoc = doc(firestore, 'inventory', productId);
+    await updateDoc(productDoc, productData).catch(async (serverError) => {
+      const permissionError = new FirestorePermissionError({
+        path: productDoc.path,
+        operation: 'update',
+        requestResourceData: productData,
+      });
+      errorEmitter.emit('permission-error', permissionError);
     });
   };
 
@@ -251,6 +266,7 @@ export const InventoryProvider = ({ children }: { children: ReactNode }) => {
     <InventoryContext.Provider value={{ 
         inventoryItems, 
         addProduct, 
+        updateProduct,
         deleteProduct, 
         updateStock, 
         categories, 

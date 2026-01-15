@@ -20,7 +20,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
-import { FolderPlus, PackagePlus, PlusCircle, Trash2, XCircle } from "lucide-react";
+import { Edit, FolderPlus, PackagePlus, PlusCircle, Trash2, XCircle } from "lucide-react";
 import { useState } from "react";
 import {
   AlertDialog,
@@ -34,7 +34,129 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
 import { useInventory } from "@/context/InventoryContext";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { InventoryItem } from "@/lib/data";
+import Image from "next/image";
 
+
+function EditProductDialog({ product, children }: { product: InventoryItem; children: React.ReactNode }) {
+    const { updateProduct, categories } = useInventory();
+    const { toast } = useToast();
+    const [open, setOpen] = useState(false);
+    const [imagePreview, setImagePreview] = useState<string | null>(product.image || null);
+    const [isNewImage, setIsNewImage] = useState(false);
+
+    const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (e.target.files && e.target.files[0]) {
+            const file = e.target.files[0];
+            setIsNewImage(true);
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                const img = new (window.Image)();
+                img.onload = () => {
+                    const canvas = document.createElement('canvas');
+                    const MAX_WIDTH = 800;
+                    const MAX_HEIGHT = 800;
+                    let width = img.width;
+                    let height = img.height;
+
+                    if (width > height) {
+                        if (width > MAX_WIDTH) {
+                            height *= MAX_WIDTH / width;
+                            width = MAX_WIDTH;
+                        }
+                    } else {
+                        if (height > MAX_HEIGHT) {
+                            width *= MAX_HEIGHT / height;
+                            height = MAX_HEIGHT;
+                        }
+                    }
+
+                    canvas.width = width;
+                    canvas.height = height;
+                    const ctx = canvas.getContext('2d');
+                    if (ctx) {
+                        ctx.drawImage(img, 0, 0, width, height);
+                        const dataUrl = canvas.toDataURL('image/jpeg', 0.7);
+                        setImagePreview(dataUrl);
+                    }
+                };
+                img.src = event.target?.result as string;
+            };
+            reader.readAsDataURL(file);
+        }
+    };
+    
+    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        const formData = new FormData(e.currentTarget);
+        const name = formData.get('product-name') as string;
+        const type = formData.get('product-type') as string;
+        const sellingPrice = Number(formData.get('selling-price'));
+        
+        const productData: Partial<InventoryItem> = {
+            name,
+            type,
+            sellingPrice,
+        };
+
+        if (isNewImage) {
+            productData.image = imagePreview ?? undefined;
+        }
+
+        await updateProduct(product.id, productData);
+        
+        toast({
+            title: "Product Updated",
+            description: `${name} has been successfully updated.`,
+        });
+        setOpen(false);
+    };
+
+    return (
+        <Dialog open={open} onOpenChange={setOpen}>
+            <DialogTrigger asChild>{children}</DialogTrigger>
+            <DialogContent className="sm:max-w-[700px]">
+                <DialogHeader>
+                    <DialogTitle>Edit Product</DialogTitle>
+                </DialogHeader>
+                <form onSubmit={handleSubmit} className="space-y-6">
+                    <div className="grid md:grid-cols-2 gap-6">
+                        <div>
+                            <Label htmlFor="edit-product-image">Product Image</Label>
+                            <Input id="edit-product-image" name="edit-product-image" type="file" accept="image/*" onChange={handleImageChange} className="mt-3 h-auto p-0 file:h-12 file:px-4 file:border-0" />
+                            {imagePreview && <Image src={imagePreview} alt="Image preview" width={300} height={300} className="mt-4 w-full h-auto rounded-md object-contain max-h-48" />}
+                        </div>
+                        <div className="space-y-6">
+                            <div className="space-y-3">
+                                <Label htmlFor="edit-product-name">Product Name</Label>
+                                <Input id="edit-product-name" name="product-name" type="text" defaultValue={product.name} required />
+                            </div>
+                            <div className="space-y-3">
+                                <Label htmlFor="edit-product-type">Product Type</Label>
+                                <Select name="product-type" defaultValue={product.type} required>
+                                    <SelectTrigger id="edit-product-type">
+                                        <SelectValue placeholder="Select a type" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        {categories?.map((cat) => (
+                                            <SelectItem key={cat.id} value={cat.name}>{cat.name}</SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                            </div>
+                        </div>
+                        <div className="space-y-3">
+                            <Label htmlFor="edit-selling-price">Selling Price (₹)</Label>
+                            <Input id="edit-selling-price" name="selling-price" type="number" defaultValue={product.sellingPrice} min="0" step="0.01" required />
+                        </div>
+                    </div>
+                    <Button type="submit" className="w-full">Save Changes</Button>
+                </form>
+            </DialogContent>
+        </Dialog>
+    );
+}
 
 export default function StockManagementPage() {
   const { toast } = useToast();
@@ -346,7 +468,7 @@ export default function StockManagementPage() {
               Manage Products
             </CardTitle>
             <CardDescription>
-              Delete products from the inventory.
+              Edit or delete products from the inventory.
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -357,28 +479,35 @@ export default function StockManagementPage() {
                       <p className="font-medium">{item.name}</p>
                       <p className="text-sm text-muted-foreground">{item.type} - {item.quantity} in stock</p>
                     </div>
-                    <AlertDialog>
-                      <AlertDialogTrigger asChild>
-                        <Button variant="destructive" size="icon">
-                          <Trash2 className="h-5 w-5"/>
-                        </Button>
-                      </AlertDialogTrigger>
-                      <AlertDialogContent>
-                        <AlertDialogHeader>
-                          <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-                          <AlertDialogDescription>
-                            This action cannot be undone. This will permanently delete the
-                            product "{item.name}" from your inventory.
-                          </AlertDialogDescription>
-                        </AlertDialogHeader>
-                        <AlertDialogFooter>
-                          <AlertDialogCancel>Cancel</AlertDialogCancel>
-                          <AlertDialogAction onClick={() => handleDeleteProduct(item.id)}>
-                            Delete
-                          </AlertDialogAction>
-                        </AlertDialogFooter>
-                      </AlertDialogContent>
-                    </AlertDialog>
+                    <div className="flex gap-2">
+                      <EditProductDialog product={item}>
+                          <Button variant="outline" size="icon">
+                              <Edit className="h-5 w-5"/>
+                          </Button>
+                      </EditProductDialog>
+                      <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                          <Button variant="destructive" size="icon">
+                            <Trash2 className="h-5 w-5"/>
+                          </Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                            <AlertDialogDescription>
+                              This action cannot be undone. This will permanently delete the
+                              product "{item.name}" from your inventory.
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                            <AlertDialogAction onClick={() => handleDeleteProduct(item.id)}>
+                              Delete
+                            </AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
+                    </div>
                   </li>
                 ))}
               </ul>
