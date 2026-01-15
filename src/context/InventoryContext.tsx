@@ -109,7 +109,7 @@ export const InventoryProvider = ({ children }: { children: ReactNode }) => {
   const addProduct = async (productData: NewProductData) => {
     if (!firestore) return;
     const inventoryCollection = collection(firestore, 'inventory');
-    addDoc(inventoryCollection, productData).catch(async (serverError) => {
+    await addDoc(inventoryCollection, productData).catch(async (serverError) => {
         const permissionError = new FirestorePermissionError({
             path: inventoryCollection.path,
             operation: 'create',
@@ -122,7 +122,7 @@ export const InventoryProvider = ({ children }: { children: ReactNode }) => {
   const deleteProduct = async (productId: string) => {
     if (!firestore) return;
     const productDoc = doc(firestore, 'inventory', productId);
-    deleteDoc(productDoc).catch(async (serverError) => {
+    await deleteDoc(productDoc).catch(async (serverError) => {
         const permissionError = new FirestorePermissionError({
             path: productDoc.path,
             operation: 'delete',
@@ -147,7 +147,7 @@ export const InventoryProvider = ({ children }: { children: ReactNode }) => {
     const newQuantity = type === 'add' ? itemToUpdate.quantity + quantity : itemToUpdate.quantity - quantity;
     
     const updateData = { quantity: newQuantity };
-    updateDoc(productDoc, updateData).catch(async (serverError) => {
+    await updateDoc(productDoc, updateData).catch(async (serverError) => {
         const permissionError = new FirestorePermissionError({
             path: productDoc.path,
             operation: 'update',
@@ -167,7 +167,7 @@ export const InventoryProvider = ({ children }: { children: ReactNode }) => {
     }
     const categoriesCollection = collection(firestore, 'categories');
     const categoryData = { name: categoryName };
-    addDoc(categoriesCollection, categoryData).catch(async (serverError) => {
+    await addDoc(categoriesCollection, categoryData).catch(async (serverError) => {
         const permissionError = new FirestorePermissionError({
             path: categoriesCollection.path,
             operation: 'create',
@@ -188,7 +188,7 @@ export const InventoryProvider = ({ children }: { children: ReactNode }) => {
       return { success: false, message: `Category is in use and cannot be removed.` };
     }
     const categoryDoc = doc(firestore, 'categories', categoryId);
-    deleteDoc(categoryDoc).catch(async (serverError) => {
+    await deleteDoc(categoryDoc).catch(async (serverError) => {
         const permissionError = new FirestorePermissionError({
             path: categoryDoc.path,
             operation: 'delete',
