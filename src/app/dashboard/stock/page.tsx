@@ -1,3 +1,4 @@
+
 "use client";
 
 import { Button } from "@/components/ui/button";
@@ -396,7 +397,7 @@ export default function StockManagementPage() {
                           <AlertDialogDescription>
                             This action cannot be undone. This will permanently delete the
                             product "{item.name}" from your inventory.
-                          </describedescription>
+                          </AlertDialogDescription>
                         </AlertDialogHeader>
                         <AlertDialogFooter>
                           <AlertDialogCancel>Cancel</AlertDialogCancel>
