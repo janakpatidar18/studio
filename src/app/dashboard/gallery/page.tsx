@@ -325,18 +325,18 @@ export default function GalleryPage() {
                 </Select>
             </div>
 
-            <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
+            <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 sm:gap-4">
                 {isLoading && Array.from({length: 8}).map((_, i) => (
                     <Card key={i} className="overflow-hidden group shadow-lg">
                         <CardContent className="p-0">
-                            <Skeleton className="aspect-[4/3] w-full" />
+                            <Skeleton className="aspect-[2/4] w-full" />
                         </CardContent>
                     </Card>
                 ))}
                 {filteredImages?.map((image) => (
                     <Card key={image.id} className="overflow-hidden group shadow-lg flex flex-col">
                         <CardHeader className="p-0 relative">
-                             <div className="aspect-[4/3] relative" onClick={() => !isEditMode && setSelectedImage(image.image)}>
+                             <div className="aspect-[2/4] relative" onClick={() => !isEditMode && setSelectedImage(image.image)}>
                                 <Image 
                                     src={image.image!}
                                     alt={image.title}
@@ -418,6 +418,8 @@ export default function GalleryPage() {
         </>
     );
 }
+
+    
 
     
 
