@@ -145,7 +145,7 @@ function AddToGalleryDialog({ children }: { children: React.ReactNode }) {
                         <Label htmlFor="gallery-image">Image</Label>
                         <Input id="gallery-image" name="gallery-image" type="file" accept="image/*" onChange={handleImageChange} required className="h-auto p-0 file:h-12 file:px-4 file:border-0"/>
                         {imagePreview && (
-                            <div className="relative mt-4">
+                            <div className="relative mt-4 max-h-[300px] overflow-hidden rounded-md">
                                 <Image src={imagePreview} alt="Image preview" width={400} height={300} className="w-full h-auto rounded-md object-contain" />
                                 <Button type="button" variant="ghost" size="icon" className="absolute top-2 right-2 h-7 w-7 bg-background/50 hover:bg-background/80" onClick={() => {
                                     setImagePreview(null);
@@ -228,12 +228,12 @@ export default function GalleryPage() {
 
         {selectedImage && (
             <Dialog open={!!selectedImage} onOpenChange={(open) => !open && setSelectedImage(null)}>
-                <DialogContent className="max-w-4xl p-2">
+                <DialogContent className="max-w-3xl p-2">
                    <Image 
                         src={selectedImage}
                         alt="Enlarged gallery image"
-                        width={1600}
-                        height={1200}
+                        width={1200}
+                        height={900}
                         className="w-full h-auto object-contain rounded-md"
                    />
                 </DialogContent>
