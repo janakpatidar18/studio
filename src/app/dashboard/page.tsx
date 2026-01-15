@@ -132,10 +132,9 @@ export default function InventoryPage() {
           </p>
         </div>
         <div className="flex items-center gap-2 w-full sm:w-auto">
-            <Label htmlFor="category-filter" className="text-base font-medium whitespace-nowrap">Filter by:</Label>
             <Select value={selectedCategory} onValueChange={setSelectedCategory} disabled={isLoading}>
-                <SelectTrigger id="category-filter" className="w-full sm:w-[240px]">
-                    <SelectValue placeholder="Select a category" />
+                <SelectTrigger id="category-filter" className="w-full sm:w-[300px] bg-accent/20 border-accent text-accent-foreground">
+                    <SelectValue placeholder="Filter by Category..." />
                 </SelectTrigger>
                 <SelectContent>
                     <SelectItem value="All">All Categories</SelectItem>
