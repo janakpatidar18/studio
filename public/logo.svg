@@ -1,17 +1,11 @@
 <svg width="256" height="70" viewBox="0 0 256 70" fill="none" xmlns="http://www.w3.org/2000/svg">
 <style>
-    .text {
-        font-family: 'Arimo', sans-serif;
-        font-size: 40px;
-        font-weight: 700;
-        fill: hsl(26, 83%, 96%);
-    }
-    .line {
-        stroke: hsl(30, 55%, 45%);
-        stroke-width: 4;
-    }
+    @import url('https://fonts.googleapis.com/css2?family=Arimo:wght@400;500;600;700&display=swap');
+    .svlsm { font-family: 'Arimo', sans-serif; font-weight: 700; font-size: 40px; fill: white; }
+    .desi { font-family: 'Arimo', sans-serif; font-weight: 500; font-size: 40px; fill: white; }
+    .line { stroke: white; stroke-width: 2; }
 </style>
-<text x="10" y="48" class="text">SVLSM</text>
-<path d="M160 15 L160 55" class="line" />
-<text x="175" y="48" class="text" font-size="20" font-weight="400">Design</text>
+<text x="10" y="45" class="svlsm">SVLSM</text>
+<line x1="140" y1="15" x2="140" y2="55" class="line"/>
+<text x="155" y="45" class="desi">Desi</text>
 </svg>
