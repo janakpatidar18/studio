@@ -85,7 +85,7 @@ export default function DashboardLayout({
         <Sidebar>
           <SidebarHeader>
             <div className="flex items-center justify-center p-4">
-              <Image src="/logo.png" alt="SVLSM Logo" width={128} height={35} />
+              <Image src="/logo.svg" alt="SVLSM Logo" width={128} height={35} />
             </div>
           </SidebarHeader>
           <SidebarContent>
@@ -131,7 +131,7 @@ export default function DashboardLayout({
 
           <header className="sticky top-0 z-10 flex h-16 items-center gap-4 border-b bg-background/80 px-4 backdrop-blur-sm md:hidden">
             <SidebarTrigger className="h-auto w-auto p-0">
-              <Image src="/logo.png" alt="SVLSM Logo" width={128} height={35} />
+              <Image src="/logo.svg" alt="SVLSM Logo" width={128} height={28} />
               <span className="sr-only">Toggle Menu</span>
             </SidebarTrigger>
             <div className="flex-1">
@@ -167,3 +167,4 @@ export default function DashboardLayout({
     </InventoryProvider>
   );
 }
+

@@ -18,8 +18,8 @@ export default function RootLayout({
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
         <link href="https://fonts.googleapis.com/css2?family=Arimo:wght@400;500;600;700&display=swap" rel="stylesheet" />
         <meta name="theme-color" content="#1a120b" />
-        <link rel="apple-touch-icon" href="/logo.png" />
-        <link rel="icon" href="/logo.png" type="image/png" />
+        <link rel="apple-touch-icon" href="/logo.svg" />
+        <link rel="icon" href="/logo.svg" type="image/svg+xml" />
       </head>
       <body className="font-body antialiased">
         <FirebaseClientProvider>
