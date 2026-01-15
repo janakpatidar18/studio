@@ -13,8 +13,6 @@ import { PlaceHolderImages } from "@/lib/placeholder-images";
 import { KeyRound } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 
-const CORRECT_PIN = "1234";
-
 export default function LoginPage() {
   const [pin, setPin] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -126,4 +124,3 @@ export default function LoginPage() {
     </div>
   );
 }
-
