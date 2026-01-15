@@ -4,7 +4,6 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
@@ -26,13 +25,23 @@ export default function LoginPage() {
       router.replace('/dashboard');
     }
   }, [user, router]);
+  
+  const handlePinChange = (value: string) => {
+    if (isLoading || value.length > 2) {
+      return;
+    }
+    setPin(value);
 
-  const handleLogin = (e: React.FormEvent) => {
-    e.preventDefault();
+    if (value.length === 2) {
+      handleLogin(value);
+    }
+  }
+
+  const handleLogin = (currentPin: string) => {
     setIsLoading(true);
 
     setTimeout(() => {
-      if (login(pin)) {
+      if (login(currentPin)) {
         toast({
           title: "Login Successful",
           description: "Welcome to your dashboard!",
@@ -47,7 +56,7 @@ export default function LoginPage() {
         setPin("");
       }
       setIsLoading(false);
-    }, 1000);
+    }, 500);
   };
 
   return (
@@ -80,42 +89,34 @@ export default function LoginPage() {
                     <CardTitle className="text-3xl font-bold">Welcome Back</CardTitle>
                     <CardDescription className="text-lg text-muted-foreground">Enter your PIN to access the dashboard</CardDescription>
                 </CardHeader>
-                <form onSubmit={handleLogin}>
+                <div>
                 <CardContent className="space-y-6 px-6 sm:px-8">
                     <div className="space-y-3">
                         <Label htmlFor="pin" className="sr-only">PIN</Label>
                         <Input
-                        id="pin"
-                        type="password"
-                        placeholder="••••"
-                        value={pin}
-                        onChange={(e) => setPin(e.target.value)}
-                        maxLength={4}
-                        required
-                        className="text-center text-2xl tracking-[1rem] sm:tracking-[2rem] placeholder:tracking-normal"
+                          id="pin"
+                          type="password"
+                          placeholder="••"
+                          value={pin}
+                          onChange={(e) => handlePinChange(e.target.value)}
+                          maxLength={2}
+                          required
+                          className="text-center text-4xl tracking-[2rem] placeholder:tracking-normal"
+                          disabled={isLoading}
                         />
                     </div>
-                </CardContent>
-                <CardFooter className="p-6 sm:p-8 pt-0">
-                    <Button type="submit" className="w-full text-xl py-7" size="lg" disabled={isLoading}>
-                    {isLoading ? (
-                        <div className="flex items-center justify-center gap-2">
+                     {isLoading && (
+                        <div className="flex items-center justify-center gap-2 text-muted-foreground">
                             <svg className="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                                 <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                                 <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                             </svg>
                             <span>Verifying...</span>
                         </div>
-                    ) : (
-                        <div className="flex items-center justify-center gap-2">
-                            <KeyRound className="h-6 w-6"/>
-                            <span>Login</span>
-                        </div>
                     )}
-                    </Button>
-                </CardFooter>
-                </form>
-                <div className="text-center text-xs text-muted-foreground pb-4 px-4">
+                </CardContent>
+                </div>
+                <div className="text-center text-xs text-muted-foreground pb-4 px-4 pt-4">
                   Design By Janak Patidar . Design Studio
                 </div>
             </Card>
