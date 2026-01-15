@@ -310,30 +310,20 @@ export default function GalleryPage() {
                     </AddToGalleryDialog>
                  </div>
             </header>
-             <Card>
-                <CardHeader>
-                    <CardTitle className="flex items-center gap-2 text-xl">
-                        <Filter className="w-5 h-5"/>
-                        Filter Gallery
-                    </CardTitle>
-                </CardHeader>
-                <CardContent>
-                    <div className="flex items-center gap-4">
-                        <Label htmlFor="category-filter" className="text-base font-medium whitespace-nowrap">Filter by Category:</Label>
-                        <Select value={selectedCategory} onValueChange={setSelectedCategory} disabled={isLoading}>
-                            <SelectTrigger id="category-filter" className="w-full sm:w-[300px]">
-                                <SelectValue placeholder="Select a category" />
-                            </SelectTrigger>
-                            <SelectContent>
-                                <SelectItem value="All">All Categories</SelectItem>
-                                {galleryCategories?.map((cat) => (
-                                    <SelectItem key={cat.id} value={cat.name}>{cat.name}</SelectItem>
-                                ))}
-                            </SelectContent>
-                        </Select>
-                    </div>
-                </CardContent>
-             </Card>
+
+            <div className="flex items-center gap-4">
+                <Select value={selectedCategory} onValueChange={setSelectedCategory} disabled={isLoading}>
+                    <SelectTrigger id="category-filter" className="w-full sm:w-[300px] bg-accent/20 border-accent text-accent-foreground">
+                        <SelectValue placeholder="Filter by Category..." />
+                    </SelectTrigger>
+                    <SelectContent>
+                        <SelectItem value="All">All Categories</SelectItem>
+                        {galleryCategories?.map((cat) => (
+                            <SelectItem key={cat.id} value={cat.name}>{cat.name}</SelectItem>
+                        ))}
+                    </SelectContent>
+                </Select>
+            </div>
 
             <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 sm:gap-4">
                 {isLoading && Array.from({length: 8}).map((_, i) => (
@@ -441,5 +431,7 @@ export default function GalleryPage() {
         </Button>
         </>
     );
+
+    
 
     
