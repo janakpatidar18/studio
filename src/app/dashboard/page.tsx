@@ -23,7 +23,7 @@ import {
 import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
-import { MinusCircle } from "lucide-react";
+import { Receipt } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
@@ -76,7 +76,7 @@ function RecordSaleDialog({ children }: { children: React.ReactNode }) {
             <DialogContent>
                 <DialogHeader>
                     <DialogTitle className="flex items-center gap-3 text-2xl">
-                        <MinusCircle className="text-destructive w-7 h-7" />
+                        <Receipt className="text-destructive w-7 h-7" />
                         Record Sale / Use Stock
                     </DialogTitle>
                 </DialogHeader>
@@ -221,7 +221,7 @@ export default function InventoryPage() {
             size="icon"
             variant="destructive"
         >
-            <MinusCircle className="h-8 w-8" />
+            <Receipt className="h-8 w-8" />
             <span className="sr-only">Record Sale</span>
         </Button>
     </RecordSaleDialog>
