@@ -11,6 +11,7 @@ import { FirestorePermissionError } from '@/firebase/errors';
 
 type NewProductData = Omit<InventoryItem, 'id'>;
 type NewGalleryImageData = Omit<GalleryImage, 'id' | 'createdAt'>
+type UpdateGalleryImageData = Partial<Omit<GalleryImage, 'id' | 'image' | 'createdAt'>>;
 
 interface InventoryContextType {
   inventoryItems: InventoryItem[] | null;
@@ -22,6 +23,7 @@ interface InventoryContextType {
   removeCategory: (categoryId: string) => Promise<{ success: boolean, message?: string }>;
   galleryImages: GalleryImage[] | null;
   addGalleryImage: (imageData: NewGalleryImageData) => Promise<void>;
+  updateGalleryImage: (imageId: string, imageData: UpdateGalleryImageData) => Promise<void>;
 }
 
 const InventoryContext = createContext<InventoryContextType | undefined>(undefined);
@@ -218,6 +220,19 @@ export const InventoryProvider = ({ children }: { children: ReactNode }) => {
     });
   };
 
+  const updateGalleryImage = async (imageId: string, imageData: UpdateGalleryImageData) => {
+    if (!firestore) return;
+    const imageDoc = doc(firestore, 'gallery', imageId);
+    await updateDoc(imageDoc, imageData).catch(async (serverError) => {
+        const permissionError = new FirestorePermissionError({
+            path: imageDoc.path,
+            operation: 'update',
+            requestResourceData: imageData,
+        });
+        errorEmitter.emit('permission-error', permissionError);
+    });
+  };
+
   return (
     <InventoryContext.Provider value={{ 
         inventoryItems, 
@@ -228,7 +243,8 @@ export const InventoryProvider = ({ children }: { children: ReactNode }) => {
         addCategory, 
         removeCategory,
         galleryImages,
-        addGalleryImage
+        addGalleryImage,
+        updateGalleryImage
     }}>
       {children}
     </InventoryContext.Provider>

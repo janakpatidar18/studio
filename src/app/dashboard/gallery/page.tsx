@@ -5,7 +5,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { useInventory } from "@/context/InventoryContext";
-import { PlusCircle, Upload, X } from "lucide-react";
+import { Edit, PlusCircle, Upload, X } from "lucide-react";
 import Image from "next/image";
 import { useToast } from "@/hooks/use-toast";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -13,6 +13,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { GalleryImage } from "@/lib/data";
 
 // Helper to convert file to data URI
 const toBase64 = (file: File): Promise<string> => new Promise((resolve, reject) => {
@@ -174,6 +175,70 @@ function AddToGalleryDialog({ children }: { children: React.ReactNode }) {
     );
 }
 
+function EditGalleryImageDialog({ image, children }: { image: GalleryImage; children: React.ReactNode }) {
+    const { updateGalleryImage } = useInventory();
+    const { toast } = useToast();
+    const [open, setOpen] = useState(false);
+    
+    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        const formData = new FormData(e.currentTarget);
+        const title = formData.get("title") as string;
+        const description = formData.get("description") as string;
+
+        if (!title) {
+            toast({
+                title: "Title Required",
+                description: "Please provide a title for the image.",
+                variant: "destructive",
+            });
+            return;
+        }
+
+        try {
+            await updateGalleryImage(image.id, { title, description });
+            toast({
+                title: "Image Updated",
+                description: "The image details have been successfully updated.",
+            });
+            setOpen(false);
+        } catch (error) {
+             toast({
+                title: "Error Updating Image",
+                description: "There was a problem updating your image. Please try again.",
+                variant: "destructive",
+            });
+        }
+    };
+
+    return (
+        <Dialog open={open} onOpenChange={setOpen}>
+            <DialogTrigger asChild>
+                {children}
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-[500px]">
+                <DialogHeader>
+                    <DialogTitle className="text-2xl">Edit Image Details</DialogTitle>
+                </DialogHeader>
+                <form onSubmit={handleSubmit} className="space-y-6">
+                    <div className="relative mt-4 max-h-[300px] overflow-hidden rounded-md">
+                        <Image src={image.image} alt={image.title} width={400} height={300} className="w-full h-auto rounded-md object-contain" />
+                    </div>
+                    <div className="space-y-3">
+                        <Label htmlFor="edit-title">Title</Label>
+                        <Input id="edit-title" name="title" defaultValue={image.title} required />
+                    </div>
+                    <div className="space-y-3">
+                        <Label htmlFor="edit-description">Description (Optional)</Label>
+                        <Textarea id="edit-description" name="description" defaultValue={image.description} placeholder="A brief description of the image..." />
+                    </div>
+                    <Button type="submit" className="w-full">Save Changes</Button>
+                </form>
+            </DialogContent>
+        </Dialog>
+    );
+}
+
 export default function GalleryPage() {
     const { galleryImages } = useInventory();
     const isLoading = galleryImages === null;
@@ -205,22 +270,29 @@ export default function GalleryPage() {
                     </Card>
                 ))}
                 {galleryImages?.map((image) => (
-                    <Card key={image.id} className="overflow-hidden group shadow-lg flex flex-col cursor-pointer" onClick={() => setSelectedImage(image.image)}>
-                        <CardHeader className="p-0">
-                             <div className="aspect-[4/3] relative">
+                    <Card key={image.id} className="overflow-hidden group shadow-lg flex flex-col">
+                        <CardHeader className="p-0 relative">
+                             <div className="aspect-[4/3] relative" onClick={() => setSelectedImage(image.image)}>
                                 <Image 
                                     src={image.image!}
                                     alt={image.title}
                                     fill
-                                    className="object-cover transition-transform duration-300 group-hover:scale-105"
+                                    className="object-cover transition-transform duration-300 group-hover:scale-105 cursor-pointer"
                                     sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
                                     data-ai-hint="product wood"
                                 />
                             </div>
+                            <div className="absolute top-2 right-2 z-10">
+                                <EditGalleryImageDialog image={image}>
+                                    <Button variant="secondary" size="icon" className="h-9 w-9">
+                                        <Edit className="w-4 h-4" />
+                                    </Button>
+                                </EditGalleryImageDialog>
+                            </div>
                         </CardHeader>
-                        <CardContent className="p-4 flex-grow">
-                             <CardTitle className="text-lg sm:text-xl leading-tight font-semibold">{image.title}</CardTitle>
-                             {image.description && <p className="text-sm text-muted-foreground mt-1">{image.description}</p>}
+                        <CardContent className="p-4 flex-grow" onClick={() => setSelectedImage(image.image)}>
+                             <CardTitle className="text-lg sm:text-xl leading-tight font-semibold cursor-pointer">{image.title}</CardTitle>
+                             {image.description && <p className="text-sm text-muted-foreground mt-1 cursor-pointer">{image.description}</p>}
                         </CardContent>
                     </Card>
                 ))}
