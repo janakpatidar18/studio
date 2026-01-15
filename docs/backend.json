@@ -1,3 +1,4 @@
+
 {
   "entities": {
     "inventoryItem": {
@@ -56,9 +57,9 @@
           "type": "string",
           "description": "The title of the image."
         },
-        "description": {
+        "category": {
           "type": "string",
-          "description": "A description for the image."
+          "description": "The category of the image."
         },
         "image": {
           "type": "string",
@@ -72,7 +73,8 @@
       "required": [
         "title",
         "image",
-        "createdAt"
+        "createdAt",
+        "category"
       ]
     }
   },

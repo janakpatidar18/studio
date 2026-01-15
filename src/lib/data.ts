@@ -16,7 +16,7 @@ export type Category = {
 export type GalleryImage = {
     id: string;
     title: string;
-    description?: string;
+    category: string;
     image: string;
     createdAt: any;
 }

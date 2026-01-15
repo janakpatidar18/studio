@@ -1,5 +1,4 @@
 
-
 "use client";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
@@ -12,7 +11,6 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import { GalleryImage } from "@/lib/data";
 import {
   AlertDialog,
@@ -25,6 +23,8 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Badge } from "@/components/ui/badge";
 
 // Helper to convert file to data URI
 const toBase64 = (file: File): Promise<string> => new Promise((resolve, reject) => {
@@ -70,7 +70,7 @@ const toBase64 = (file: File): Promise<string> => new Promise((resolve, reject) 
 
 
 function AddToGalleryDialog({ children }: { children: React.ReactNode }) {
-    const { addGalleryImage } = useInventory();
+    const { addGalleryImage, categories } = useInventory();
     const { toast } = useToast();
     const [imageFile, setImageFile] = useState<File | null>(null);
     const [imagePreview, setImagePreview] = useState<string | null>(null);
@@ -98,7 +98,7 @@ function AddToGalleryDialog({ children }: { children: React.ReactNode }) {
         e.preventDefault();
         const formData = new FormData(e.currentTarget);
         const title = formData.get("title") as string;
-        const description = formData.get("description") as string;
+        const category = formData.get("category") as string;
 
         if (!imageFile) {
             toast({
@@ -109,10 +109,10 @@ function AddToGalleryDialog({ children }: { children: React.ReactNode }) {
             return;
         }
 
-        if (!title) {
+        if (!title || !category) {
             toast({
-                title: "Title Required",
-                description: "Please provide a title for the image.",
+                title: "All Fields Required",
+                description: "Please provide a title and category for the image.",
                 variant: "destructive",
             });
             return;
@@ -120,7 +120,7 @@ function AddToGalleryDialog({ children }: { children: React.ReactNode }) {
 
         try {
             const image = await toBase64(imageFile);
-            await addGalleryImage({ title, description, image });
+            await addGalleryImage({ title, category, image });
 
             toast({
                 title: "Image Added",
@@ -176,8 +176,17 @@ function AddToGalleryDialog({ children }: { children: React.ReactNode }) {
                         <Input id="title" name="title" placeholder="e.g., Custom Teak Door" required />
                     </div>
                     <div className="space-y-3">
-                        <Label htmlFor="description">Description (Optional)</Label>
-                        <Textarea id="description" name="description" placeholder="A brief description of the image..." />
+                        <Label htmlFor="category">Category</Label>
+                        <Select name="category" required>
+                            <SelectTrigger id="category">
+                                <SelectValue placeholder="Select a category" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                {categories?.map((cat) => (
+                                    <SelectItem key={cat.id} value={cat.name}>{cat.name}</SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
                     </div>
                     <Button type="submit" className="w-full">Add to Gallery</Button>
                 </form>
@@ -187,7 +196,7 @@ function AddToGalleryDialog({ children }: { children: React.ReactNode }) {
 }
 
 function EditGalleryImageDialog({ image, children }: { image: GalleryImage; children: React.ReactNode }) {
-    const { updateGalleryImage } = useInventory();
+    const { updateGalleryImage, categories } = useInventory();
     const { toast } = useToast();
     const [open, setOpen] = useState(false);
     
@@ -195,19 +204,19 @@ function EditGalleryImageDialog({ image, children }: { image: GalleryImage; chil
         e.preventDefault();
         const formData = new FormData(e.currentTarget);
         const title = formData.get("title") as string;
-        const description = formData.get("description") as string;
+        const category = formData.get("category") as string;
 
-        if (!title) {
+        if (!title || !category) {
             toast({
-                title: "Title Required",
-                description: "Please provide a title for the image.",
+                title: "All Fields Required",
+                description: "Please provide a title and category.",
                 variant: "destructive",
             });
             return;
         }
 
         try {
-            await updateGalleryImage(image.id, { title, description });
+            await updateGalleryImage(image.id, { title, category });
             toast({
                 title: "Image Updated",
                 description: "The image details have been successfully updated.",
@@ -240,8 +249,17 @@ function EditGalleryImageDialog({ image, children }: { image: GalleryImage; chil
                         <Input id="edit-title" name="title" defaultValue={image.title} required />
                     </div>
                     <div className="space-y-3">
-                        <Label htmlFor="edit-description">Description (Optional)</Label>
-                        <Textarea id="edit-description" name="description" defaultValue={image.description} placeholder="A brief description of the image..." />
+                        <Label htmlFor="edit-category">Category</Label>
+                        <Select name="category" defaultValue={image.category} required>
+                            <SelectTrigger id="edit-category">
+                                <SelectValue placeholder="Select a category" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                {categories?.map((cat) => (
+                                    <SelectItem key={cat.id} value={cat.name}>{cat.name}</SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
                     </div>
                     <Button type="submit" className="w-full">Save Changes</Button>
                 </form>
@@ -251,11 +269,18 @@ function EditGalleryImageDialog({ image, children }: { image: GalleryImage; chil
 }
 
 export default function GalleryPage() {
-    const { galleryImages, deleteGalleryImage } = useInventory();
+    const { galleryImages, deleteGalleryImage, categories } = useInventory();
     const { toast } = useToast();
-    const isLoading = galleryImages === null;
+    const [selectedCategory, setSelectedCategory] = useState("All");
     const [selectedImage, setSelectedImage] = useState<string | null>(null);
     const [isEditMode, setIsEditMode] = useState(false);
+    
+    const isLoading = galleryImages === null;
+
+    const filteredImages =
+        selectedCategory === "All"
+        ? galleryImages
+        : galleryImages?.filter((item) => item.category === selectedCategory);
 
     const handleDelete = async (imageId: string, imageTitle: string) => {
         await deleteGalleryImage(imageId);
@@ -270,19 +295,36 @@ export default function GalleryPage() {
         <>
         <div className="space-y-8">
             <header className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-                <div>
+                <div className="flex-1">
                     <h1 className="text-3xl sm:text-4xl font-bold font-headline">Product Gallery</h1>
                     <p className="text-md sm:text-lg text-muted-foreground">
                         A showcase of our finest handcrafted products.
                     </p>
                 </div>
-                 <AddToGalleryDialog>
-                    <Button className="w-full sm:w-auto">
-                        <PlusCircle className="mr-2 h-5 w-5" />
-                        Add Image to Gallery
-                    </Button>
-                </AddToGalleryDialog>
+                 <div className="flex items-center gap-2 w-full sm:w-auto">
+                    <AddToGalleryDialog>
+                        <Button className="w-full sm:w-auto flex-shrink-0">
+                            <PlusCircle className="mr-2 h-5 w-5" />
+                            Add Image
+                        </Button>
+                    </AddToGalleryDialog>
+                 </div>
             </header>
+             <div className="flex items-center gap-2">
+                <Label htmlFor="category-filter" className="text-base font-medium whitespace-nowrap">Filter by:</Label>
+                <Select value={selectedCategory} onValueChange={setSelectedCategory} disabled={isLoading}>
+                    <SelectTrigger id="category-filter" className="w-full sm:w-[240px]">
+                        <SelectValue placeholder="Select a category" />
+                    </SelectTrigger>
+                    <SelectContent>
+                        <SelectItem value="All">All Categories</SelectItem>
+                        {categories?.map((cat) => (
+                            <SelectItem key={cat.id} value={cat.name}>{cat.name}</SelectItem>
+                        ))}
+                    </SelectContent>
+                </Select>
+            </div>
+
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 sm:gap-8">
                 {isLoading && Array.from({length: 8}).map((_, i) => (
                     <Card key={i} className="overflow-hidden group shadow-lg">
@@ -291,7 +333,7 @@ export default function GalleryPage() {
                         </CardContent>
                     </Card>
                 ))}
-                {galleryImages?.map((image) => (
+                {filteredImages?.map((image) => (
                     <Card key={image.id} className="overflow-hidden group shadow-lg flex flex-col">
                         <CardHeader className="p-0 relative">
                              <div className="aspect-[4/3] relative" onClick={() => !isEditMode && setSelectedImage(image.image)}>
@@ -338,7 +380,12 @@ export default function GalleryPage() {
                         </CardHeader>
                         <CardContent className="p-4 flex-grow" onClick={() => !isEditMode && setSelectedImage(image.image)}>
                              <CardTitle className="text-lg sm:text-xl leading-tight font-semibold cursor-pointer">{image.title}</CardTitle>
-                             {image.description && <p className="text-sm text-muted-foreground mt-1 cursor-pointer">{image.description}</p>}
+                              <Badge
+                                variant={image.category === "Machinery" ? "secondary" : "outline"}
+                                className="mt-2"
+                              >
+                                {image.category}
+                              </Badge>
                         </CardContent>
                     </Card>
                 ))}
