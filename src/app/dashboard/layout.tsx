@@ -48,6 +48,8 @@ export default function DashboardLayout({
     { href: "/dashboard/stock", label: "Stock", icon: Package },
     { href: "/dashboard/gallery", label: "Gallery", icon: ImageIcon },
   ];
+
+  const mobileNavItems = navItems.filter(item => item.label !== 'Stock');
   
   if (loading || !user) {
     return (
@@ -144,8 +146,8 @@ export default function DashboardLayout({
           </main>
           
           <nav className="fixed bottom-0 left-0 right-0 z-50 p-2 border-t md:hidden bg-background/95 backdrop-blur-sm">
-            <div className="grid h-16 grid-cols-3 gap-2">
-              {navItems.map((item) => (
+            <div className="grid h-16 grid-cols-2 gap-2">
+              {mobileNavItems.map((item) => (
                 <Link href={item.href} key={item.href} passHref>
                   <div
                     className={cn(
