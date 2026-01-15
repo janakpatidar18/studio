@@ -118,7 +118,7 @@ export default function LoginPage() {
                 </CardFooter>
                 </form>
                 <div className="text-center text-xs text-muted-foreground pb-4">
-                  Design By Janak Patidar . Design Studio
+                  Design By Janak Patidar . Design
                 </div>
             </Card>
         </div>
