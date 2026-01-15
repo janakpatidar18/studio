@@ -255,6 +255,7 @@ export default function GalleryPage() {
     const { toast } = useToast();
     const isLoading = galleryImages === null;
     const [selectedImage, setSelectedImage] = useState<string | null>(null);
+    const [isEditMode, setIsEditMode] = useState(false);
 
     const handleDelete = async (imageId: string, imageTitle: string) => {
         await deleteGalleryImage(imageId);
@@ -293,7 +294,7 @@ export default function GalleryPage() {
                 {galleryImages?.map((image) => (
                     <Card key={image.id} className="overflow-hidden group shadow-lg flex flex-col">
                         <CardHeader className="p-0 relative">
-                             <div className="aspect-[4/3] relative" onClick={() => setSelectedImage(image.image)}>
+                             <div className="aspect-[4/3] relative" onClick={() => !isEditMode && setSelectedImage(image.image)}>
                                 <Image 
                                     src={image.image!}
                                     alt={image.title}
@@ -303,37 +304,39 @@ export default function GalleryPage() {
                                     data-ai-hint="product wood"
                                 />
                             </div>
-                            <div className="absolute top-2 right-2 z-10 flex gap-2">
-                                <EditGalleryImageDialog image={image}>
-                                    <Button variant="secondary" size="icon" className="h-9 w-9">
-                                        <Edit className="w-4 h-4" />
-                                    </Button>
-                                </EditGalleryImageDialog>
-                                 <AlertDialog>
-                                    <AlertDialogTrigger asChild>
-                                        <Button variant="destructive" size="icon" className="h-9 w-9">
-                                            <Trash2 className="w-4 h-4" />
+                            {isEditMode && (
+                                <div className="absolute top-2 right-2 z-10 flex gap-2">
+                                    <EditGalleryImageDialog image={image}>
+                                        <Button variant="secondary" size="icon" className="h-9 w-9">
+                                            <Edit className="w-4 h-4" />
                                         </Button>
-                                    </AlertDialogTrigger>
-                                    <AlertDialogContent>
-                                        <AlertDialogHeader>
-                                        <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-                                        <AlertDialogDescription>
-                                            This action cannot be undone. This will permanently delete the
-                                            image "{image.title}" from your gallery.
-                                        </AlertDialogDescription>
-                                        </AlertDialogHeader>
-                                        <AlertDialogFooter>
-                                        <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                        <AlertDialogAction onClick={() => handleDelete(image.id, image.title)}>
-                                            Delete
-                                        </AlertDialogAction>
-                                        </AlertDialogFooter>
-                                    </AlertDialogContent>
-                                </AlertDialog>
-                            </div>
+                                    </EditGalleryImageDialog>
+                                    <AlertDialog>
+                                        <AlertDialogTrigger asChild>
+                                            <Button variant="destructive" size="icon" className="h-9 w-9">
+                                                <Trash2 className="w-4 h-4" />
+                                            </Button>
+                                        </AlertDialogTrigger>
+                                        <AlertDialogContent>
+                                            <AlertDialogHeader>
+                                            <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                                            <AlertDialogDescription>
+                                                This action cannot be undone. This will permanently delete the
+                                                image "{image.title}" from your gallery.
+                                            </AlertDialogDescription>
+                                            </AlertDialogHeader>
+                                            <AlertDialogFooter>
+                                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                            <AlertDialogAction onClick={() => handleDelete(image.id, image.title)}>
+                                                Delete
+                                            </AlertDialogAction>
+                                            </AlertDialogFooter>
+                                        </AlertDialogContent>
+                                    </AlertDialog>
+                                </div>
+                            )}
                         </CardHeader>
-                        <CardContent className="p-4 flex-grow" onClick={() => setSelectedImage(image.image)}>
+                        <CardContent className="p-4 flex-grow" onClick={() => !isEditMode && setSelectedImage(image.image)}>
                              <CardTitle className="text-lg sm:text-xl leading-tight font-semibold cursor-pointer">{image.title}</CardTitle>
                              {image.description && <p className="text-sm text-muted-foreground mt-1 cursor-pointer">{image.description}</p>}
                         </CardContent>
@@ -355,6 +358,16 @@ export default function GalleryPage() {
                 </DialogContent>
             </Dialog>
         )}
+
+        <Button
+            onClick={() => setIsEditMode(!isEditMode)}
+            className="fixed bottom-24 right-4 h-14 w-14 rounded-full shadow-lg z-20 md:bottom-6 md:right-6"
+            size="icon"
+            variant={isEditMode ? "destructive" : "default"}
+        >
+            {isEditMode ? <X className="h-7 w-7" /> : <Edit className="h-7 w-7" />}
+            <span className="sr-only">Toggle Edit Mode</span>
+        </Button>
         </>
     );
 }
