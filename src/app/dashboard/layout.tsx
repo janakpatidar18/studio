@@ -135,7 +135,7 @@ export default function DashboardLayout({
               <span className="sr-only">Toggle Menu</span>
             </SidebarTrigger>
             <div className="flex-1">
-              <Image src="/logo.png" alt="SVLSM Logo" width={100} height={28} />
+              <Image src="/logo.png" alt="SVLSM Logo" width={80} height={22} />
             </div>
           </header>
 
