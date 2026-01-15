@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { useInventory } from "@/context/InventoryContext";
-import { Edit, PlusCircle, Trash2, Upload, X, Download } from "lucide-react";
+import { Edit, PlusCircle, Trash2, Upload, X, Download, Filter } from "lucide-react";
 import Image from "next/image";
 import { useToast } from "@/hooks/use-toast";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -310,20 +310,30 @@ export default function GalleryPage() {
                     </AddToGalleryDialog>
                  </div>
             </header>
-             <div className="flex items-center gap-2">
-                <Label htmlFor="category-filter" className="text-base font-medium whitespace-nowrap">Filter by:</Label>
-                <Select value={selectedCategory} onValueChange={setSelectedCategory} disabled={isLoading}>
-                    <SelectTrigger id="category-filter" className="w-full sm:w-[240px]">
-                        <SelectValue placeholder="Select a category" />
-                    </SelectTrigger>
-                    <SelectContent>
-                        <SelectItem value="All">All Categories</SelectItem>
-                        {galleryCategories?.map((cat) => (
-                            <SelectItem key={cat.id} value={cat.name}>{cat.name}</SelectItem>
-                        ))}
-                    </SelectContent>
-                </Select>
-            </div>
+             <Card>
+                <CardHeader>
+                    <CardTitle className="flex items-center gap-2 text-xl">
+                        <Filter className="w-5 h-5"/>
+                        Filter Gallery
+                    </CardTitle>
+                </CardHeader>
+                <CardContent>
+                    <div className="flex items-center gap-4">
+                        <Label htmlFor="category-filter" className="text-base font-medium whitespace-nowrap">Filter by Category:</Label>
+                        <Select value={selectedCategory} onValueChange={setSelectedCategory} disabled={isLoading}>
+                            <SelectTrigger id="category-filter" className="w-full sm:w-[300px]">
+                                <SelectValue placeholder="Select a category" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="All">All Categories</SelectItem>
+                                {galleryCategories?.map((cat) => (
+                                    <SelectItem key={cat.id} value={cat.name}>{cat.name}</SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
+                    </div>
+                </CardContent>
+             </Card>
 
             <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 sm:gap-4">
                 {isLoading && Array.from({length: 8}).map((_, i) => (
@@ -431,4 +441,5 @@ export default function GalleryPage() {
         </Button>
         </>
     );
-}
+
+    
