@@ -27,7 +27,7 @@ export default function LoginPage() {
   }, [user, router]);
   
   const handlePinChange = (value: string) => {
-    if (isLoading || value.length > 2) {
+    if (isLoading || !/^\d*$/.test(value) || value.length > 2) {
       return;
     }
     setPin(value);
@@ -96,6 +96,8 @@ export default function LoginPage() {
                         <Input
                           id="pin"
                           type="password"
+                          inputMode="numeric"
+                          pattern="[0-9]*"
                           placeholder="••"
                           value={pin}
                           onChange={(e) => handlePinChange(e.target.value)}
