@@ -1,6 +1,7 @@
+
 "use client";
 
-import React, { createContext, useContext, ReactNode } from 'react';
+import React, { createContext, useContext, ReactNode, useEffect } from 'react';
 import { addDoc, collection, deleteDoc, doc, updateDoc, writeBatch } from 'firebase/firestore';
 import { useFirestore, useCollection } from '@/firebase';
 import { Category, InventoryItem } from '@/lib/data';
@@ -22,6 +23,44 @@ interface InventoryContextType {
 
 const InventoryContext = createContext<InventoryContextType | undefined>(undefined);
 
+const DEFAULT_CATEGORIES: Omit<Category, 'id'>[] = [
+  { name: 'Sawn Timber' },
+  { name: 'Door' },
+  { name: 'Machinery' },
+];
+
+const DEFAULT_INVENTORY: Omit<InventoryItem, 'id'>[] = [
+  {
+    name: 'Neem Wood',
+    type: 'Sawn Timber',
+    quantity: 100,
+    sellingPrice: 1200,
+    image: 'https://picsum.photos/seed/1/600/600',
+  },
+  {
+    name: 'Pine Wood',
+    type: 'Sawn Timber',
+    quantity: 150,
+    sellingPrice: 900,
+    image: 'https://picsum.photos/seed/2/600/600',
+  },
+  {
+    name: 'Teak Wood Single Door',
+    type: 'Door',
+    quantity: 20,
+    sellingPrice: 8000,
+    image: 'https://picsum.photos/seed/3/600/600',
+  },
+  {
+    name: 'Wood Cutting Machine',
+    type: 'Machinery',
+    quantity: 5,
+    sellingPrice: 25000,
+    image: 'https://picsum.photos/seed/4/600/600',
+  },
+];
+
+
 export const InventoryProvider = ({ children }: { children: ReactNode }) => {
   const firestore = useFirestore();
 
@@ -30,6 +69,42 @@ export const InventoryProvider = ({ children }: { children: ReactNode }) => {
   
   const categoriesQuery = useMemo(() => firestore ? collection(firestore, 'categories') : null, [firestore]);
   const { data: categories, loading: categoriesLoading, error: categoriesError } = useCollection<Category>(categoriesQuery);
+
+  useEffect(() => {
+    const seedDatabase = async () => {
+      if (!firestore) return;
+
+      // Check if both collections are not loading and are empty
+      if (!inventoryLoading && !categoriesLoading && inventoryItems?.length === 0 && categories?.length === 0) {
+        console.log("Database is empty. Seeding with default data...");
+        const batch = writeBatch(firestore);
+
+        // Add default categories
+        const categoriesCollection = collection(firestore, 'categories');
+        DEFAULT_CATEGORIES.forEach(category => {
+          const docRef = doc(categoriesCollection);
+          batch.set(docRef, category);
+        });
+
+        // Add default inventory items
+        const inventoryCollection = collection(firestore, 'inventory');
+        DEFAULT_INVENTORY.forEach(item => {
+          const docRef = doc(inventoryCollection);
+          batch.set(docRef, item);
+        });
+
+        try {
+          await batch.commit();
+          console.log("Database seeded successfully.");
+        } catch (e) {
+          console.error("Error seeding database: ", e);
+        }
+      }
+    };
+
+    seedDatabase();
+  }, [firestore, inventoryItems, categories, inventoryLoading, categoriesLoading]);
+
 
   const addProduct = async (productData: NewProductData) => {
     if (!firestore) return;
@@ -145,3 +220,5 @@ export const useInventory = () => {
   }
   return context;
 };
+
+    
