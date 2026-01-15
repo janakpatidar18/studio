@@ -24,6 +24,7 @@ interface InventoryContextType {
   galleryImages: GalleryImage[] | null;
   addGalleryImage: (imageData: NewGalleryImageData) => Promise<void>;
   updateGalleryImage: (imageId: string, imageData: UpdateGalleryImageData) => Promise<void>;
+  deleteGalleryImage: (imageId: string) => Promise<void>;
 }
 
 const InventoryContext = createContext<InventoryContextType | undefined>(undefined);
@@ -233,6 +234,19 @@ export const InventoryProvider = ({ children }: { children: ReactNode }) => {
     });
   };
 
+  const deleteGalleryImage = async (imageId: string) => {
+    if (!firestore) return;
+    const imageDoc = doc(firestore, 'gallery', imageId);
+    await deleteDoc(imageDoc).catch(async (serverError) => {
+        const permissionError = new FirestorePermissionError({
+            path: imageDoc.path,
+            operation: 'delete',
+        });
+        errorEmitter.emit('permission-error', permissionError);
+    });
+  };
+
+
   return (
     <InventoryContext.Provider value={{ 
         inventoryItems, 
@@ -244,7 +258,8 @@ export const InventoryProvider = ({ children }: { children: ReactNode }) => {
         removeCategory,
         galleryImages,
         addGalleryImage,
-        updateGalleryImage
+        updateGalleryImage,
+        deleteGalleryImage,
     }}>
       {children}
     </InventoryContext.Provider>

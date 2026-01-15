@@ -5,7 +5,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { useInventory } from "@/context/InventoryContext";
-import { Edit, PlusCircle, Upload, X } from "lucide-react";
+import { Edit, PlusCircle, Trash2, Upload, X } from "lucide-react";
 import Image from "next/image";
 import { useToast } from "@/hooks/use-toast";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -14,6 +14,17 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { GalleryImage } from "@/lib/data";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog"
 
 // Helper to convert file to data URI
 const toBase64 = (file: File): Promise<string> => new Promise((resolve, reject) => {
@@ -240,9 +251,19 @@ function EditGalleryImageDialog({ image, children }: { image: GalleryImage; chil
 }
 
 export default function GalleryPage() {
-    const { galleryImages } = useInventory();
+    const { galleryImages, deleteGalleryImage } = useInventory();
+    const { toast } = useToast();
     const isLoading = galleryImages === null;
     const [selectedImage, setSelectedImage] = useState<string | null>(null);
+
+    const handleDelete = async (imageId: string, imageTitle: string) => {
+        await deleteGalleryImage(imageId);
+        toast({
+            title: "Image Deleted",
+            description: `"${imageTitle}" has been removed from the gallery.`,
+            variant: "destructive"
+        })
+    }
 
     return (
         <>
@@ -282,12 +303,34 @@ export default function GalleryPage() {
                                     data-ai-hint="product wood"
                                 />
                             </div>
-                            <div className="absolute top-2 right-2 z-10">
+                            <div className="absolute top-2 right-2 z-10 flex gap-2">
                                 <EditGalleryImageDialog image={image}>
                                     <Button variant="secondary" size="icon" className="h-9 w-9">
                                         <Edit className="w-4 h-4" />
                                     </Button>
                                 </EditGalleryImageDialog>
+                                 <AlertDialog>
+                                    <AlertDialogTrigger asChild>
+                                        <Button variant="destructive" size="icon" className="h-9 w-9">
+                                            <Trash2 className="w-4 h-4" />
+                                        </Button>
+                                    </AlertDialogTrigger>
+                                    <AlertDialogContent>
+                                        <AlertDialogHeader>
+                                        <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                                        <AlertDialogDescription>
+                                            This action cannot be undone. This will permanently delete the
+                                            image "{image.title}" from your gallery.
+                                        </AlertDialogDescription>
+                                        </AlertDialogHeader>
+                                        <AlertDialogFooter>
+                                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                        <AlertDialogAction onClick={() => handleDelete(image.id, image.title)}>
+                                            Delete
+                                        </AlertDialogAction>
+                                        </AlertDialogFooter>
+                                    </AlertDialogContent>
+                                </AlertDialog>
                             </div>
                         </CardHeader>
                         <CardContent className="p-4 flex-grow" onClick={() => setSelectedImage(image.image)}>
