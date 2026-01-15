@@ -70,7 +70,7 @@ const toBase64 = (file: File): Promise<string> => new Promise((resolve, reject) 
 
 
 function AddToGalleryDialog({ children }: { children: React.ReactNode }) {
-    const { addGalleryImage, categories } = useInventory();
+    const { addGalleryImage, galleryCategories } = useInventory();
     const { toast } = useToast();
     const [imageFile, setImageFile] = useState<File | null>(null);
     const [imagePreview, setImagePreview] = useState<string | null>(null);
@@ -182,7 +182,7 @@ function AddToGalleryDialog({ children }: { children: React.ReactNode }) {
                                 <SelectValue placeholder="Select a category" />
                             </SelectTrigger>
                             <SelectContent>
-                                {categories?.map((cat) => (
+                                {galleryCategories?.map((cat) => (
                                     <SelectItem key={cat.id} value={cat.name}>{cat.name}</SelectItem>
                                 ))}
                             </SelectContent>
@@ -196,7 +196,7 @@ function AddToGalleryDialog({ children }: { children: React.ReactNode }) {
 }
 
 function EditGalleryImageDialog({ image, children }: { image: GalleryImage; children: React.ReactNode }) {
-    const { updateGalleryImage, categories } = useInventory();
+    const { updateGalleryImage, galleryCategories } = useInventory();
     const { toast } = useToast();
     const [open, setOpen] = useState(false);
     
@@ -255,7 +255,7 @@ function EditGalleryImageDialog({ image, children }: { image: GalleryImage; chil
                                 <SelectValue placeholder="Select a category" />
                             </SelectTrigger>
                             <SelectContent>
-                                {categories?.map((cat) => (
+                                {galleryCategories?.map((cat) => (
                                     <SelectItem key={cat.id} value={cat.name}>{cat.name}</SelectItem>
                                 ))}
                             </SelectContent>
@@ -269,7 +269,7 @@ function EditGalleryImageDialog({ image, children }: { image: GalleryImage; chil
 }
 
 export default function GalleryPage() {
-    const { galleryImages, deleteGalleryImage, categories } = useInventory();
+    const { galleryImages, deleteGalleryImage, galleryCategories } = useInventory();
     const { toast } = useToast();
     const [selectedCategory, setSelectedCategory] = useState("All");
     const [selectedImage, setSelectedImage] = useState<string | null>(null);
@@ -318,7 +318,7 @@ export default function GalleryPage() {
                     </SelectTrigger>
                     <SelectContent>
                         <SelectItem value="All">All Categories</SelectItem>
-                        {categories?.map((cat) => (
+                        {galleryCategories?.map((cat) => (
                             <SelectItem key={cat.id} value={cat.name}>{cat.name}</SelectItem>
                         ))}
                     </SelectContent>
@@ -381,7 +381,7 @@ export default function GalleryPage() {
                         <CardContent className="p-4 flex-grow" onClick={() => !isEditMode && setSelectedImage(image.image)}>
                              <CardTitle className="text-lg sm:text-xl leading-tight font-semibold cursor-pointer">{image.title}</CardTitle>
                               <Badge
-                                variant={image.category === "Machinery" ? "secondary" : "outline"}
+                                variant="outline"
                                 className="mt-2"
                               >
                                 {image.category}

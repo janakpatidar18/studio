@@ -1,5 +1,4 @@
 
-
 "use client";
 
 import { Button } from "@/components/ui/button";
@@ -20,7 +19,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
-import { Edit, FolderPlus, PackagePlus, PlusCircle, Trash2, XCircle } from "lucide-react";
+import { Edit, FolderPlus, ImageIcon, PackagePlus, PlusCircle, Trash2, XCircle } from "lucide-react";
 import { useState } from "react";
 import {
   AlertDialog,
@@ -167,9 +166,13 @@ export default function StockManagementPage() {
     updateStock,
     categories,
     addCategory,
-    removeCategory 
+    removeCategory,
+    galleryCategories,
+    addGalleryCategory,
+    removeGalleryCategory
   } = useInventory();
   const [newCategory, setNewCategory] = useState('');
+  const [newGalleryCategory, setNewGalleryCategory] = useState('');
   const [imagePreview, setImagePreview] = useState<string | null>(null);
 
   const handleAddStock = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -294,7 +297,7 @@ export default function StockManagementPage() {
       if (result.success) {
         setNewCategory('');
         toast({
-          title: 'Category Added',
+          title: 'Product Category Added',
           description: `Category "${newCategory.trim()}" has been added.`,
         });
       } else {
@@ -312,7 +315,7 @@ export default function StockManagementPage() {
     if(result.success) {
       const categoryName = categories?.find(c => c.id === categoryToRemove)?.name;
       toast({
-        title: 'Category Removed',
+        title: 'Product Category Removed',
         description: `Category "${categoryName}" has been removed.`,
         variant: 'destructive',
       });
@@ -324,6 +327,44 @@ export default function StockManagementPage() {
       });
     }
   };
+
+  const handleAddGalleryCategory = async () => {
+    if (newGalleryCategory.trim()) {
+      const result = await addGalleryCategory(newGalleryCategory.trim());
+      if (result.success) {
+        setNewGalleryCategory('');
+        toast({
+          title: 'Gallery Category Added',
+          description: `Category "${newGalleryCategory.trim()}" has been added.`,
+        });
+      } else {
+        toast({
+          title: 'Error',
+          description: result.message,
+          variant: 'destructive'
+        })
+      }
+    }
+  };
+
+  const handleRemoveGalleryCategory = async (categoryToRemove: string) => {
+    const result = await removeGalleryCategory(categoryToRemove);
+    if(result.success) {
+      const categoryName = galleryCategories?.find(c => c.id === categoryToRemove)?.name;
+      toast({
+        title: 'Gallery Category Removed',
+        description: `Category "${categoryName}" has been removed.`,
+        variant: 'destructive',
+      });
+    } else {
+       toast({
+        title: 'Cannot Remove Category',
+        description: result.message,
+        variant: 'destructive',
+      });
+    }
+  };
+
 
   return (
     <div className="space-y-8">
@@ -395,10 +436,10 @@ export default function StockManagementPage() {
                         <Input id="product-name" name="product-name" type="text" placeholder="e.g., Cherry Wood" required />
                       </div>
                       <div className="space-y-3">
-                        <Label htmlFor="product-type">Product Type</Label>
+                        <Label htmlFor="product-type">Product Category</Label>
                         <Select name="product-type" required>
                           <SelectTrigger id="product-type">
-                            <SelectValue placeholder="Select a type" />
+                            <SelectValue placeholder="Select a category" />
                           </SelectTrigger>
                           <SelectContent>
                             {categories?.map((cat) => (
@@ -426,7 +467,7 @@ export default function StockManagementPage() {
           <CardHeader>
             <CardTitle className="flex items-center gap-3 text-2xl">
               <FolderPlus className="text-primary w-7 h-7" />
-              Manage Categories
+              Manage Product Categories
             </CardTitle>
             <CardDescription>
               Add or remove product categories.
@@ -460,8 +501,47 @@ export default function StockManagementPage() {
               </div>
           </CardContent>
         </Card>
-        
+
         <Card className="shadow-lg">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-3 text-2xl">
+              <ImageIcon className="text-primary w-7 h-7" />
+              Manage Gallery Categories
+            </CardTitle>
+            <CardDescription>
+              Add or remove categories for the gallery.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-6">
+              <div>
+                  <Label htmlFor="new-gallery-category">Add New Category</Label>
+                  <div className="flex gap-2 mt-3">
+                      <Input 
+                          id="new-gallery-category"
+                          value={newGalleryCategory}
+                          onChange={(e) => setNewGalleryCategory(e.target.value)}
+                          placeholder="e.g., Custom Furniture"
+                      />
+                      <Button onClick={handleAddGalleryCategory} size="sm">Add</Button>
+                  </div>
+              </div>
+              <div className="space-y-3">
+                  <Label>Existing Categories</Label>
+                  <div className="space-y-3 max-h-48 overflow-y-auto pr-2">
+                    {galleryCategories?.map(cat => (
+                        <div key={cat.id} className="flex items-center justify-between p-3 rounded-md bg-muted">
+                            <span className="font-medium">{cat.name}</span>
+                            <Button size="icon" variant="ghost" className="h-8 w-8" onClick={() => handleRemoveGalleryCategory(cat.id)}>
+                                <XCircle className="h-5 w-5 text-destructive" />
+                            </Button>
+                        </div>
+                    ))}
+                  </div>
+              </div>
+          </CardContent>
+        </Card>
+        
+        <Card className="md:col-span-2 shadow-lg">
           <CardHeader>
             <CardTitle className="flex items-center gap-3 text-2xl">
               <Trash2 className="text-destructive w-7 h-7"/>

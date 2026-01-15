@@ -13,6 +13,11 @@ export type Category = {
     name: string;
 };
 
+export type GalleryCategory = {
+    id: string;
+    name: string;
+}
+
 export type GalleryImage = {
     id: string;
     title: string;

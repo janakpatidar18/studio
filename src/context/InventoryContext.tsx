@@ -4,7 +4,7 @@
 import React, { createContext, useContext, ReactNode, useEffect } from 'react';
 import { addDoc, collection, deleteDoc, doc, query, orderBy, serverTimestamp, updateDoc, writeBatch } from 'firebase/firestore';
 import { useFirestore, useCollection } from '@/firebase';
-import { Category, GalleryImage, InventoryItem } from '@/lib/data';
+import { Category, GalleryImage, InventoryItem, GalleryCategory } from '@/lib/data';
 import { useMemo } from 'react';
 import { errorEmitter } from '@/firebase/error-emitter';
 import { FirestorePermissionError } from '@/firebase/errors';
@@ -27,6 +27,9 @@ interface InventoryContextType {
   addGalleryImage: (imageData: NewGalleryImageData) => Promise<void>;
   updateGalleryImage: (imageId: string, imageData: UpdateGalleryImageData) => Promise<void>;
   deleteGalleryImage: (imageId: string) => Promise<void>;
+  galleryCategories: GalleryCategory[] | null;
+  addGalleryCategory: (categoryName: string) => Promise<{ success: boolean, message?: string }>;
+  removeGalleryCategory: (categoryId: string) => Promise<{ success: boolean, message?: string }>;
 }
 
 const InventoryContext = createContext<InventoryContextType | undefined>(undefined);
@@ -35,6 +38,12 @@ const DEFAULT_CATEGORIES: Omit<Category, 'id'>[] = [
   { name: 'Sawn Timber' },
   { name: 'Door' },
   { name: 'Machinery' },
+];
+
+const DEFAULT_GALLERY_CATEGORIES: Omit<GalleryCategory, 'id'>[] = [
+    { name: 'Doors' },
+    { name: 'Furniture' },
+    { name: 'Custom Work' },
 ];
 
 const DEFAULT_INVENTORY: Omit<InventoryItem, 'id'>[] = [
@@ -77,16 +86,21 @@ export const InventoryProvider = ({ children }: { children: ReactNode }) => {
   
   const categoriesQuery = useMemo(() => firestore ? collection(firestore, 'categories') : null, [firestore]);
   const { data: categories, loading: categoriesLoading } = useCollection<Category>(categoriesQuery);
+  
+  const galleryCategoriesQuery = useMemo(() => firestore ? collection(firestore, 'galleryCategories') : null, [firestore]);
+  const { data: galleryCategories, loading: galleryCategoriesLoading } = useCollection<GalleryCategory>(galleryCategoriesQuery);
 
   const galleryQuery = useMemo(() => firestore ? query(collection(firestore, 'gallery'), orderBy('createdAt', 'desc')) : null, [firestore]);
-  const { data: galleryImages } = useCollection<GalleryImage>(galleryQuery);
+  const { data: galleryImages, loading: galleryImagesLoading } = useCollection<GalleryImage>(galleryQuery);
 
   useEffect(() => {
     const seedDatabase = async () => {
       if (!firestore) return;
 
-      // Check if both collections are not loading and are empty
-      if (!inventoryLoading && !categoriesLoading && inventoryItems?.length === 0 && categories?.length === 0) {
+      const isDataLoaded = !inventoryLoading && !categoriesLoading && !galleryCategoriesLoading;
+      const isDbEmpty = inventoryItems?.length === 0 && categories?.length === 0 && galleryCategories?.length === 0;
+
+      if (isDataLoaded && isDbEmpty) {
         console.log("Database is empty. Seeding with default data...");
         const batch = writeBatch(firestore);
 
@@ -95,6 +109,13 @@ export const InventoryProvider = ({ children }: { children: ReactNode }) => {
         DEFAULT_CATEGORIES.forEach(category => {
           const docRef = doc(categoriesCollection);
           batch.set(docRef, category);
+        });
+
+        // Add default gallery categories
+        const galleryCategoriesCollection = collection(firestore, 'galleryCategories');
+        DEFAULT_GALLERY_CATEGORIES.forEach(category => {
+            const docRef = doc(galleryCategoriesCollection);
+            batch.set(docRef, category);
         });
 
         // Add default inventory items
@@ -111,7 +132,7 @@ export const InventoryProvider = ({ children }: { children: ReactNode }) => {
     };
 
     seedDatabase();
-  }, [firestore, inventoryItems, categories, inventoryLoading, categoriesLoading]);
+  }, [firestore, inventoryItems, categories, galleryCategories, inventoryLoading, categoriesLoading, galleryCategoriesLoading]);
 
 
   const addProduct = async (productData: NewProductData) => {
@@ -218,6 +239,46 @@ export const InventoryProvider = ({ children }: { children: ReactNode }) => {
     });
     return { success: true };
   };
+  
+    const addGalleryCategory = async (categoryName: string) => {
+    if (!firestore) return { success: false, message: 'Database not connected.' };
+
+    if (galleryCategories?.some(cat => cat.name.toLowerCase() === categoryName.toLowerCase())) {
+      return { success: false, message: 'Gallery category already exists.' };
+    }
+    const galleryCategoriesCollection = collection(firestore, 'galleryCategories');
+    const categoryData = { name: categoryName };
+    await addDoc(galleryCategoriesCollection, categoryData).catch(async (serverError) => {
+        const permissionError = new FirestorePermissionError({
+            path: galleryCategoriesCollection.path,
+            operation: 'create',
+            requestResourceData: categoryData,
+        });
+        errorEmitter.emit('permission-error', permissionError);
+    });
+    return { success: true };
+  };
+
+  const removeGalleryCategory = async (categoryId: string) => {
+    if (!firestore || !galleryCategories || !galleryImages) return { success: false, message: 'Database not connected or data not loaded.' };
+    
+    const categoryToRemove = galleryCategories.find(c => c.id === categoryId);
+    const isCategoryInUse = galleryImages.some(item => item.category === categoryToRemove?.name);
+
+    if (isCategoryInUse) {
+      return { success: false, message: `Category is in use by gallery images and cannot be removed.` };
+    }
+    const categoryDoc = doc(firestore, 'galleryCategories', categoryId);
+    await deleteDoc(categoryDoc).catch(async (serverError) => {
+        const permissionError = new FirestorePermissionError({
+            path: categoryDoc.path,
+            operation: 'delete',
+        });
+        errorEmitter.emit('permission-error', permissionError);
+    });
+    return { success: true };
+  };
+
 
   const addGalleryImage = async (imageData: NewGalleryImageData) => {
     if (!firestore) return;
@@ -276,6 +337,9 @@ export const InventoryProvider = ({ children }: { children: ReactNode }) => {
         addGalleryImage,
         updateGalleryImage,
         deleteGalleryImage,
+        galleryCategories,
+        addGalleryCategory,
+        removeGalleryCategory,
     }}>
       {children}
     </InventoryContext.Provider>

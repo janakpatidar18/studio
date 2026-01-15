@@ -76,6 +76,20 @@
         "createdAt",
         "category"
       ]
+    },
+    "galleryCategory": {
+      "title": "Gallery Category",
+      "description": "Represents a category for gallery images.",
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "The name of the category."
+        }
+      },
+      "required": [
+        "name"
+      ]
     }
   },
   "auth": {
@@ -101,6 +115,12 @@
         "$ref": "#/entities/galleryImage"
       },
       "description": "Stores gallery images."
+    },
+    "/galleryCategories/{galleryCategoryId}": {
+      "schema": {
+        "$ref": "#/entities/galleryCategory"
+      },
+      "description": "Stores gallery image categories."
     }
   }
 }
