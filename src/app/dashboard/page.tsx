@@ -76,7 +76,7 @@ function RecordSaleDialog({ children }: { children: React.ReactNode }) {
             <DialogContent>
                 <DialogHeader>
                     <DialogTitle className="flex items-center gap-3 text-2xl">
-                        <Receipt className="text-destructive w-7 h-7" />
+                        <Receipt className="w-7 h-7" />
                         Record Sale / Use Stock
                     </DialogTitle>
                 </DialogHeader>
@@ -219,7 +219,6 @@ export default function InventoryPage() {
         <Button
             className="fixed bottom-24 right-4 h-16 w-16 rounded-full shadow-lg z-20 md:bottom-6 md:right-6"
             size="icon"
-            variant="destructive"
         >
             <Receipt className="h-8 w-8" />
             <span className="sr-only">Record Sale</span>
@@ -228,3 +227,5 @@ export default function InventoryPage() {
     </>
   );
 }
+
+    
