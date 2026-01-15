@@ -22,6 +22,91 @@ import {
 } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Button } from "@/components/ui/button";
+import { MinusCircle } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { useToast } from "@/hooks/use-toast";
+
+
+function RecordSaleDialog({ children }: { children: React.ReactNode }) {
+    const { inventoryItems, updateStock } = useInventory();
+    const { toast } = useToast();
+    const [open, setOpen] = useState(false);
+
+    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        const formData = new FormData(e.currentTarget);
+        const itemId = formData.get('item') as string;
+        const quantity = Number(formData.get('quantity'));
+        const itemName = inventoryItems?.find(i => i.id === itemId)?.name;
+
+        if (!itemId || !quantity) {
+            toast({
+                title: "Invalid Input",
+                description: "Please select an item and enter a quantity.",
+                variant: "destructive",
+            });
+            return;
+        }
+
+        const result = await updateStock(itemId, quantity, 'sell');
+
+        if (result.success) {
+            toast({
+                title: `Sale Recorded`,
+                description: `${quantity} units of ${itemName} have been sold.`,
+            });
+            (e.target as HTMLFormElement).reset();
+            setOpen(false);
+        } else {
+            toast({
+                title: `Error Recording Sale`,
+                description: result.message,
+                variant: "destructive",
+            });
+        }
+    };
+    
+    return (
+        <Dialog open={open} onOpenChange={setOpen}>
+            <DialogTrigger asChild>
+                {children}
+            </DialogTrigger>
+            <DialogContent>
+                <DialogHeader>
+                    <DialogTitle className="flex items-center gap-3 text-2xl">
+                        <MinusCircle className="text-destructive w-7 h-7" />
+                        Record Sale / Use Stock
+                    </DialogTitle>
+                </DialogHeader>
+                 <form onSubmit={handleSubmit} className="space-y-6">
+                    <div className="space-y-3">
+                        <Label htmlFor="sell-item">Item</Label>
+                        <Select name="item" required>
+                        <SelectTrigger id="sell-item">
+                            <SelectValue placeholder="Select an item" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            {inventoryItems?.map((item) => (
+                            <SelectItem key={item.id} value={item.id}>
+                                {item.name}
+                            </SelectItem>
+                            ))}
+                        </SelectContent>
+                        </Select>
+                    </div>
+                    <div className="space-y-3">
+                        <Label htmlFor="sell-quantity">Quantity</Label>
+                        <Input id="sell-quantity" name="quantity" type="number" placeholder="0" min="1" required />
+                    </div>
+                    <Button type="submit" variant="destructive" className="w-full">Record Sale/Usage</Button>
+                </form>
+            </DialogContent>
+        </Dialog>
+    );
+}
+
 
 export default function InventoryPage() {
   const { inventoryItems, categories } = useInventory();
@@ -35,6 +120,7 @@ export default function InventoryPage() {
   const isLoading = !inventoryItems;
 
   return (
+    <>
     <div className="space-y-8">
       <header className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
@@ -128,5 +214,17 @@ export default function InventoryPage() {
         ))}
       </div>
     </div>
+
+    <RecordSaleDialog>
+        <Button
+            className="fixed bottom-24 right-4 h-16 w-16 rounded-full shadow-lg z-20 md:bottom-6 md:right-6"
+            size="icon"
+            variant="destructive"
+        >
+            <MinusCircle className="h-8 w-8" />
+            <span className="sr-only">Record Sale</span>
+        </Button>
+    </RecordSaleDialog>
+    </>
   );
 }

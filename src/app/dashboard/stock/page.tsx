@@ -20,7 +20,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
-import { FolderPlus, MinusCircle, PackagePlus, PlusCircle, Trash2, XCircle } from "lucide-react";
+import { FolderPlus, PackagePlus, PlusCircle, Trash2, XCircle } from "lucide-react";
 import { useState } from "react";
 import {
   AlertDialog,
@@ -50,7 +50,7 @@ export default function StockManagementPage() {
   const [newCategory, setNewCategory] = useState('');
   const [imagePreview, setImagePreview] = useState<string | null>(null);
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>, type: 'add' | 'sell') => {
+  const handleAddStock = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
     const itemId = formData.get('item') as string;
@@ -66,17 +66,17 @@ export default function StockManagementPage() {
         return;
     }
 
-    const result = await updateStock(itemId, quantity, type);
+    const result = await updateStock(itemId, quantity, 'add');
 
     if (result.success) {
         toast({
-            title: `Stock ${type === 'add' ? 'Added' : 'Updated'}`,
+            title: `Stock Added`,
             description: `${quantity} units of ${itemName} have been processed.`,
         });
         (e.target as HTMLFormElement).reset();
     } else {
         toast({
-            title: `Error ${type === 'add' ? 'Updating' : 'Selling'} Stock`,
+            title: `Error Adding Stock`,
             description: result.message,
             variant: "destructive",
         });
@@ -224,7 +224,7 @@ export default function StockManagementPage() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <form onSubmit={(e) => handleSubmit(e, 'add')} className="space-y-6">
+            <form onSubmit={handleAddStock} className="space-y-6">
               <div className="space-y-3">
                 <Label htmlFor="add-item">Item</Label>
                 <Select name="item" required>
@@ -245,42 +245,6 @@ export default function StockManagementPage() {
                 <Input id="add-quantity" name="quantity" type="number" placeholder="0" min="1" required />
               </div>
               <Button type="submit" className="w-full bg-accent hover:bg-accent/90 text-accent-foreground">Add Stock</Button>
-            </form>
-          </CardContent>
-        </Card>
-        
-        <Card className="shadow-lg">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-3 text-2xl">
-              <MinusCircle className="text-destructive w-7 h-7" />
-              Sell / Use Stock
-            </CardTitle>
-            <CardDescription>
-              Record items sold or used from inventory.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <form onSubmit={(e) => handleSubmit(e, 'sell')} className="space-y-6">
-              <div className="space-y-3">
-                <Label htmlFor="sell-item">Item</Label>
-                <Select name="item" required>
-                  <SelectTrigger id="sell-item">
-                    <SelectValue placeholder="Select an item" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {inventoryItems?.map((item) => (
-                      <SelectItem key={item.id} value={item.id}>
-                        {item.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="space-y-3">
-                <Label htmlFor="sell-quantity">Quantity</Label>
-                <Input id="sell-quantity" name="quantity" type="number" placeholder="0" min="1" required />
-              </div>
-              <Button type="submit" variant="destructive" className="w-full">Record Sale/Usage</Button>
             </form>
           </CardContent>
         </Card>
