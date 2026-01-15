@@ -406,6 +406,9 @@ export default function GalleryPage() {
         {selectedImage && (
             <Dialog open={!!selectedImage} onOpenChange={(open) => !open && setSelectedImage(null)}>
                 <DialogContent className="max-w-3xl p-2">
+                   <DialogHeader>
+                        <DialogTitle className="sr-only">Enlarged Image</DialogTitle>
+                    </DialogHeader>
                    <Image 
                         src={selectedImage}
                         alt="Enlarged gallery image"
@@ -429,11 +432,3 @@ export default function GalleryPage() {
         </>
     );
 }
-
-    
-
-    
-
-    
-
-    
