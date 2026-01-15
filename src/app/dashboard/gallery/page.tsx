@@ -325,7 +325,7 @@ export default function GalleryPage() {
                 </Select>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 sm:gap-8">
+            <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
                 {isLoading && Array.from({length: 8}).map((_, i) => (
                     <Card key={i} className="overflow-hidden group shadow-lg">
                         <CardContent className="p-0">
@@ -342,7 +342,7 @@ export default function GalleryPage() {
                                     alt={image.title}
                                     fill
                                     className="object-cover transition-transform duration-300 group-hover:scale-105 cursor-pointer"
-                                    sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
+                                    sizes="(max-width: 640px) 50vw, (max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
                                     data-ai-hint="product wood"
                                 />
                             </div>
@@ -379,10 +379,10 @@ export default function GalleryPage() {
                             )}
                         </CardHeader>
                         <CardContent className="p-4 flex-grow" onClick={() => !isEditMode && setSelectedImage(image.image)}>
-                             <CardTitle className="text-lg sm:text-xl leading-tight font-semibold cursor-pointer">{image.title}</CardTitle>
+                             <CardTitle className="text-base sm:text-lg leading-tight font-semibold cursor-pointer">{image.title}</CardTitle>
                               <Badge
                                 variant="outline"
-                                className="mt-2"
+                                className="mt-2 text-xs"
                               >
                                 {image.category}
                               </Badge>
@@ -418,5 +418,7 @@ export default function GalleryPage() {
         </>
     );
 }
+
+    
 
     

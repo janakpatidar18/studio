@@ -146,25 +146,25 @@ export default function InventoryPage() {
             </Select>
         </div>
       </header>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 sm:gap-8">
+      <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
         {isLoading && Array.from({ length: 8 }).map((_, i) => (
           <Card key={i} className="overflow-hidden group shadow-lg flex flex-col">
               <CardHeader className="p-0">
                   <Skeleton className="aspect-square w-full" />
               </CardHeader>
-              <CardContent className="p-6 flex-grow">
-                  <Skeleton className="h-8 w-3/4 mb-4" />
-                  <Skeleton className="h-6 w-1/2" />
+              <CardContent className="p-4 flex-grow">
+                  <Skeleton className="h-6 w-3/4 mb-2" />
+                  <Skeleton className="h-5 w-1/2" />
               </CardContent>
               <CardFooter className="p-0 border-t mt-auto">
                   <div className="flex w-full text-center">
-                      <div className="p-4 w-1/2">
-                          <Skeleton className="h-5 w-12 mx-auto mb-1" />
-                          <Skeleton className="h-6 w-20 mx-auto" />
+                      <div className="p-3 w-1/2">
+                          <Skeleton className="h-4 w-10 mx-auto mb-1" />
+                          <Skeleton className="h-5 w-16 mx-auto" />
                       </div>
-                      <div className="p-4 w-1/2 border-l">
-                          <Skeleton className="h-5 w-12 mx-auto mb-1" />
-                          <Skeleton className="h-6 w-10 mx-auto" />
+                      <div className="p-3 w-1/2 border-l">
+                          <Skeleton className="h-4 w-10 mx-auto mb-1" />
+                          <Skeleton className="h-5 w-8 mx-auto" />
                       </div>
                   </div>
               </CardFooter>
@@ -182,30 +182,30 @@ export default function InventoryPage() {
                   alt={item.name}
                   fill
                   className="object-cover transition-transform duration-300 group-hover:scale-105"
-                  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, (max-width: 1280px) 33vw, 25vw"
+                  sizes="(max-width: 640px) 50vw, (max-width: 1024px) 50vw, (max-width: 1280px) 33vw, 25vw"
                   data-ai-hint="product photo"
                 />
               </div>
             </CardHeader>
-            <CardContent className="p-4 sm:p-6 flex-grow">
-              <CardTitle className="text-xl sm:text-2xl leading-tight">
+            <CardContent className="p-4 flex-grow">
+              <CardTitle className="text-base sm:text-lg leading-tight">
                 {item.name}
               </CardTitle>
               <Badge
                 variant={item.type === "Machinery" ? "secondary" : "outline"}
-                className="mt-3"
+                className="mt-2 text-xs"
               >
                 {item.type}
               </Badge>
             </CardContent>
-            <CardFooter className="p-0 border-t mt-auto text-base sm:text-lg">
+            <CardFooter className="p-0 border-t mt-auto text-sm sm:text-base">
               <div className="flex w-full text-center">
-                <div className="p-3 sm:p-4 w-1/2">
-                  <p className="text-xs sm:text-sm text-muted-foreground">Price</p>
+                <div className="p-3 w-1/2">
+                  <p className="text-xs text-muted-foreground">Price</p>
                   <p className="font-semibold">₹{item.sellingPrice.toFixed(2)}</p>
                 </div>
-                <div className="p-3 sm:p-4 w-1/2 border-l">
-                  <p className="text-xs sm:text-sm text-muted-foreground">Stock</p>
+                <div className="p-3 w-1/2 border-l">
+                  <p className="text-xs text-muted-foreground">Stock</p>
                   <p className="font-semibold">{item.quantity}</p>
                 </div>
               </div>
@@ -227,5 +227,7 @@ export default function InventoryPage() {
     </>
   );
 }
+
+    
 
     
