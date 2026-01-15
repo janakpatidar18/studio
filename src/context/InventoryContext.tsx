@@ -2,14 +2,15 @@
 "use client";
 
 import React, { createContext, useContext, ReactNode, useEffect } from 'react';
-import { addDoc, collection, deleteDoc, doc, updateDoc, writeBatch } from 'firebase/firestore';
+import { addDoc, collection, deleteDoc, doc, query, orderBy, serverTimestamp, updateDoc, writeBatch } from 'firebase/firestore';
 import { useFirestore, useCollection } from '@/firebase';
-import { Category, InventoryItem } from '@/lib/data';
+import { Category, GalleryImage, InventoryItem } from '@/lib/data';
 import { useMemo } from 'react';
 import { errorEmitter } from '@/firebase/error-emitter';
 import { FirestorePermissionError } from '@/firebase/errors';
 
 type NewProductData = Omit<InventoryItem, 'id'>;
+type NewGalleryImageData = Omit<GalleryImage, 'id' | 'createdAt'>
 
 interface InventoryContextType {
   inventoryItems: InventoryItem[] | null;
@@ -19,6 +20,8 @@ interface InventoryContextType {
   categories: Category[] | null;
   addCategory: (categoryName: string) => Promise<{ success: boolean, message?: string }>;
   removeCategory: (categoryId: string) => Promise<{ success: boolean, message?: string }>;
+  galleryImages: GalleryImage[] | null;
+  addGalleryImage: (imageData: NewGalleryImageData) => Promise<void>;
 }
 
 const InventoryContext = createContext<InventoryContextType | undefined>(undefined);
@@ -65,10 +68,13 @@ export const InventoryProvider = ({ children }: { children: ReactNode }) => {
   const firestore = useFirestore();
 
   const inventoryQuery = useMemo(() => firestore ? collection(firestore, 'inventory') : null, [firestore]);
-  const { data: inventoryItems, loading: inventoryLoading, error: inventoryError } = useCollection<InventoryItem>(inventoryQuery);
+  const { data: inventoryItems, loading: inventoryLoading } = useCollection<InventoryItem>(inventoryQuery);
   
   const categoriesQuery = useMemo(() => firestore ? collection(firestore, 'categories') : null, [firestore]);
-  const { data: categories, loading: categoriesLoading, error: categoriesError } = useCollection<Category>(categoriesQuery);
+  const { data: categories, loading: categoriesLoading } = useCollection<Category>(categoriesQuery);
+
+  const galleryQuery = useMemo(() => firestore ? query(collection(firestore, 'gallery'), orderBy('createdAt', 'desc')) : null, [firestore]);
+  const { data: galleryImages } = useCollection<GalleryImage>(galleryQuery);
 
   useEffect(() => {
     const seedDatabase = async () => {
@@ -93,12 +99,9 @@ export const InventoryProvider = ({ children }: { children: ReactNode }) => {
           batch.set(docRef, item);
         });
 
-        try {
-          await batch.commit();
-          console.log("Database seeded successfully.");
-        } catch (e) {
-          console.error("Error seeding database: ", e);
-        }
+        await batch.commit().catch(e => {
+            console.error("Error seeding database: ", e);
+        });
       }
     };
 
@@ -198,6 +201,23 @@ export const InventoryProvider = ({ children }: { children: ReactNode }) => {
     return { success: true };
   };
 
+  const addGalleryImage = async (imageData: NewGalleryImageData) => {
+    if (!firestore) return;
+    const galleryCollection = collection(firestore, 'gallery');
+    const newImageData = {
+        ...imageData,
+        createdAt: serverTimestamp()
+    }
+    await addDoc(galleryCollection, newImageData).catch(async (serverError) => {
+        const permissionError = new FirestorePermissionError({
+            path: galleryCollection.path,
+            operation: 'create',
+            requestResourceData: newImageData,
+        });
+        errorEmitter.emit('permission-error', permissionError);
+    });
+  };
+
   return (
     <InventoryContext.Provider value={{ 
         inventoryItems, 
@@ -206,7 +226,9 @@ export const InventoryProvider = ({ children }: { children: ReactNode }) => {
         updateStock, 
         categories, 
         addCategory, 
-        removeCategory 
+        removeCategory,
+        galleryImages,
+        addGalleryImage
     }}>
       {children}
     </InventoryContext.Provider>
@@ -220,5 +242,3 @@ export const useInventory = () => {
   }
   return context;
 };
-
-    

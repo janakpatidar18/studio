@@ -46,6 +46,34 @@
       "required": [
         "name"
       ]
+    },
+    "galleryImage": {
+      "title": "Gallery Image",
+      "description": "Represents an image in the gallery.",
+      "type": "object",
+      "properties": {
+        "title": {
+          "type": "string",
+          "description": "The title of the image."
+        },
+        "description": {
+          "type": "string",
+          "description": "A description for the image."
+        },
+        "image": {
+          "type": "string",
+          "description": "A data URI of the gallery image."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "title",
+        "image",
+        "createdAt"
+      ]
     }
   },
   "auth": {
@@ -65,6 +93,12 @@
         "$ref": "#/entities/category"
       },
       "description": "Stores inventory item categories."
+    },
+    "/gallery/{imageId}": {
+      "schema": {
+        "$ref": "#/entities/galleryImage"
+      },
+      "description": "Stores gallery images."
     }
   }
 }
