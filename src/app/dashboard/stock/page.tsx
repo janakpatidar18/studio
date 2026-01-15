@@ -1,4 +1,5 @@
 
+
 "use client";
 
 import { Button } from "@/components/ui/button";
@@ -75,7 +76,7 @@ export default function StockManagementPage() {
         (e.target as HTMLFormElement).reset();
     } else {
         toast({
-            title: `Error ${type === 'add' ? 'Adding' : 'Updating'} Stock`,
+            title: `Error ${type === 'add' ? 'Updating' : 'Selling'} Stock`,
             description: result.message,
             variant: "destructive",
         });
@@ -205,20 +206,21 @@ export default function StockManagementPage() {
   return (
     <div className="space-y-8">
       <header>
-        <h1 className="text-4xl font-bold font-headline">Stock Management</h1>
-        <p className="text-lg text-muted-foreground">
-          Record stock inputs and outputs, add new products and manage categories.
+        <h1 className="text-3xl sm:text-4xl font-bold font-headline">Stock Management</h1>
+        <p className="text-md sm:text-lg text-muted-foreground">
+          Record stock inputs/outputs, add products, and manage categories.
         </p>
       </header>
-      <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+      <div className="grid gap-8 md:grid-cols-2">
+        
         <Card className="shadow-lg">
           <CardHeader>
             <CardTitle className="flex items-center gap-3 text-2xl">
               <PlusCircle className="text-accent w-7 h-7" />
               Add Stock
             </CardTitle>
-            <CardDescription className="text-base">
-              Record new items or additional quantities coming into the inventory.
+            <CardDescription>
+              Record new items or additional quantities.
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -246,14 +248,15 @@ export default function StockManagementPage() {
             </form>
           </CardContent>
         </Card>
+        
         <Card className="shadow-lg">
           <CardHeader>
             <CardTitle className="flex items-center gap-3 text-2xl">
               <MinusCircle className="text-destructive w-7 h-7" />
               Sell / Use Stock
             </CardTitle>
-            <CardDescription className="text-base">
-              Record items sold or used from the inventory.
+            <CardDescription>
+              Record items sold or used from inventory.
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -281,60 +284,65 @@ export default function StockManagementPage() {
             </form>
           </CardContent>
         </Card>
-        <Card className="md:col-span-2 lg:col-span-1 shadow-lg">
+        
+        <Card className="md:col-span-2 shadow-lg">
           <CardHeader>
             <CardTitle className="flex items-center gap-3 text-2xl">
               <PackagePlus className="text-primary w-7 h-7" />
               Add New Product
             </CardTitle>
-            <CardDescription className="text-base">
+            <CardDescription>
               Add a completely new product to the inventory.
             </CardDescription>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleAddProduct} className="space-y-6">
-               <div className="space-y-3">
-                <Label htmlFor="product-image">Product Image</Label>
-                <Input id="product-image" name="product-image" type="file" accept="image/*" onChange={handleImageChange} required className="h-auto p-0 file:h-12 file:px-4 file:border-0"/>
-                {imagePreview && <img src={imagePreview} alt="Image preview" className="mt-4 w-full h-auto rounded-md" />}
-              </div>
-              <div className="space-y-3">
-                <Label htmlFor="product-name">Product Name</Label>
-                <Input id="product-name" name="product-name" type="text" placeholder="e.g., Cherry Wood" required />
-              </div>
-              <div className="space-y-3">
-                <Label htmlFor="product-type">Product Type</Label>
-                <Select name="product-type" required>
-                  <SelectTrigger id="product-type">
-                    <SelectValue placeholder="Select a type" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {categories?.map((cat) => (
-                       <SelectItem key={cat.id} value={cat.name}>{cat.name}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="space-y-3">
-                <Label htmlFor="selling-price">Selling Price (₹)</Label>
-                <Input id="selling-price" name="selling-price" type="number" placeholder="0.00" min="0" step="0.01" required />
-              </div>
-              <div className="space-y-3">
-                <Label htmlFor="opening-stock">Opening Stock</Label>
-                <Input id="opening-stock" name="opening-stock" type="number" placeholder="0" min="0" required />
+              <div className="grid md:grid-cols-2 gap-6">
+                  <div>
+                    <Label htmlFor="product-image">Product Image</Label>
+                    <Input id="product-image" name="product-image" type="file" accept="image/*" onChange={handleImageChange} required className="mt-3 h-auto p-0 file:h-12 file:px-4 file:border-0"/>
+                    {imagePreview && <img src={imagePreview} alt="Image preview" className="mt-4 w-full h-auto rounded-md object-contain max-h-48" />}
+                  </div>
+                  <div className="space-y-6">
+                      <div className="space-y-3">
+                        <Label htmlFor="product-name">Product Name</Label>
+                        <Input id="product-name" name="product-name" type="text" placeholder="e.g., Cherry Wood" required />
+                      </div>
+                      <div className="space-y-3">
+                        <Label htmlFor="product-type">Product Type</Label>
+                        <Select name="product-type" required>
+                          <SelectTrigger id="product-type">
+                            <SelectValue placeholder="Select a type" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {categories?.map((cat) => (
+                               <SelectItem key={cat.id} value={cat.name}>{cat.name}</SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                  </div>
+                  <div className="space-y-3">
+                    <Label htmlFor="selling-price">Selling Price (₹)</Label>
+                    <Input id="selling-price" name="selling-price" type="number" placeholder="0.00" min="0" step="0.01" required />
+                  </div>
+                  <div className="space-y-3">
+                    <Label htmlFor="opening-stock">Opening Stock</Label>
+                    <Input id="opening-stock" name="opening-stock" type="number" placeholder="0" min="0" required />
+                  </div>
               </div>
               <Button type="submit" className="w-full">Add Product</Button>
             </form>
           </CardContent>
         </Card>
         
-        <Card className="md:col-span-1 shadow-lg">
+        <Card className="shadow-lg">
           <CardHeader>
             <CardTitle className="flex items-center gap-3 text-2xl">
               <FolderPlus className="text-primary w-7 h-7" />
               Manage Categories
             </CardTitle>
-            <CardDescription className="text-base">
+            <CardDescription>
               Add or remove product categories.
             </CardDescription>
           </CardHeader>
@@ -353,10 +361,10 @@ export default function StockManagementPage() {
               </div>
               <div className="space-y-3">
                   <Label>Existing Categories</Label>
-                  <div className="space-y-3">
+                  <div className="space-y-3 max-h-48 overflow-y-auto pr-2">
                     {categories?.map(cat => (
                         <div key={cat.id} className="flex items-center justify-between p-3 rounded-md bg-muted">
-                            <span className="font-medium text-base">{cat.name}</span>
+                            <span className="font-medium">{cat.name}</span>
                             <Button size="icon" variant="ghost" className="h-8 w-8" onClick={() => handleRemoveCategory(cat.id)}>
                                 <XCircle className="h-5 w-5 text-destructive" />
                             </Button>
@@ -367,23 +375,23 @@ export default function StockManagementPage() {
           </CardContent>
         </Card>
         
-        <Card className="md:col-span-2 shadow-lg">
+        <Card className="shadow-lg">
           <CardHeader>
             <CardTitle className="flex items-center gap-3 text-2xl">
               <Trash2 className="text-destructive w-7 h-7"/>
               Manage Products
             </CardTitle>
-            <CardDescription className="text-base">
+            <CardDescription>
               Delete products from the inventory.
             </CardDescription>
           </CardHeader>
           <CardContent>
-              <ul className="space-y-3">
+              <ul className="space-y-3 max-h-96 overflow-y-auto pr-2">
                 {inventoryItems?.map(item => (
-                  <li key={item.id} className="flex items-center justify-between p-4 rounded-md bg-muted">
+                  <li key={item.id} className="flex items-center justify-between p-3 rounded-md bg-muted">
                     <div>
-                      <p className="font-medium text-base">{item.name}</p>
-                      <p className="text-base text-muted-foreground">{item.type} - {item.quantity} in stock</p>
+                      <p className="font-medium">{item.name}</p>
+                      <p className="text-sm text-muted-foreground">{item.type} - {item.quantity} in stock</p>
                     </div>
                     <AlertDialog>
                       <AlertDialogTrigger asChild>

@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState } from "react";
@@ -35,19 +36,19 @@ export default function InventoryPage() {
 
   return (
     <div className="space-y-8">
-      <header className="flex flex-wrap items-center justify-between gap-6">
+      <header className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-4xl font-bold font-headline">
+          <h1 className="text-3xl sm:text-4xl font-bold font-headline">
             Inventory Overview
           </h1>
-          <p className="text-lg text-muted-foreground">
+          <p className="text-md sm:text-lg text-muted-foreground">
             Current status of your stock and machinery.
           </p>
         </div>
-        <div className="flex items-center gap-4">
-            <Label htmlFor="category-filter" className="text-base font-medium">Filter by Category:</Label>
+        <div className="flex items-center gap-2 w-full sm:w-auto">
+            <Label htmlFor="category-filter" className="text-base font-medium whitespace-nowrap">Filter by:</Label>
             <Select value={selectedCategory} onValueChange={setSelectedCategory} disabled={isLoading}>
-                <SelectTrigger id="category-filter" className="w-[240px]">
+                <SelectTrigger id="category-filter" className="w-full sm:w-[240px]">
                     <SelectValue placeholder="Select a category" />
                 </SelectTrigger>
                 <SelectContent>
@@ -59,7 +60,7 @@ export default function InventoryPage() {
             </Select>
         </div>
       </header>
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 sm:gap-8">
         {isLoading && Array.from({ length: 8 }).map((_, i) => (
           <Card key={i} className="overflow-hidden group shadow-lg flex flex-col">
               <CardHeader className="p-0">
@@ -95,13 +96,13 @@ export default function InventoryPage() {
                   alt={item.name}
                   fill
                   className="object-cover transition-transform duration-300 group-hover:scale-105"
-                  sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, (max-width: 1024px) 33vw, (max-width: 1280px) 25vw, 20vw"
+                  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, (max-width: 1280px) 33vw, 25vw"
                   data-ai-hint="product photo"
                 />
               </div>
             </CardHeader>
-            <CardContent className="p-6 flex-grow">
-              <CardTitle className="text-2xl leading-tight">
+            <CardContent className="p-4 sm:p-6 flex-grow">
+              <CardTitle className="text-xl sm:text-2xl leading-tight">
                 {item.name}
               </CardTitle>
               <Badge
@@ -111,14 +112,14 @@ export default function InventoryPage() {
                 {item.type}
               </Badge>
             </CardContent>
-            <CardFooter className="p-0 border-t mt-auto text-lg">
+            <CardFooter className="p-0 border-t mt-auto text-base sm:text-lg">
               <div className="flex w-full text-center">
-                <div className="p-4 w-1/2">
-                  <p className="text-sm text-muted-foreground">Price</p>
+                <div className="p-3 sm:p-4 w-1/2">
+                  <p className="text-xs sm:text-sm text-muted-foreground">Price</p>
                   <p className="font-semibold">₹{item.sellingPrice.toFixed(2)}</p>
                 </div>
-                <div className="p-4 w-1/2 border-l">
-                  <p className="text-sm text-muted-foreground">Stock</p>
+                <div className="p-3 sm:p-4 w-1/2 border-l">
+                  <p className="text-xs sm:text-sm text-muted-foreground">Stock</p>
                   <p className="font-semibold">{item.quantity}</p>
                 </div>
               </div>

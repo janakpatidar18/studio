@@ -75,7 +75,7 @@ export default function LoginPage() {
 
         <div className="flex items-center justify-center p-4">
             <Card className="w-full max-w-sm shadow-2xl bg-card/80 backdrop-blur-lg">
-                <CardHeader className="text-center p-8">
+                <CardHeader className="text-center p-6 sm:p-8">
                     <div className="flex items-center justify-center gap-2 lg:hidden mb-4">
                          <Image src="/logo.png" alt="SVLSM Logo" width={160} height={44} />
                     </div>
@@ -83,22 +83,22 @@ export default function LoginPage() {
                     <CardDescription className="text-lg text-muted-foreground">Enter your PIN to access the dashboard</CardDescription>
                 </CardHeader>
                 <form onSubmit={handleLogin}>
-                <CardContent className="space-y-8 px-8">
+                <CardContent className="space-y-6 px-6 sm:px-8">
                     <div className="space-y-3">
                         <Label htmlFor="pin" className="sr-only">PIN</Label>
                         <Input
                         id="pin"
                         type="password"
-                        placeholder="Enter PIN"
+                        placeholder="••••"
                         value={pin}
                         onChange={(e) => setPin(e.target.value)}
                         maxLength={4}
                         required
-                        className="text-center text-2xl tracking-[1rem]"
+                        className="text-center text-2xl tracking-[1rem] sm:tracking-[2rem] placeholder:tracking-normal"
                         />
                     </div>
                 </CardContent>
-                <CardFooter className="p-8 pt-0">
+                <CardFooter className="p-6 sm:p-8 pt-0">
                     <Button type="submit" className="w-full text-xl py-7" size="lg" disabled={isLoading}>
                     {isLoading ? (
                         <div className="flex items-center justify-center gap-2">
@@ -117,7 +117,7 @@ export default function LoginPage() {
                     </Button>
                 </CardFooter>
                 </form>
-                <div className="text-center text-xs text-muted-foreground pb-4">
+                <div className="text-center text-xs text-muted-foreground pb-4 px-4">
                   Design By Janak Patidar . Design Studio
                 </div>
             </Card>

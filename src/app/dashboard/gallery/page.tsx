@@ -1,4 +1,5 @@
 
+
 "use client";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
@@ -181,21 +182,21 @@ export default function GalleryPage() {
     return (
         <>
         <div className="space-y-8">
-            <header className="flex flex-wrap items-center justify-between gap-6">
+            <header className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                 <div>
-                    <h1 className="text-4xl font-bold font-headline">Product Gallery</h1>
-                    <p className="text-lg text-muted-foreground">
+                    <h1 className="text-3xl sm:text-4xl font-bold font-headline">Product Gallery</h1>
+                    <p className="text-md sm:text-lg text-muted-foreground">
                         A showcase of our finest handcrafted products.
                     </p>
                 </div>
                  <AddToGalleryDialog>
-                    <Button>
+                    <Button className="w-full sm:w-auto">
                         <PlusCircle className="mr-2 h-5 w-5" />
                         Add Image to Gallery
                     </Button>
                 </AddToGalleryDialog>
             </header>
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 sm:gap-8">
                 {isLoading && Array.from({length: 8}).map((_, i) => (
                     <Card key={i} className="overflow-hidden group shadow-lg">
                         <CardContent className="p-0">
@@ -218,7 +219,7 @@ export default function GalleryPage() {
                             </div>
                         </CardHeader>
                         <CardContent className="p-4 flex-grow">
-                             <CardTitle className="text-xl leading-tight font-semibold">{image.title}</CardTitle>
+                             <CardTitle className="text-lg sm:text-xl leading-tight font-semibold">{image.title}</CardTitle>
                              {image.description && <p className="text-sm text-muted-foreground mt-1">{image.description}</p>}
                         </CardContent>
                     </Card>
