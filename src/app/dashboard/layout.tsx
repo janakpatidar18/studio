@@ -15,7 +15,7 @@ import {
   SidebarInset,
   SidebarTrigger
 } from "@/components/ui/sidebar";
-import { Home, Package, ImageIcon, LogOut, PanelLeft } from "lucide-react";
+import { Home, Package, ImageIcon, LogOut } from "lucide-react";
 import Image from "next/image";
 import { PlaceHolderImages } from "@/lib/placeholder-images";
 import { InventoryProvider } from "@/context/InventoryContext";
@@ -130,12 +130,12 @@ export default function DashboardLayout({
           <div className="absolute inset-0 bg-background/90 -z-10" />
 
           <header className="sticky top-0 z-10 flex h-16 items-center gap-4 border-b bg-background/80 px-4 backdrop-blur-sm md:hidden">
-            <SidebarTrigger className="h-8 w-8">
-              <PanelLeft className="h-5 w-5" />
+            <SidebarTrigger className="h-auto w-auto p-0">
+              <Image src="/logo.png" alt="SVLSM Logo" width={128} height={35} />
               <span className="sr-only">Toggle Menu</span>
             </SidebarTrigger>
             <div className="flex-1">
-              <Image src="/logo.png" alt="SVLSM Logo" width={64} height={18} />
+              
             </div>
           </header>
 
