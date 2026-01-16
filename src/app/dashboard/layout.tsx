@@ -15,7 +15,7 @@ import {
   SidebarInset,
   SidebarTrigger
 } from "@/components/ui/sidebar";
-import { Home, Package, ImageIcon, LogOut } from "lucide-react";
+import { Home, Package, ImageIcon, LogOut, Wand2 } from "lucide-react";
 import Image from "next/image";
 import { PlaceHolderImages } from "@/lib/placeholder-images";
 import { InventoryProvider } from "@/context/InventoryContext";
@@ -45,8 +45,9 @@ export default function DashboardLayout({
 
   const navItems = [
     { href: "/dashboard", label: "Gallery", icon: ImageIcon },
-    { href: "/dashboard/gallery", label: "Inventory", icon: Home },
+    { href: "/dashboard/inventory", label: "Inventory", icon: Home },
     { href: "/dashboard/stock", label: "Stock", icon: Package },
+    { href: "/dashboard/door-reimaginer", label: "Door Reimaginer", icon: Wand2 },
   ];
 
   const mobileNavItems = navItems.filter(item => item.label !== 'Stock' && item.label !== 'Inventory');
@@ -146,7 +147,7 @@ export default function DashboardLayout({
           </main>
           
           <nav className="fixed bottom-0 left-0 right-0 z-50 p-2 border-t md:hidden bg-background/95 backdrop-blur-sm">
-            <div className="grid h-16 grid-cols-1 gap-2">
+            <div className="grid h-16 grid-cols-2 gap-2">
               {mobileNavItems.map((item) => (
                 <Link href={item.href} key={item.href} passHref>
                   <div
