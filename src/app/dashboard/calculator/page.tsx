@@ -148,32 +148,10 @@ function SawnWoodCalculator() {
     const dateStr = today.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
     const pageWidth = doc.internal.pageSize.getWidth();
 
-    const loadImage = (src: string): Promise<HTMLImageElement> => {
-      return new Promise((resolve, reject) => {
-          const img = new Image();
-          img.crossOrigin = "Anonymous";
-          img.onload = () => resolve(img);
-          img.onerror = (err) => reject(err);
-          img.src = src;
-      });
-    };
-    
-    try {
-        const img = await loadImage('/shree-icon.webp');
-        // NOTE: For this to work, place 'shree-icon.webp' in the 'public' folder.
-        // jsPDF has better support for JPEG/PNG. If WEBP fails, please convert the image.
-        doc.addImage(img, 'WEBP', (pageWidth / 2) - 10, 8, 20, 20);
-    } catch (error) {
-        doc.setTextColor(255, 0, 0);
-        doc.setFontSize(16);
-        doc.text("||श्री||", pageWidth / 2, 15, { align: 'center' });
-        doc.setTextColor(0, 0, 0);
-    }
-
     doc.setFontSize(18);
-    doc.text("Sawn Wood CFT Calculation", pageWidth / 2, 35, { align: 'center' });
+    doc.text("Sawn Wood CFT Calculation", pageWidth / 2, 20, { align: 'center' });
     doc.setFontSize(11);
-    doc.text(`Date: ${dateStr}`, pageWidth / 2, 42, { align: 'center' });
+    doc.text(`Date: ${dateStr}`, pageWidth / 2, 27, { align: 'center' });
 
     const tableColumn = ["#", "Length (ft)", "Width (in)", "Thickness (in)", "Qty", "CFT (Item)", "Total CFT"];
     const tableRows: (string | number)[][] = [];
@@ -194,7 +172,7 @@ function SawnWoodCalculator() {
     doc.autoTable({
         head: [tableColumn],
         body: tableRows,
-        startY: 50,
+        startY: 35,
         didDrawPage: function (data) {
             let str = `Page ${doc.internal.getNumberOfPages()}`;
             doc.setFontSize(10);
@@ -436,32 +414,10 @@ function RoundLogsCalculator() {
         const dateStr = today.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
         const pageWidth = doc.internal.pageSize.getWidth();
     
-        const loadImage = (src: string): Promise<HTMLImageElement> => {
-            return new Promise((resolve, reject) => {
-                const img = new Image();
-                img.crossOrigin = "Anonymous";
-                img.onload = () => resolve(img);
-                img.onerror = (err) => reject(err);
-                img.src = src;
-            });
-          };
-          
-          try {
-              const img = await loadImage('/shree-icon.webp');
-              // NOTE: For this to work, place 'shree-icon.webp' in the 'public' folder.
-              // jsPDF has better support for JPEG/PNG. If WEBP fails, please convert the image.
-              doc.addImage(img, 'WEBP', (pageWidth / 2) - 10, 8, 20, 20);
-          } catch (error) {
-              doc.setTextColor(255, 0, 0);
-              doc.setFontSize(16);
-              doc.text("||श्री||", pageWidth / 2, 15, { align: 'center' });
-              doc.setTextColor(0, 0, 0);
-          }
-
         doc.setFontSize(18);
-        doc.text("Round Logs CFT Calculation", pageWidth / 2, 35, { align: 'center' });
+        doc.text("Round Logs CFT Calculation", pageWidth / 2, 20, { align: 'center' });
         doc.setFontSize(11);
-        doc.text(`Date: ${dateStr}`, pageWidth / 2, 42, { align: 'center' });
+        doc.text(`Date: ${dateStr}`, pageWidth / 2, 27, { align: 'center' });
     
         const tableColumn = ["#", "Length (ft)", "Girth (in)", "Qty", "CFT (Item)", "Total CFT"];
         const tableRows: (string | number)[][] = [];
@@ -481,7 +437,7 @@ function RoundLogsCalculator() {
         doc.autoTable({
             head: [tableColumn],
             body: tableRows,
-            startY: 50,
+            startY: 35,
             didDrawPage: function (data) {
                 let str = `Page ${doc.internal.getNumberOfPages()}`;
                 doc.setFontSize(10);
@@ -652,4 +608,6 @@ export default function CalculatorPage() {
         </Tabs>
     )
 }
+    
+
     
