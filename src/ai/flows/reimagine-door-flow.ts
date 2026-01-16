@@ -36,7 +36,6 @@ const reimagineDoorFlow = ai.defineFlow(
   },
   async (input) => {
     const { media } = await ai.generate({
-        model: 'googleai/gemini-1.5-flash',
         prompt: [
             { media: { url: input.doorImage } },
             { media: { url: input.backgroundImage } },
