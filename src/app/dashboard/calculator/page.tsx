@@ -157,7 +157,7 @@ function SawnWoodCalculator() {
                         <TableHead className="w-12 text-center">#</TableHead>
                         <TableHead className="text-right">Length (ft)</TableHead>
                         <TableHead className="text-right">Width (in)</TableHead>
-                        <TableHead className="text-right">Thickness (in)</协商金额</TableHead>
+                        <TableHead className="text-right">Thickness (in)</TableHead>
                         <TableHead className="text-right">Qty</TableHead>
                         <TableHead className="text-right">CFT (Item)</TableHead>
                         <TableHead className="text-right">Total CFT</TableHead>
@@ -364,5 +364,7 @@ export default function CalculatorPage() {
         </Tabs>
     )
 }
+
+    
 
     
