@@ -258,7 +258,7 @@ function SawnWoodCalculator() {
                       <TableRow key={entry.id}>
                         <TableCell className="text-center font-medium">{index + 1}</TableCell>
                         <TableCell>
-                            <div className="font-medium whitespace-nowrap">{entry.length.toFixed(2)}ft × {entry.width.toFixed(2)}in × {entry.height.toFixed(2)}in</div>
+                            <div className="font-medium">{entry.length.toFixed(2)}ft × {entry.width.toFixed(2)}in × {entry.height.toFixed(2)}in</div>
                             <div className="text-xs text-muted-foreground">Item CFT: {entry.cft.toFixed(4)}</div>
                         </TableCell>
                         <TableCell className="text-right">{entry.quantity}</TableCell>
@@ -489,7 +489,7 @@ function RoundLogsCalculator() {
                               <TableRow key={entry.id}>
                                 <TableCell className="text-center font-medium">{index + 1}</TableCell>
                                 <TableCell>
-                                    <div className="font-medium whitespace-nowrap">{entry.length.toFixed(2)}ft × {entry.girth.toFixed(2)}in</div>
+                                    <div className="font-medium">{entry.length.toFixed(2)}ft × {entry.girth.toFixed(2)}in</div>
                                     <div className="text-xs text-muted-foreground">Item CFT: {entry.cft.toFixed(4)}</div>
                                 </TableCell>
                                 <TableCell className="text-right">{entry.quantity}</TableCell>
@@ -548,3 +548,5 @@ export default function CalculatorPage() {
         </Tabs>
     )
 }
+
+    
