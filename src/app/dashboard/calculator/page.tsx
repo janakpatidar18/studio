@@ -37,6 +37,25 @@ const RoundLogEntrySchema = z.object({
 
 type RoundLogEntry = z.infer<typeof RoundLogEntrySchema> & { id: number; cft: number };
 
+const handleInputKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      const form = e.currentTarget.form;
+      if (!form) return;
+
+      const inputs = Array.from(form.querySelectorAll('input'));
+      const currentIndex = inputs.indexOf(e.currentTarget);
+
+      if (currentIndex > -1 && currentIndex < inputs.length - 1) {
+        inputs[currentIndex + 1].focus();
+      } else if (currentIndex === inputs.length - 1) {
+        const submitButton = form.querySelector('button[type="submit"]');
+        if (submitButton instanceof HTMLElement) {
+            submitButton.click();
+        }
+      }
+    }
+};
 
 function SawnWoodCalculator() {
   const initialFormState = { length: "", width: "", height: "", quantity: "1" };
@@ -105,19 +124,19 @@ function SawnWoodCalculator() {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
                  <div className="space-y-1">
                     <Label htmlFor="sawn-length">Length (ft)</Label>
-                    <Input id="sawn-length" value={formValues.length} onChange={e => handleFormChange('length', e.target.value)} type="number" step="any" placeholder="e.g., 10" />
+                    <Input id="sawn-length" value={formValues.length} onChange={e => handleFormChange('length', e.target.value)} onKeyDown={handleInputKeyDown} type="number" step="any" placeholder="e.g., 10" />
                 </div>
                 <div className="space-y-1">
                     <Label htmlFor="sawn-width">Width (in)</Label>
-                    <Input id="sawn-width" value={formValues.width} onChange={e => handleFormChange('width', e.target.value)} type="number" step="any" placeholder="e.g., 6" />
+                    <Input id="sawn-width" value={formValues.width} onChange={e => handleFormChange('width', e.target.value)} onKeyDown={handleInputKeyDown} type="number" step="any" placeholder="e.g., 6" />
                 </div>
                 <div className="space-y-1">
                     <Label htmlFor="sawn-height">Thickness (in)</Label>
-                    <Input id="sawn-height" value={formValues.height} onChange={e => handleFormChange('height', e.target.value)} type="number" step="any" placeholder="e.g., 2" />
+                    <Input id="sawn-height" value={formValues.height} onChange={e => handleFormChange('height', e.target.value)} onKeyDown={handleInputKeyDown} type="number" step="any" placeholder="e.g., 2" />
                 </div>
                  <div className="space-y-1">
                     <Label htmlFor="sawn-quantity">Quantity</Label>
-                    <Input id="sawn-quantity" value={formValues.quantity} onChange={e => handleFormChange('quantity', e.target.value)} type="number" min="1" placeholder="e.g., 1" />
+                    <Input id="sawn-quantity" value={formValues.quantity} onChange={e => handleFormChange('quantity', e.target.value)} onKeyDown={handleInputKeyDown} type="number" min="1" placeholder="e.g., 1" />
                 </div>
             </div>
             {formError && <p className="text-sm text-destructive">{formError}</p>}
@@ -253,15 +272,15 @@ function RoundLogsCalculator() {
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                         <div className="space-y-1">
                             <Label htmlFor="log-length">Length (ft)</Label>
-                            <Input id="log-length" value={formValues.length} onChange={e => handleFormChange('length', e.target.value)} type="number" step="any" placeholder="e.g., 12" />
+                            <Input id="log-length" value={formValues.length} onChange={e => handleFormChange('length', e.target.value)} onKeyDown={handleInputKeyDown} type="number" step="any" placeholder="e.g., 12" />
                         </div>
                         <div className="space-y-1">
                             <Label htmlFor="log-girth">Girth (in)</Label>
-                            <Input id="log-girth" value={formValues.girth} onChange={e => handleFormChange('girth', e.target.value)} type="number" step="any" placeholder="e.g., 24" />
+                            <Input id="log-girth" value={formValues.girth} onChange={e => handleFormChange('girth', e.target.value)} onKeyDown={handleInputKeyDown} type="number" step="any" placeholder="e.g., 24" />
                         </div>
                         <div className="space-y-1">
                             <Label htmlFor="log-quantity">Quantity</Label>
-                            <Input id="log-quantity" value={formValues.quantity} onChange={e => handleFormChange('quantity', e.target.value)} type="number" min="1" placeholder="e.g., 1" />
+                            <Input id="log-quantity" value={formValues.quantity} onChange={e => handleFormChange('quantity', e.target.value)} onKeyDown={handleInputKeyDown} type="number" min="1" placeholder="e.g., 1" />
                         </div>
                     </div>
                     {formError && <p className="text-sm text-destructive">{formError}</p>}
