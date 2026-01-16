@@ -1,14 +1,14 @@
 
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { z } from "zod";
-import { PlusCircle, Trash2 } from "lucide-react";
+import { Plus, Trash2, X } from "lucide-react";
 import {
   Table,
   TableBody,
@@ -17,308 +17,257 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { Badge } from "@/components/ui/badge";
 
-const SawnWoodSchema = z.object({
+
+const SawnWoodEntrySchema = z.object({
+  commodity: z.string().min(1, "Commodity is required"),
   length: z.coerce.number().min(0.01, "Length must be positive"),
   width: z.coerce.number().min(0.01, "Width must be positive"),
   height: z.coerce.number().min(0.01, "Height must be positive"),
   quantity: z.coerce.number().int().min(1, "Quantity must be at least 1"),
 });
 
-const RoundLogSchema = z.object({
+type SawnWoodEntry = z.infer<typeof SawnWoodEntrySchema> & { id: number; cft: number };
+
+const RoundLogEntrySchema = z.object({
+  commodity: z.string().min(1, "Commodity is required"),
   length: z.coerce.number().min(0.01, "Length must be positive"),
   girth: z.coerce.number().min(0.01, "Girth must be positive"),
   quantity: z.coerce.number().int().min(1, "Quantity must be at least 1"),
 });
 
+type RoundLogEntry = z.infer<typeof RoundLogEntrySchema> & { id: number; cft: number };
+
 
 function SawnWoodCalculator() {
-  const [entries, setEntries] = useState([
-      { id: Date.now(), length: "", width: "", height: "", quantity: "1" }
-  ]);
-  const [result, setResult] = useState<number | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const initialFormState = { commodity: "", length: "", width: "", height: "", quantity: "1" };
+  const [formValues, setFormValues] = useState(initialFormState);
+  const [entries, setEntries] = useState<SawnWoodEntry[]>([]);
+  const [formError, setFormError] = useState<string | null>(null);
 
-  const handleEntryChange = (id: number, field: string, value: string) => {
-    const newEntries = entries.map(entry =>
-      entry.id === id ? { ...entry, [field]: value } : entry
-    );
-    setEntries(newEntries);
-    setResult(null);
+  const handleFormChange = (field: string, value: string) => {
+    setFormValues(prev => ({ ...prev, [field]: value }));
+    setFormError(null);
   };
+  
+  const handleAddEntry = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const parsed = SawnWoodEntrySchema.safeParse(formValues);
+    
+    if (!parsed.success) {
+      setFormError(parsed.error.errors[0].message);
+      return;
+    }
+    
+    setFormError(null);
+    const { length, width, height, quantity, commodity } = parsed.data;
+    const cft = ((length * width * height) / 144);
+    
+    setEntries(prev => [...prev, {
+        id: Date.now(),
+        commodity,
+        length,
+        width,
+        height,
+        quantity,
+        cft,
+    }]);
 
-  const addEntry = () => {
-    setEntries([...entries, { id: Date.now(), length: "", width: "", height: "", quantity: "1" }]);
+    setFormValues(initialFormState);
   };
 
   const removeEntry = (id: number) => {
-    if (entries.length > 1) {
-      setEntries(entries.filter(entry => entry.id !== id));
-    }
+    setEntries(entries.filter(entry => entry.id !== id));
   };
-
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    let totalCft = 0;
-    setError(null);
-    let hasValidRow = false;
-
-    for (let i = 0; i < entries.length; i++) {
-        const entry = entries[i];
-        if (!entry.length && !entry.width && !entry.height) {
-            continue;
-        }
-
-        const parsed = SawnWoodSchema.safeParse(entry);
-        if (!parsed.success) {
-            const firstError = parsed.error.errors[0];
-            setError(`Row ${i + 1}: ${firstError.message}`);
-            setResult(null);
-            return;
-        }
-        hasValidRow = true;
-        const { length, width, height, quantity } = parsed.data;
-        totalCft += ((length * width * height) / 144) * quantity;
-    }
-
-    if (hasValidRow) {
-        setResult(totalCft);
-    } else {
-        setResult(null);
-        setError("Please fill in at least one row.");
-    }
-  };
+  
+  const clearForm = () => {
+      setFormValues(initialFormState);
+      setFormError(null);
+  }
+  
+  const { totalCft, totalQuantity } = useMemo(() => {
+    return entries.reduce(
+      (acc, entry) => {
+        acc.totalCft += entry.cft * entry.quantity;
+        acc.totalQuantity += entry.quantity;
+        return acc;
+      },
+      { totalCft: 0, totalQuantity: 0 }
+    );
+  }, [entries]);
 
   return (
-    <Card className="flex flex-col h-[70vh]">
+    <Card>
       <CardHeader>
         <CardTitle>Sawn Wood CFT Calculator</CardTitle>
         <CardDescription>Add multiple timber sizes to calculate the total cubic feet (CFT).</CardDescription>
       </CardHeader>
-      <div className="flex flex-col flex-grow overflow-hidden">
-        <CardContent className="flex-grow overflow-y-auto p-0">
-          <form id="sawn-wood-form" onSubmit={handleSubmit}>
-            <Table>
-              <TableHeader className="sticky top-0 bg-muted/80 backdrop-blur-sm z-10">
-                <TableRow>
-                  <TableHead className="w-16 text-center">#</TableHead>
-                  <TableHead>Length (ft)</TableHead>
-                  <TableHead>Width (in)</TableHead>
-                  <TableHead>Thickness (in)</TableHead>
-                  <TableHead>Quantity</TableHead>
-                  <TableHead className="w-20 text-center">Action</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {entries.map((entry, index) => (
-                  <TableRow key={entry.id}>
-                    <TableCell className="text-center font-medium">{index + 1}</TableCell>
-                    <TableCell>
-                      <Label htmlFor={`sawn-length-${entry.id}`} className="sr-only">Length (ft)</Label>
-                      <Input id={`sawn-length-${entry.id}`} value={entry.length} onChange={e => handleEntryChange(entry.id, 'length', e.target.value)} type="number" step="any" placeholder="e.g., 10" />
-                    </TableCell>
-                    <TableCell>
-                      <Label htmlFor={`sawn-width-${entry.id}`} className="sr-only">Width (in)</Label>
-                      <Input id={`sawn-width-${entry.id}`} value={entry.width} onChange={e => handleEntryChange(entry.id, 'width', e.target.value)} type="number" step="any" placeholder="e.g., 6" />
-                    </TableCell>
-                    <TableCell>
-                      <Label htmlFor={`sawn-height-${entry.id}`} className="sr-only">Thickness (in)</Label>
-                      <Input id={`sawn-height-${entry.id}`} value={entry.height} onChange={e => handleEntryChange(entry.id, 'height', e.target.value)} type="number" step="any" placeholder="e.g., 2" />
-                    </TableCell>
-                    <TableCell>
-                       <Label htmlFor={`sawn-quantity-${entry.id}`} className="sr-only">Quantity</Label>
-                       <Input id={`sawn-quantity-${entry.id}`} value={entry.quantity} onChange={e => handleEntryChange(entry.id, 'quantity', e.target.value)} type="number" min="1" placeholder="e.g., 1" />
-                    </TableCell>
-                    <TableCell className="text-center">
-                       <Button variant="ghost" size="icon" type="button" onClick={() => removeEntry(entry.id)} disabled={entries.length <= 1} className="text-muted-foreground hover:text-destructive">
-                         <Trash2 className="h-5 w-5" />
-                         <span className="sr-only">Remove</span>
-                       </Button>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </form>
-        </CardContent>
-
-        <div className="flex-shrink-0 p-6 border-t bg-card space-y-4">
-          <Button type="button" variant="outline" onClick={addEntry} className="w-full">
-            <PlusCircle className="mr-2 h-5 w-5" />
-            Add another size
-          </Button>
-          <Button type="submit" form="sawn-wood-form" className="w-full">Calculate Total CFT</Button>
-          
-          {error && (
-              <div className="text-center text-destructive font-medium">
-                <p>{error}</p>
-              </div>
-          )}
-          {result !== null && (
-            <div className="pt-4 text-center">
-              <p className="text-lg text-muted-foreground">Total Cubic Feet (CFT)</p>
-              <p className="text-4xl font-bold font-headline">{result.toFixed(4)}</p>
+      <CardContent className="p-4 space-y-4">
+        <form onSubmit={handleAddEntry} className="p-4 border rounded-lg bg-muted/50 space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-3">
+                <div className="space-y-1 lg:col-span-2 md:col-span-3">
+                    <Label htmlFor="sawn-commodity">Commodity</Label>
+                    <Input id="sawn-commodity" value={formValues.commodity} onChange={e => handleFormChange('commodity', e.target.value)} placeholder="e.g., Teak wood" />
+                </div>
+                 <div className="space-y-1">
+                    <Label htmlFor="sawn-length">Length (ft)</Label>
+                    <Input id="sawn-length" value={formValues.length} onChange={e => handleFormChange('length', e.target.value)} type="number" step="any" placeholder="e.g., 10" />
+                </div>
+                <div className="space-y-1">
+                    <Label htmlFor="sawn-width">Width (in)</Label>
+                    <Input id="sawn-width" value={formValues.width} onChange={e => handleFormChange('width', e.target.value)} type="number" step="any" placeholder="e.g., 6" />
+                </div>
+                <div className="space-y-1">
+                    <Label htmlFor="sawn-height">Thickness (in)</Label>
+                    <Input id="sawn-height" value={formValues.height} onChange={e => handleFormChange('height', e.target.value)} type="number" step="any" placeholder="e.g., 2" />
+                </div>
+                 <div className="space-y-1 md:col-span-2 lg:col-span-1">
+                    <Label htmlFor="sawn-quantity">Quantity</Label>
+                    <Input id="sawn-quantity" value={formValues.quantity} onChange={e => handleFormChange('quantity', e.target.value)} type="number" min="1" placeholder="e.g., 1" />
+                </div>
             </div>
-          )}
+            {formError && <p className="text-sm text-destructive">{formError}</p>}
+             <div className="flex justify-end gap-2">
+                <Button type="button" variant="ghost" onClick={clearForm}>
+                    <X className="mr-2 h-4 w-4" /> Clear
+                </Button>
+                <Button type="submit">
+                    <Plus className="mr-2 h-4 w-4" /> Add Entry
+                </Button>
+            </div>
+        </form>
+
+        <div className="overflow-auto border rounded-lg">
+            <Table>
+                <TableHeader>
+                    <TableRow>
+                        <TableHead className="w-12 text-center">#</TableHead>
+                        <TableHead>Commodity</TableHead>
+                        <TableHead className="text-right">Length (ft)</TableHead>
+                        <TableHead className="text-right">Width (in)</TableHead>
+                        <TableHead className="text-right">Thickness (in)</TableHead>
+                        <TableHead className="text-right">Qty</TableHead>
+                        <TableHead className="text-right">CFT (Item)</TableHead>
+                        <TableHead className="text-right">Total CFT</TableHead>
+                        <TableHead className="w-20 text-center">Action</TableHead>
+                    </TableRow>
+                </TableHeader>
+                <TableBody>
+                    {entries.length === 0 ? (
+                        <TableRow>
+                            <TableCell colSpan={9} className="text-center h-24 text-muted-foreground">No entries added yet.</TableCell>
+                        </TableRow>
+                    ) : entries.map((entry, index) => (
+                      <TableRow key={entry.id}>
+                        <TableCell className="text-center font-medium">{index + 1}</TableCell>
+                        <TableCell>{entry.commodity}</TableCell>
+                        <TableCell className="text-right">{entry.length.toFixed(2)}</TableCell>
+                        <TableCell className="text-right">{entry.width.toFixed(2)}</TableCell>
+                        <TableCell className="text-right">{entry.height.toFixed(2)}</TableCell>
+                        <TableCell className="text-right">{entry.quantity}</TableCell>
+                        <TableCell className="text-right">{entry.cft.toFixed(4)}</TableCell>
+                        <TableCell className="text-right font-medium">{(entry.cft * entry.quantity).toFixed(4)}</TableCell>
+                        <TableCell className="text-center">
+                           <Button variant="ghost" size="icon" type="button" onClick={() => removeEntry(entry.id)} className="text-muted-foreground hover:text-destructive h-8 w-8">
+                             <Trash2 className="h-4 w-4" />
+                             <span className="sr-only">Remove</span>
+                           </Button>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                </TableBody>
+            </Table>
         </div>
-      </div>
+      </CardContent>
+      {entries.length > 0 && (
+          <CardFooter className="flex-col items-stretch p-4 border-t bg-muted/50 space-y-2">
+            <div className="flex justify-between text-lg">
+                <span className="text-muted-foreground">Total Quantity</span>
+                <span className="font-bold">{totalQuantity}</span>
+            </div>
+            <div className="flex justify-between text-2xl">
+                <span className="text-muted-foreground">Total CFT</span>
+                <span className="font-bold font-headline text-primary">{totalCft.toFixed(4)}</span>
+            </div>
+          </CardFooter>
+      )}
     </Card>
   );
 }
 
 function RoundLogsCalculator() {
-    const [entries, setEntries] = useState([
-        { id: Date.now(), length: "", girth: "", quantity: "1" }
-    ]);
-    const [result, setResult] = useState<number | null>(null);
-    const [error, setError] = useState<string | null>(null);
+    const initialFormState = { commodity: "", length: "", girth: "", quantity: "1" };
+    const [formValues, setFormValues] = useState(initialFormState);
+    const [entries, setEntries] = useState<RoundLogEntry[]>([]);
+    const [formError, setFormError] = useState<string | null>(null);
 
-    const handleEntryChange = (id: number, field: string, value: string) => {
-        const newEntries = entries.map(entry =>
-            entry.id === id ? { ...entry, [field]: value } : entry
-        );
-        setEntries(newEntries);
-        setResult(null);
+    const handleFormChange = (field: string, value: string) => {
+        setFormValues(prev => ({ ...prev, [field]: value }));
+        setFormError(null);
     };
 
-    const addEntry = () => {
-        setEntries([...entries, { id: Date.now(), length: "", girth: "", quantity: "1" }]);
+    const handleAddEntry = (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        const parsed = RoundLogEntrySchema.safeParse(formValues);
+
+        if (!parsed.success) {
+            setFormError(parsed.error.errors[0].message);
+            return;
+        }
+
+        setFormError(null);
+        const { length, girth, quantity, commodity } = parsed.data;
+        const cft = ((girth * girth * length) / 2304);
+
+        setEntries(prev => [...prev, {
+            id: Date.now(),
+            commodity,
+            length,
+            girth,
+            quantity,
+            cft,
+        }]);
+
+        setFormValues(initialFormState);
     };
 
     const removeEntry = (id: number) => {
-        if (entries.length > 1) {
-            setEntries(entries.filter(entry => entry.id !== id));
-        }
+        setEntries(entries.filter(entry => entry.id !== id));
     };
     
-    const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-        e.preventDefault();
-        let totalCft = 0;
-        setError(null);
-        let hasValidRow = false;
+    const clearForm = () => {
+        setFormValues(initialFormState);
+        setFormError(null);
+    }
 
-        for (let i = 0; i < entries.length; i++) {
-            const entry = entries[i];
-            if (!entry.length && !entry.girth) {
-                continue;
-            }
-            
-            const parsed = RoundLogSchema.safeParse(entry);
-            if (!parsed.success) {
-                setError(`Row ${i + 1}: ${parsed.error.errors[0].message}`);
-                setResult(null);
-                return;
-            }
-            
-            hasValidRow = true;
-            const { length, girth, quantity } = parsed.data;
-            totalCft += ((girth * girth * length) / 2304) * quantity;
-        }
+    const { totalCft, totalQuantity } = useMemo(() => {
+        return entries.reduce(
+          (acc, entry) => {
+            acc.totalCft += entry.cft * entry.quantity;
+            acc.totalQuantity += entry.quantity;
+            return acc;
+          },
+          { totalCft: 0, totalQuantity: 0 }
+        );
+      }, [entries]);
 
-        if (hasValidRow) {
-            setResult(totalCft);
-        } else {
-             setResult(null);
-             setError("Please fill in at least one row.");
-        }
-    };
-    
     return (
-        <Card className="flex flex-col h-[70vh]">
+        <Card>
             <CardHeader>
                 <CardTitle>Round Logs CFT Calculator</CardTitle>
-                <CardDescription>Add multiple log sizes to calculate the total cubic feet (CFT) using the Hoppus formula.</CardDescription>
+                <CardDescription>Add multiple log sizes to calculate the total CFT using the Hoppus formula.</CardDescription>
             </CardHeader>
-            <div className="flex flex-col flex-grow overflow-hidden">
-                <CardContent className="flex-grow overflow-y-auto p-0">
-                    <form id="round-logs-form" onSubmit={handleSubmit}>
-                        <Table>
-                            <TableHeader className="sticky top-0 bg-muted/80 backdrop-blur-sm z-10">
-                                <TableRow>
-                                    <TableHead className="w-16 text-center">#</TableHead>
-                                    <TableHead>Length (ft)</TableHead>
-                                    <TableHead>Girth (in)</TableHead>
-                                    <TableHead>Quantity</TableHead>
-                                    <TableHead className="w-20 text-center">Action</TableHead>
-                                </TableRow>
-                            </TableHeader>
-                            <TableBody>
-                                {entries.map((entry, index) => (
-                                    <TableRow key={entry.id}>
-                                        <TableCell className="text-center font-medium">{index + 1}</TableCell>
-                                        <TableCell>
-                                            <Label htmlFor={`log-length-${entry.id}`} className="sr-only">Length (ft)</Label>
-                                            <Input id={`log-length-${entry.id}`} value={entry.length} onChange={e => handleEntryChange(entry.id, 'length', e.target.value)} type="number" step="any" placeholder="e.g., 12" />
-                                        </TableCell>
-                                        <TableCell>
-                                            <Label htmlFor={`log-girth-${entry.id}`} className="sr-only">Girth (in)</Label>
-                                            <Input id={`log-girth-${entry.id}`} value={entry.girth} onChange={e => handleEntryChange(entry.id, 'girth', e.target.value)} type="number" step="any" placeholder="e.g., 50" />
-                                        </TableCell>
-                                        <TableCell>
-                                            <Label htmlFor={`log-quantity-${entry.id}`} className="sr-only">Quantity</Label>
-                                            <Input id={`log-quantity-${entry.id}`} value={entry.quantity} onChange={e => handleEntryChange(entry.id, 'quantity', e.target.value)} type="number" min="1" placeholder="e.g., 1" />
-                                        </TableCell>
-                                        <TableCell className="text-center">
-                                            <Button variant="ghost" size="icon" type="button" onClick={() => removeEntry(entry.id)} disabled={entries.length <= 1} className="text-muted-foreground hover:text-destructive">
-                                                <Trash2 className="h-5 w-5" />
-                                                <span className="sr-only">Remove</span>
-                                            </Button>
-                                        </TableCell>
-                                    </TableRow>
-                                ))}
-                            </TableBody>
-                        </Table>
-                    </form>
-                </CardContent>
-                <div className="flex-shrink-0 p-6 border-t bg-card space-y-4">
-                    <Button type="button" variant="outline" onClick={addEntry} className="w-full">
-                        <PlusCircle className="mr-2 h-5 w-5" />
-                        Add another size
-                    </Button>
-                    <Button type="submit" form="round-logs-form" className="w-full">Calculate Total CFT</Button>
-                    
-                    {error && (
-                        <div className="text-center text-destructive font-medium">
-                            <p>{error}</p>
+            <CardContent className="p-4 space-y-4">
+                <form onSubmit={handleAddEntry} className="p-4 border rounded-lg bg-muted/50 space-y-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
+                        <div className="space-y-1 md:col-span-2 lg:col-span-2">
+                            <Label htmlFor="log-commodity">Commodity</Label>
+                            <Input id="log-commodity" value={formValues.commodity} onChange={e => handleFormChange('commodity', e.target.value)} placeholder="e.g., Pine wood" />
                         </div>
-                    )}
-                    {result !== null && (
-                        <div className="pt-4 text-center">
-                        <p className="text-lg text-muted-foreground">Total Cubic Feet (CFT)</p>
-                        <p className="text-4xl font-bold font-headline">{result.toFixed(4)}</p>
+                        <div className="space-y-1">
+                            <Label htmlFor="log-length">Length (ft)</Label>
+                            <Input id="log-length" value={formValues.length} onChange={e => handleFormChange('length', e.target.value)} type="number" step="any" placeholder="e.g., 12" />
                         </div>
-                    )}
-                </div>
-            </div>
-        </Card>
-    );
-}
-
-
-export default function CalculatorPage() {
-  return (
-    <div className="space-y-8">
-      <header>
-        <h1 className="text-3xl sm:text-4xl font-bold font-headline">Timber Calculator</h1>
-        <p className="text-md sm:text-lg text-muted-foreground">
-          Calculate CFT for sawn wood and round logs.
-        </p>
-      </header>
-
-      <Tabs defaultValue="sawn-wood" className="w-full max-w-4xl mx-auto">
-        <TabsList className="grid w-full grid-cols-2">
-          <TabsTrigger value="sawn-wood">Sawn Wood</TabsTrigger>
-          <TabsTrigger value="round-logs">Round Logs</TabsTrigger>
-        </TabsList>
-        <TabsContent value="sawn-wood" className="mt-6">
-          <SawnWoodCalculator />
-        </TabsContent>
-        <TabsContent value="round-logs" className="mt-6">
-          <RoundLogsCalculator />
-        </TabsContent>
-      </Tabs>
-    </div>
-  );
-}
-
-    
+                        <div className="space-y-1">
+                            <Label htmlFor
