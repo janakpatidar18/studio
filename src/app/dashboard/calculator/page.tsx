@@ -174,9 +174,18 @@ function SawnWoodCalculator() {
         body: tableRows,
         startY: 35,
         didDrawPage: function (data) {
+            const pageHeight = doc.internal.pageSize.getHeight();
+            const pageWidth = doc.internal.pageSize.getWidth();
+            
+            // Page Number
             let str = `Page ${doc.internal.getNumberOfPages()}`;
             doc.setFontSize(10);
-            doc.text(str, data.settings.margin.left, doc.internal.pageSize.height - 10);
+            doc.text(str, data.settings.margin.left, pageHeight - 10);
+            
+            // Footer
+            doc.setFontSize(9);
+            doc.setTextColor(128);
+            doc.text("©2026 JanakPatidar.Design Studio", pageWidth / 2, pageHeight - 10, { align: 'center' });
         }
     });
     
@@ -439,9 +448,18 @@ function RoundLogsCalculator() {
             body: tableRows,
             startY: 35,
             didDrawPage: function (data) {
+                const pageHeight = doc.internal.pageSize.getHeight();
+                const pageWidth = doc.internal.pageSize.getWidth();
+                
+                // Page Number
                 let str = `Page ${doc.internal.getNumberOfPages()}`;
                 doc.setFontSize(10);
-                doc.text(str, data.settings.margin.left, doc.internal.pageSize.height - 10);
+                doc.text(str, data.settings.margin.left, pageHeight - 10);
+                
+                // Footer
+                doc.setFontSize(9);
+                doc.setTextColor(128);
+                doc.text("©2026 JanakPatidar.Design Studio", pageWidth / 2, pageHeight - 10, { align: 'center' });
             }
         });
     
@@ -608,6 +626,8 @@ export default function CalculatorPage() {
         </Tabs>
     )
 }
+    
+
     
 
     
