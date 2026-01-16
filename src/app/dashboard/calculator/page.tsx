@@ -233,43 +233,42 @@ function SawnWoodCalculator() {
             </div>
         </form>
 
-        <div className="overflow-auto border rounded-lg">
+        <div className="overflow-x-auto border rounded-lg">
             <Table>
                 <TableHeader>
                     <TableRow>
                         <TableHead className="w-12 text-center">#</TableHead>
-                        <TableHead className="text-right">Length (ft)</TableHead>
-                        <TableHead className="text-right">Width (in)</TableHead>
-                        <TableHead className="text-right">Thickness (in)</TableHead>
+                        <TableHead>Dimensions</TableHead>
                         <TableHead className="text-right">Qty</TableHead>
-                        <TableHead className="text-right">CFT (Item)</TableHead>
                         <TableHead className="text-right">Total CFT</TableHead>
-                        <TableHead className="w-24 text-center">Action</TableHead>
+                        <TableHead className="w-28 text-center">Actions</TableHead>
                     </TableRow>
                 </TableHeader>
                 <TableBody>
                     {entries.length === 0 ? (
                         <TableRow>
-                            <TableCell colSpan={8} className="text-center h-24 text-muted-foreground">No entries added yet.</TableCell>
+                            <TableCell colSpan={5} className="text-center h-24 text-muted-foreground">No entries added yet.</TableCell>
                         </TableRow>
                     ) : entries.map((entry, index) => (
                       <TableRow key={entry.id}>
                         <TableCell className="text-center font-medium">{index + 1}</TableCell>
-                        <TableCell className="text-right">{entry.length.toFixed(2)}</TableCell>
-                        <TableCell className="text-right">{entry.width.toFixed(2)}</TableCell>
-                        <TableCell className="text-right">{entry.height.toFixed(2)}</TableCell>
+                        <TableCell>
+                            <div className="font-medium whitespace-nowrap">{entry.length.toFixed(2)}ft × {entry.width.toFixed(2)}in × {entry.height.toFixed(2)}in</div>
+                            <div className="text-xs text-muted-foreground">Item CFT: {entry.cft.toFixed(4)}</div>
+                        </TableCell>
                         <TableCell className="text-right">{entry.quantity}</TableCell>
-                        <TableCell className="text-right">{entry.cft.toFixed(4)}</TableCell>
                         <TableCell className="text-right font-medium">{(entry.cft * entry.quantity).toFixed(4)}</TableCell>
                         <TableCell className="text-center">
-                           <Button variant="ghost" size="icon" type="button" onClick={() => handleEditClick(entry)} className="text-muted-foreground hover:text-primary h-8 w-8">
-                             <Edit className="h-4 w-4" />
-                             <span className="sr-only">Edit</span>
-                           </Button>
-                           <Button variant="ghost" size="icon" type="button" onClick={() => removeEntry(entry.id)} className="text-muted-foreground hover:text-destructive h-8 w-8">
-                             <Trash2 className="h-4 w-4" />
-                             <span className="sr-only">Remove</span>
-                           </Button>
+                          <div className="flex items-center justify-center">
+                            <Button variant="ghost" size="icon" type="button" onClick={() => handleEditClick(entry)} className="text-muted-foreground hover:text-primary h-8 w-8">
+                              <Edit className="h-4 w-4" />
+                              <span className="sr-only">Edit</span>
+                            </Button>
+                            <Button variant="ghost" size="icon" type="button" onClick={() => removeEntry(entry.id)} className="text-muted-foreground hover:text-destructive h-8 w-8">
+                              <Trash2 className="h-4 w-4" />
+                              <span className="sr-only">Remove</span>
+                            </Button>
+                          </div>
                         </TableCell>
                       </TableRow>
                     ))}
@@ -460,41 +459,42 @@ function RoundLogsCalculator() {
                     </div>
                 </form>
 
-                <div className="overflow-auto border rounded-lg">
+                <div className="overflow-x-auto border rounded-lg">
                     <Table>
                         <TableHeader>
                             <TableRow>
                                 <TableHead className="w-12 text-center">#</TableHead>
-                                <TableHead className="text-right">Length (ft)</TableHead>
-                                <TableHead className="text-right">Girth (in)</TableHead>
+                                <TableHead>Dimensions</TableHead>
                                 <TableHead className="text-right">Qty</TableHead>
-                                <TableHead className="text-right">CFT (Item)</TableHead>
                                 <TableHead className="text-right">Total CFT</TableHead>
-                                <TableHead className="w-24 text-center">Action</TableHead>
+                                <TableHead className="w-28 text-center">Actions</TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>
                             {entries.length === 0 ? (
                                 <TableRow>
-                                    <TableCell colSpan={7} className="text-center h-24 text-muted-foreground">No entries added yet.</TableCell>
+                                    <TableCell colSpan={5} className="text-center h-24 text-muted-foreground">No entries added yet.</TableCell>
                                 </TableRow>
                             ) : entries.map((entry, index) => (
                               <TableRow key={entry.id}>
                                 <TableCell className="text-center font-medium">{index + 1}</TableCell>
-                                <TableCell className="text-right">{entry.length.toFixed(2)}</TableCell>
-                                <TableCell className="text-right">{entry.girth.toFixed(2)}</TableCell>
+                                <TableCell>
+                                    <div className="font-medium whitespace-nowrap">{entry.length.toFixed(2)}ft × {entry.girth.toFixed(2)}in</div>
+                                    <div className="text-xs text-muted-foreground">Item CFT: {entry.cft.toFixed(4)}</div>
+                                </TableCell>
                                 <TableCell className="text-right">{entry.quantity}</TableCell>
-                                <TableCell className="text-right">{entry.cft.toFixed(4)}</TableCell>
                                 <TableCell className="text-right font-medium">{(entry.cft * entry.quantity).toFixed(4)}</TableCell>
                                 <TableCell className="text-center">
-                                   <Button variant="ghost" size="icon" type="button" onClick={() => handleEditClick(entry)} className="text-muted-foreground hover:text-primary h-8 w-8">
-                                     <Edit className="h-4 w-4" />
-                                     <span className="sr-only">Edit</span>
-                                   </Button>
-                                   <Button variant="ghost" size="icon" type="button" onClick={() => removeEntry(entry.id)} className="text-muted-foreground hover:text-destructive h-8 w-8">
-                                     <Trash2 className="h-4 w-4" />
-                                     <span className="sr-only">Remove</span>
-                                   </Button>
+                                  <div className="flex items-center justify-center">
+                                    <Button variant="ghost" size="icon" type="button" onClick={() => handleEditClick(entry)} className="text-muted-foreground hover:text-primary h-8 w-8">
+                                      <Edit className="h-4 w-4" />
+                                      <span className="sr-only">Edit</span>
+                                    </Button>
+                                    <Button variant="ghost" size="icon" type="button" onClick={() => removeEntry(entry.id)} className="text-muted-foreground hover:text-destructive h-8 w-8">
+                                      <Trash2 className="h-4 w-4" />
+                                      <span className="sr-only">Remove</span>
+                                    </Button>
+                                   </div>
                                 </TableCell>
                               </TableRow>
                             ))}
