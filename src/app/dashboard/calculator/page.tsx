@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { z } from "zod";
-import { Plus, Trash2, X } from "lucide-react";
+import { Plus, Trash2, X, Edit } from "lucide-react";
 import {
   Table,
   TableBody,
@@ -62,13 +62,14 @@ function SawnWoodCalculator() {
   const [formValues, setFormValues] = useState(initialFormState);
   const [entries, setEntries] = useState<SawnWoodEntry[]>([]);
   const [formError, setFormError] = useState<string | null>(null);
+  const [editingId, setEditingId] = useState<number | null>(null);
 
   const handleFormChange = (field: string, value: string) => {
     setFormValues(prev => ({ ...prev, [field]: value }));
     setFormError(null);
   };
   
-  const handleAddEntry = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleFormSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const parsed = SawnWoodEntrySchema.safeParse(formValues);
     
@@ -81,18 +82,38 @@ function SawnWoodCalculator() {
     const { length, width, height, quantity } = parsed.data;
     const cft = ((length * width * height) / 144);
     
-    setEntries(prev => [...prev, {
-        id: Date.now(),
-        length,
-        width,
-        height,
-        quantity,
-        cft,
-    }]);
+    if (editingId) {
+        setEntries(prev => prev.map(entry => 
+            entry.id === editingId 
+            ? { ...entry, length, width, height, quantity, cft } 
+            : entry
+        ));
+    } else {
+        setEntries(prev => [...prev, {
+            id: Date.now(),
+            length,
+            width,
+            height,
+            quantity,
+            cft,
+        }]);
+    }
 
-    setFormValues(initialFormState);
+    clearForm();
     (e.currentTarget.elements[0] as HTMLInputElement)?.focus();
   };
+
+  const handleEditClick = (entry: SawnWoodEntry) => {
+    setEditingId(entry.id);
+    setFormValues({
+        length: String(entry.length),
+        width: String(entry.width),
+        height: String(entry.height),
+        quantity: String(entry.quantity),
+    });
+    setFormError(null);
+    (document.getElementById('sawn-length') as HTMLInputElement)?.focus();
+  }
 
   const removeEntry = (id: number) => {
     setEntries(entries.filter(entry => entry.id !== id));
@@ -101,6 +122,7 @@ function SawnWoodCalculator() {
   const clearForm = () => {
       setFormValues(initialFormState);
       setFormError(null);
+      setEditingId(null);
   }
   
   const { totalCft, totalQuantity } = useMemo(() => {
@@ -121,7 +143,7 @@ function SawnWoodCalculator() {
         <CardDescription>Add multiple timber sizes to calculate the total cubic feet (CFT).</CardDescription>
       </CardHeader>
       <CardContent className="p-4 space-y-4">
-        <form onSubmit={handleAddEntry} className="p-4 border rounded-lg bg-muted/50 space-y-4">
+        <form onSubmit={handleFormSubmit} className="p-4 border rounded-lg bg-muted/50 space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
                  <div className="space-y-1">
                     <Label htmlFor="sawn-length">Length (ft)</Label>
@@ -143,10 +165,10 @@ function SawnWoodCalculator() {
             {formError && <p className="text-sm text-destructive">{formError}</p>}
              <div className="flex justify-end gap-2">
                 <Button type="button" variant="ghost" onClick={clearForm}>
-                    <X className="mr-2 h-4 w-4" /> Clear
+                    <X className="mr-2 h-4 w-4" /> {editingId ? 'Cancel' : 'Clear'}
                 </Button>
                 <Button type="submit">
-                    <Plus className="mr-2 h-4 w-4" /> Add Entry
+                    <Plus className="mr-2 h-4 w-4" /> {editingId ? 'Update Entry' : 'Add Entry'}
                 </Button>
             </div>
         </form>
@@ -162,7 +184,7 @@ function SawnWoodCalculator() {
                         <TableHead className="text-right">Qty</TableHead>
                         <TableHead className="text-right">CFT (Item)</TableHead>
                         <TableHead className="text-right">Total CFT</TableHead>
-                        <TableHead className="w-20 text-center">Action</TableHead>
+                        <TableHead className="w-24 text-center">Action</TableHead>
                     </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -180,6 +202,10 @@ function SawnWoodCalculator() {
                         <TableCell className="text-right">{entry.cft.toFixed(4)}</TableCell>
                         <TableCell className="text-right font-medium">{(entry.cft * entry.quantity).toFixed(4)}</TableCell>
                         <TableCell className="text-center">
+                           <Button variant="ghost" size="icon" type="button" onClick={() => handleEditClick(entry)} className="text-muted-foreground hover:text-primary h-8 w-8">
+                             <Edit className="h-4 w-4" />
+                             <span className="sr-only">Edit</span>
+                           </Button>
                            <Button variant="ghost" size="icon" type="button" onClick={() => removeEntry(entry.id)} className="text-muted-foreground hover:text-destructive h-8 w-8">
                              <Trash2 className="h-4 w-4" />
                              <span className="sr-only">Remove</span>
@@ -212,13 +238,14 @@ function RoundLogsCalculator() {
     const [formValues, setFormValues] = useState(initialFormState);
     const [entries, setEntries] = useState<RoundLogEntry[]>([]);
     const [formError, setFormError] = useState<string | null>(null);
+    const [editingId, setEditingId] = useState<number | null>(null);
 
     const handleFormChange = (field: string, value: string) => {
         setFormValues(prev => ({ ...prev, [field]: value }));
         setFormError(null);
     };
 
-    const handleAddEntry = (e: React.FormEvent<HTMLFormElement>) => {
+    const handleFormSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         const parsed = RoundLogEntrySchema.safeParse(formValues);
 
@@ -231,17 +258,36 @@ function RoundLogsCalculator() {
         const { length, girth, quantity } = parsed.data;
         const cft = ((girth * girth * length) / 2304);
 
-        setEntries(prev => [...prev, {
-            id: Date.now(),
-            length,
-            girth,
-            quantity,
-            cft,
-        }]);
-
-        setFormValues(initialFormState);
+        if (editingId) {
+            setEntries(prev => prev.map(entry =>
+                entry.id === editingId
+                ? { ...entry, length, girth, quantity, cft }
+                : entry
+            ));
+        } else {
+            setEntries(prev => [...prev, {
+                id: Date.now(),
+                length,
+                girth,
+                quantity,
+                cft,
+            }]);
+        }
+        
+        clearForm();
         (e.currentTarget.elements[0] as HTMLInputElement)?.focus();
     };
+
+    const handleEditClick = (entry: RoundLogEntry) => {
+        setEditingId(entry.id);
+        setFormValues({
+            length: String(entry.length),
+            girth: String(entry.girth),
+            quantity: String(entry.quantity),
+        });
+        setFormError(null);
+        (document.getElementById('log-length') as HTMLInputElement)?.focus();
+    }
 
     const removeEntry = (id: number) => {
         setEntries(entries.filter(entry => entry.id !== id));
@@ -250,6 +296,7 @@ function RoundLogsCalculator() {
     const clearForm = () => {
         setFormValues(initialFormState);
         setFormError(null);
+        setEditingId(null);
     }
 
     const { totalCft, totalQuantity } = useMemo(() => {
@@ -270,7 +317,7 @@ function RoundLogsCalculator() {
                 <CardDescription>Add multiple log sizes to calculate the total CFT using the Hoppus formula.</CardDescription>
             </CardHeader>
             <CardContent className="p-4 space-y-4">
-                <form onSubmit={handleAddEntry} className="p-4 border rounded-lg bg-muted/50 space-y-4">
+                <form onSubmit={handleFormSubmit} className="p-4 border rounded-lg bg-muted/50 space-y-4">
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                         <div className="space-y-1">
                             <Label htmlFor="log-length">Length (ft)</Label>
@@ -288,10 +335,10 @@ function RoundLogsCalculator() {
                     {formError && <p className="text-sm text-destructive">{formError}</p>}
                     <div className="flex justify-end gap-2">
                         <Button type="button" variant="ghost" onClick={clearForm}>
-                            <X className="mr-2 h-4 w-4" /> Clear
+                            <X className="mr-2 h-4 w-4" /> {editingId ? 'Cancel' : 'Clear'}
                         </Button>
                         <Button type="submit">
-                            <Plus className="mr-2 h-4 w-4" /> Add Entry
+                            <Plus className="mr-2 h-4 w-4" /> {editingId ? 'Update Entry' : 'Add Entry'}
                         </Button>
                     </div>
                 </form>
@@ -306,7 +353,7 @@ function RoundLogsCalculator() {
                                 <TableHead className="text-right">Qty</TableHead>
                                 <TableHead className="text-right">CFT (Item)</TableHead>
                                 <TableHead className="text-right">Total CFT</TableHead>
-                                <TableHead className="w-20 text-center">Action</TableHead>
+                                <TableHead className="w-24 text-center">Action</TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>
@@ -323,6 +370,10 @@ function RoundLogsCalculator() {
                                 <TableCell className="text-right">{entry.cft.toFixed(4)}</TableCell>
                                 <TableCell className="text-right font-medium">{(entry.cft * entry.quantity).toFixed(4)}</TableCell>
                                 <TableCell className="text-center">
+                                   <Button variant="ghost" size="icon" type="button" onClick={() => handleEditClick(entry)} className="text-muted-foreground hover:text-primary h-8 w-8">
+                                     <Edit className="h-4 w-4" />
+                                     <span className="sr-only">Edit</span>
+                                   </Button>
                                    <Button variant="ghost" size="icon" type="button" onClick={() => removeEntry(entry.id)} className="text-muted-foreground hover:text-destructive h-8 w-8">
                                      <Trash2 className="h-4 w-4" />
                                      <span className="sr-only">Remove</span>
@@ -366,9 +417,3 @@ export default function CalculatorPage() {
         </Tabs>
     )
 }
-
-    
-
-    
-
-    
