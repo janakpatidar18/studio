@@ -76,7 +76,7 @@ export default function LoginPage() {
       <div className="relative grid min-h-screen grid-cols-1 lg:grid-cols-2">
         <div className="hidden lg:flex flex-col items-start justify-center p-12 text-background">
           <div className="flex items-center gap-4">
-             <Image src="/logo.png" alt="SVLSM Logo" width={240} height={65} />
+             <Image src="/logo.png" alt="SVLSM Logo" width={240} height={65} priority />
           </div>
         </div>
 
@@ -84,7 +84,7 @@ export default function LoginPage() {
             <Card className="w-full max-w-sm shadow-2xl bg-card/80 backdrop-blur-lg">
                 <CardHeader className="text-center p-6 sm:p-8">
                     <div className="flex items-center justify-center gap-2 lg:hidden mb-4">
-                         <Image src="/logo.png" alt="SVLSM Logo" width={160} height={44} />
+                         <Image src="/logo.png" alt="SVLSM Logo" width={160} height={44} priority />
                     </div>
                     <CardTitle className="text-3xl font-bold">Welcome Back</CardTitle>
                     <CardDescription className="text-lg text-muted-foreground">Enter your PIN to access the dashboard</CardDescription>
