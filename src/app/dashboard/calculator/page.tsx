@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState } from "react";
@@ -88,7 +89,7 @@ function SawnWoodCalculator() {
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-6">
-          <div className="space-y-4">
+          <div className="max-h-[45vh] overflow-y-auto space-y-4 pr-4">
             {entries.map((entry, index) => (
               <div key={entry.id} className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-[1fr_1fr_1fr_1fr_auto] gap-3 items-end p-4 border rounded-lg bg-card/50 relative pt-8">
                  <div className="absolute top-2 left-2 text-xs font-bold text-muted-foreground">{`#${index + 1}`}</div>
@@ -116,25 +117,26 @@ function SawnWoodCalculator() {
             ))}
           </div>
 
-          <Button type="button" variant="outline" onClick={addEntry} className="w-full">
-            <PlusCircle className="mr-2 h-5 w-5" />
-            Add another size
-          </Button>
-          
-          <Button type="submit" className="w-full">Calculate Total CFT</Button>
-        </form>
-        
-        {error && (
-            <div className="mt-4 text-center text-destructive font-medium">
-              <p>{error}</p>
-            </div>
-        )}
-        {result !== null && (
-          <div className="mt-6 text-center">
-            <p className="text-lg text-muted-foreground">Total Cubic Feet (CFT)</p>
-            <p className="text-4xl font-bold font-headline">{result.toFixed(4)}</p>
+          <div className="pt-6 border-t space-y-4">
+            <Button type="button" variant="outline" onClick={addEntry} className="w-full">
+              <PlusCircle className="mr-2 h-5 w-5" />
+              Add another size
+            </Button>
+            <Button type="submit" className="w-full">Calculate Total CFT</Button>
+            
+            {error && (
+                <div className="text-center text-destructive font-medium">
+                  <p>{error}</p>
+                </div>
+            )}
+            {result !== null && (
+              <div className="mt-2 text-center">
+                <p className="text-lg text-muted-foreground">Total Cubic Feet (CFT)</p>
+                <p className="text-4xl font-bold font-headline">{result.toFixed(4)}</p>
+              </div>
+            )}
           </div>
-        )}
+        </form>
       </CardContent>
     </Card>
   );
@@ -205,7 +207,7 @@ function RoundLogsCalculator() {
             </CardHeader>
             <CardContent>
                 <form onSubmit={handleSubmit} className="space-y-6">
-                    <div className="space-y-4">
+                    <div className="max-h-[45vh] overflow-y-auto space-y-4 pr-4">
                         {entries.map((entry, index) => (
                             <div key={entry.id} className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-[1fr_1fr_1fr_auto] gap-3 items-end p-4 border rounded-lg bg-card/50 relative pt-8">
                                 <div className="absolute top-2 left-2 text-xs font-bold text-muted-foreground">{`#${index + 1}`}</div>
@@ -228,23 +230,26 @@ function RoundLogsCalculator() {
                             </div>
                         ))}
                     </div>
-                    <Button type="button" variant="outline" onClick={addEntry} className="w-full">
-                        <PlusCircle className="mr-2 h-5 w-5" />
-                        Add another size
-                    </Button>
-                    <Button type="submit" className="w-full">Calculate Total CFT</Button>
-                </form>
-                 {error && (
-                    <div className="mt-4 text-center text-destructive font-medium">
-                      <p>{error}</p>
+                    <div className="pt-6 border-t space-y-4">
+                        <Button type="button" variant="outline" onClick={addEntry} className="w-full">
+                            <PlusCircle className="mr-2 h-5 w-5" />
+                            Add another size
+                        </Button>
+                        <Button type="submit" className="w-full">Calculate Total CFT</Button>
+                        
+                        {error && (
+                            <div className="text-center text-destructive font-medium">
+                              <p>{error}</p>
+                            </div>
+                        )}
+                        {result !== null && (
+                          <div className="mt-2 text-center">
+                            <p className="text-lg text-muted-foreground">Total Cubic Feet (CFT)</p>
+                            <p className="text-4xl font-bold font-headline">{result.toFixed(4)}</p>
+                          </div>
+                        )}
                     </div>
-                )}
-                {result !== null && (
-                  <div className="mt-6 text-center">
-                    <p className="text-lg text-muted-foreground">Total Cubic Feet (CFT)</p>
-                    <p className="text-4xl font-bold font-headline">{result.toFixed(4)}</p>
-                  </div>
-                )}
+                </form>
             </CardContent>
         </Card>
     );
@@ -276,3 +281,5 @@ export default function CalculatorPage() {
     </div>
   );
 }
+
+    
