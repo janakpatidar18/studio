@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState, useMemo } from "react";
@@ -8,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { z } from "zod";
-import { Plus, Trash2, X, Edit, Download } from "lucide-react";
+import { Plus, Trash2, X, Edit, Download, Share2 } from "lucide-react";
 import {
   Table,
   TableBody,
@@ -142,7 +141,7 @@ function SawnWoodCalculator() {
     );
   }, [entries]);
 
-  const handleDownloadPdf = () => {
+  const generateSawnWoodPdfDoc = () => {
     const doc = new jsPDF('p', 'mm', 'a4');
     const today = new Date();
     const dateStr = today.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
@@ -198,7 +197,36 @@ function SawnWoodCalculator() {
         styles: { fontStyle: 'bold' }
     });
 
+    return doc;
+  };
+
+  const handleDownloadPdf = () => {
+    const doc = generateSawnWoodPdfDoc();
+    const today = new Date();
     doc.save(`sawn-wood-cft_${today.toISOString().split('T')[0]}.pdf`);
+  };
+
+  const handleSharePdf = async () => {
+    const doc = generateSawnWoodPdfDoc();
+    const today = new Date();
+    const fileName = `sawn-wood-cft_${today.toISOString().split('T')[0]}.pdf`;
+    const pdfBlob = doc.output('blob');
+    const pdfFile = new File([pdfBlob], fileName, { type: 'application/pdf' });
+
+    if (navigator.share && navigator.canShare({ files: [pdfFile] })) {
+      try {
+        await navigator.share({
+          title: 'Sawn Wood CFT Calculation',
+          text: 'Here is the Sawn Wood CFT Calculation PDF.',
+          files: [pdfFile],
+        });
+      } catch (error) {
+        console.error('Error sharing PDF:', error);
+      }
+    } else {
+      alert("Web Share API is not supported in this browser. Downloading the PDF instead.");
+      handleDownloadPdf();
+    }
   };
 
   return (
@@ -258,7 +286,7 @@ function SawnWoodCalculator() {
                       <TableRow key={entry.id}>
                         <TableCell className="text-center font-medium">{index + 1}</TableCell>
                         <TableCell>
-                            <div className="font-medium">{entry.length.toFixed(2)}ft × {entry.width.toFixed(2)}in × {entry.height.toFixed(2)}in</div>
+                            <div className="font-medium whitespace-normal">{entry.length.toFixed(2)}ft × {entry.width.toFixed(2)}in × {entry.height.toFixed(2)}in</div>
                             <div className="text-xs text-muted-foreground">Item CFT: {entry.cft.toFixed(4)}</div>
                         </TableCell>
                         <TableCell className="text-right">{entry.quantity}</TableCell>
@@ -291,10 +319,16 @@ function SawnWoodCalculator() {
                 <span className="text-muted-foreground">Total CFT</span>
                 <span className="font-bold font-headline text-primary">{totalCft.toFixed(4)}</span>
             </div>
-            <Button onClick={handleDownloadPdf} variant="outline" className="mt-2 w-full">
-                <Download className="mr-2 h-4 w-4" />
-                Download as PDF
-            </Button>
+            <div className="mt-4 flex flex-col gap-2 sm:flex-row">
+                <Button onClick={handleDownloadPdf} variant="outline" className="w-full">
+                    <Download className="mr-2 h-4 w-4" />
+                    Download PDF
+                </Button>
+                <Button onClick={handleSharePdf} className="w-full">
+                    <Share2 className="mr-2 h-4 w-4" />
+                    Share PDF
+                </Button>
+            </div>
           </CardFooter>
       )}
     </Card>
@@ -378,7 +412,7 @@ function RoundLogsCalculator() {
         );
       }, [entries]);
 
-      const handleDownloadPdf = () => {
+      const generateRoundLogsPdfDoc = () => {
         const doc = new jsPDF('p', 'mm', 'a4');
         const today = new Date();
         const dateStr = today.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
@@ -433,7 +467,36 @@ function RoundLogsCalculator() {
             styles: { fontStyle: 'bold' }
         });
         
+        return doc;
+    };
+
+    const handleDownloadPdf = () => {
+        const doc = generateRoundLogsPdfDoc();
+        const today = new Date();
         doc.save(`round-logs-cft_${today.toISOString().split('T')[0]}.pdf`);
+    };
+
+    const handleSharePdf = async () => {
+        const doc = generateRoundLogsPdfDoc();
+        const today = new Date();
+        const fileName = `round-logs-cft_${today.toISOString().split('T')[0]}.pdf`;
+        const pdfBlob = doc.output('blob');
+        const pdfFile = new File([pdfBlob], fileName, { type: 'application/pdf' });
+
+        if (navigator.share && navigator.canShare({ files: [pdfFile] })) {
+            try {
+                await navigator.share({
+                    title: 'Round Logs CFT Calculation',
+                    text: 'Here is the Round Logs CFT Calculation PDF.',
+                    files: [pdfFile],
+                });
+            } catch (error) {
+                console.error('Error sharing PDF:', error);
+            }
+        } else {
+            alert("Web Share API is not supported in this browser. Downloading the PDF instead.");
+            handleDownloadPdf();
+        }
     };
 
     return (
@@ -489,7 +552,7 @@ function RoundLogsCalculator() {
                               <TableRow key={entry.id}>
                                 <TableCell className="text-center font-medium">{index + 1}</TableCell>
                                 <TableCell>
-                                    <div className="font-medium">{entry.length.toFixed(2)}ft × {entry.girth.toFixed(2)}in</div>
+                                    <div className="font-medium whitespace-normal">{entry.length.toFixed(2)}ft × {entry.girth.toFixed(2)}in</div>
                                     <div className="text-xs text-muted-foreground">Item CFT: {entry.cft.toFixed(4)}</div>
                                 </TableCell>
                                 <TableCell className="text-right">{entry.quantity}</TableCell>
@@ -522,10 +585,16 @@ function RoundLogsCalculator() {
                         <span className="text-muted-foreground">Total CFT</span>
                         <span className="font-bold font-headline text-primary">{totalCft.toFixed(4)}</span>
                     </div>
-                    <Button onClick={handleDownloadPdf} variant="outline" className="mt-2 w-full">
-                        <Download className="mr-2 h-4 w-4" />
-                        Download as PDF
-                    </Button>
+                    <div className="mt-4 flex flex-col gap-2 sm:flex-row">
+                        <Button onClick={handleDownloadPdf} variant="outline" className="w-full">
+                            <Download className="mr-2 h-4 w-4" />
+                            Download PDF
+                        </Button>
+                        <Button onClick={handleSharePdf} className="w-full">
+                            <Share2 className="mr-2 h-4 w-4" />
+                            Share PDF
+                        </Button>
+                    </div>
                 </CardFooter>
             )}
         </Card>
@@ -548,5 +617,3 @@ export default function CalculatorPage() {
         </Tabs>
     )
 }
-
-    
