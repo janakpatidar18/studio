@@ -27,7 +27,7 @@ declare module 'jspdf' {
   }
 }
 
-const shreeIcon = 'data:image/png;base64,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sR/8gD/v1k+r6W8/sR/8gD/v1k+r6W8/sR/8gD/v1k+r6W8/sR/8gD/v1k+r6W8/sR/8gD/v1k+r6W8/sR/8gD/v1k+r6W8/sR/8gD/v1k+r6W8/sR/8gD/v1k+r6W8/sR/8gD/v1k+r6W8/sR/8gD/v1k+r6W8/sR/8gD/v1k+r6W8/sR/8gD/v1k+r6W8/sR/8gD/v1k+r6W8/sR/8gD/v1k+r6W8/sR/8gD/v1k+r6W8/sR/8gD/v1k+r6W8/sR/8gD/v1k+r6W8/sR/8gD/v1k+r6W8/sR/8gD/v1k+r6W8/sR/8gD/v1k+r6W8/sR/8gD/v1k+r6W8/sR/8gD/v1k+r6W8/sR/8gD/v1k+r6W8/sR/8gD/v1k+r6W8/sR/8gD/v1k+r6W8/sR/8gD/v1k+r6W8/sR/8gD/v1k+r6W8/sR/8gD/v1k+r6W8/sR/8gD/v1k+r6W8/sR/8gD/v1k+r6W8/sR/8gD/v1k+r6W8/sR/8gD/v1k+r6W8/sR/8gD/v1k+r6W8/sR/8gD/v1k+r6W8/sR/8gD/v1k+r6W8/sR/8gD/v1k+r6W8/sR/8gD/v1k+r6W8/sR/8gD/v1k+r6W8/sR/8gD/v1k+r6W8/sR/8gD/v1k+r6W8/sR/8gD/v1k+r6W8/sR/8gD/v1k+r6W8/sR/8gD/v1k+r6W8/sR/8gD/v1k+r6W8/sR/8gD/v1k+r6W8/sR/8gD/v1k+r6W8/sR/8gD/v1k+r6W8/sR/8gD/v1k+r6W8/sR/8gD/v1k+r6W8/sR/8gD/v1k+r6W8/sR/8gD/v1k+r6W8/sR/8gD/v1k+r6W8/sR/8gD/v1k+r6W8/sR/8gD/v1k+r6W8/sR/8gD/v1k+r6W8/sR/8gD/v1k+r6W8/sR/8gD/v1k+r6W8/sR/8gD/v1k+r6W8/sR/8gD/v1k+r6W8/sR/8gD/v1k+r6W8/sR/8gD/v1k+r6W8/sR/8gD/v1k+r6W8/sR/8gD/v1k+r6W8/sR/8gD/v1k+r6W8/sR/8gD/v1k+r6W8/sR/8gD/v1k+r6W8/sR/8gD/v1k+r6W8/sR/8gD/v1k+r6W8/sR/8gD/v1k+r6W8/sR/8gD/v1k+r6W8/sR/8gD/v1k+r6W8/sR/8gD/v1k+r6W8/sR/8gD/v1k+r6W8/sR/8gD/v1k+r6W8/sR/8gD/v1k+r6W8/sR/8gD/v1k+r6W8/sR/8gD/v1k+r6W8/sR/8gD/v1k+r6W8/sR/8gD/v1k+r6W8/sR/8gD/v1k+r6W8/sR/8gD/v1k+r6W8/sR/8gD/v1k+r6W8/sR/8gD/v1k+r6W8/sR/8gD/v1k+r6W8/sR/8gD/v1k+r6W8/sR/8gD/v1k+r6W8/sR/8gD/v1k+r6W8/sR/8gD/v1k+r6W8/sR/8gD/v1k+r6W8/sR/8gD/v1k+r6W8/sR/8gD/v1k+r6W8/sR/8gD/v1k+r6W8/sR/8gD/v1k+r6W8/sR/8gD/v1k+r6W8/sR/8gD/v1k+r6W8/sR/8gD/v1k+r6W8/sR/8gD/v1k+r6W8/sR/8gD/v1k+r6W8/sR/8gD/v1k+r6W8/sR/8gD/v1k+r6W8/sR/8gD/v1k+r6W8/sR/8gD/v1k+r6W8/sR/8gD/v1k+r6W8/sR/8gD/v1k+r6W8/sR/sZIkSZIkSZIkSZIkSZIkSZIkSZIkSZIkSfo/9C89NFuP+y5dAAAAAElFTkSuQmCC';
+const shreeIcon = 'data:image/png;base64,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';
 
 const SawnWoodEntrySchema = z.object({
   length: z.coerce.number().min(0.01, "Length must be positive"),
@@ -207,9 +207,9 @@ function SawnWoodCalculator() {
         <CardTitle>Sawn Wood CFT Calculator</CardTitle>
         <CardDescription>Add multiple timber sizes to calculate the total cubic feet (CFT).</CardDescription>
       </CardHeader>
-      <CardContent className="p-4 space-y-4">
-        <form onSubmit={handleFormSubmit} className="p-4 border rounded-lg bg-muted/50 space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
+      <CardContent className="p-4 sm:p-6 space-y-6">
+        <form onSubmit={handleFormSubmit} className="p-4 sm:p-6 border rounded-lg bg-muted/50 space-y-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                  <div className="space-y-1">
                     <Label htmlFor="sawn-length">Length (ft)</Label>
                     <Input id="sawn-length" value={formValues.length} onChange={e => handleFormChange('length', e.target.value)} onKeyDown={handleInputKeyDown} type="number" inputMode="decimal" step="any" placeholder="e.g., 10" />
@@ -283,7 +283,7 @@ function SawnWoodCalculator() {
         </div>
       </CardContent>
       {entries.length > 0 && (
-          <CardFooter className="flex-col items-stretch p-4 border-t bg-muted/50 space-y-2">
+          <CardFooter className="flex-col items-stretch p-4 sm:p-6 border-t bg-muted/50 space-y-2">
             <div className="flex justify-between text-lg">
                 <span className="text-muted-foreground">Total Quantity</span>
                 <span className="font-bold">{totalQuantity}</span>
@@ -440,9 +440,9 @@ function RoundLogsCalculator() {
                 <CardTitle>Round Logs CFT Calculator</CardTitle>
                 <CardDescription>Add multiple log sizes to calculate the total CFT using the Hoppus formula.</CardDescription>
             </CardHeader>
-            <CardContent className="p-4 space-y-4">
-                <form onSubmit={handleFormSubmit} className="p-4 border rounded-lg bg-muted/50 space-y-4">
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+            <CardContent className="p-4 sm:p-6 space-y-6">
+                <form onSubmit={handleFormSubmit} className="p-4 sm:p-6 border rounded-lg bg-muted/50 space-y-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                         <div className="space-y-1">
                             <Label htmlFor="log-length">Length (ft)</Label>
                             <Input id="log-length" value={formValues.length} onChange={e => handleFormChange('length', e.target.value)} onKeyDown={handleInputKeyDown} type="number" inputMode="decimal" step="any" placeholder="e.g., 12" />
@@ -510,7 +510,7 @@ function RoundLogsCalculator() {
                 </div>
             </CardContent>
             {entries.length > 0 && (
-                <CardFooter className="flex-col items-stretch p-4 border-t bg-muted/50 space-y-2">
+                <CardFooter className="flex-col items-stretch p-4 sm:p-6 border-t bg-muted/50 space-y-2">
                     <div className="flex justify-between text-lg">
                         <span className="text-muted-foreground">Total Quantity</span>
                         <span className="font-bold">{totalQuantity}</span>
@@ -545,7 +545,5 @@ export default function CalculatorPage() {
         </Tabs>
     )
 }
-
-    
 
     
