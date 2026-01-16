@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useMemo } from "react";
@@ -141,21 +142,39 @@ function SawnWoodCalculator() {
     );
   }, [entries]);
 
-  const generateSawnWoodPdfDoc = () => {
+  const generateSawnWoodPdfDoc = async () => {
     const doc = new jsPDF('p', 'mm', 'a4');
     const today = new Date();
     const dateStr = today.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
     const pageWidth = doc.internal.pageSize.getWidth();
+
+    const loadImage = (src: string): Promise<HTMLImageElement> => {
+      return new Promise((resolve, reject) => {
+          const img = new Image();
+          img.crossOrigin = "Anonymous";
+          img.onload = () => resolve(img);
+          img.onerror = (err) => reject(err);
+          img.src = src;
+      });
+    };
     
-    doc.setTextColor(255, 0, 0);
-    doc.setFontSize(16);
-    doc.text("||श्री||", pageWidth / 2, 15, { align: 'center' });
-    doc.setTextColor(0, 0, 0);
+    try {
+        const img = await loadImage('/shree-icon.webp');
+        // NOTE: For this to work, place 'shree-icon.webp' in the 'public' folder.
+        // jsPDF has better support for JPEG/PNG. If WEBP fails, please convert the image.
+        doc.addImage(img, 'WEBP', (pageWidth / 2) - 10, 8, 20, 20);
+    } catch (error) {
+        console.error("PDF Image Error: Could not load image. Falling back to text. Ensure 'shree-icon.webp' is in the /public folder.", error);
+        doc.setTextColor(255, 0, 0);
+        doc.setFontSize(16);
+        doc.text("||श्री||", pageWidth / 2, 15, { align: 'center' });
+        doc.setTextColor(0, 0, 0);
+    }
 
     doc.setFontSize(18);
-    doc.text("Sawn Wood CFT Calculation", pageWidth / 2, 25, { align: 'center' });
+    doc.text("Sawn Wood CFT Calculation", pageWidth / 2, 35, { align: 'center' });
     doc.setFontSize(11);
-    doc.text(`Date: ${dateStr}`, pageWidth / 2, 32, { align: 'center' });
+    doc.text(`Date: ${dateStr}`, pageWidth / 2, 42, { align: 'center' });
 
     const tableColumn = ["#", "Length (ft)", "Width (in)", "Thickness (in)", "Qty", "CFT (Item)", "Total CFT"];
     const tableRows: (string | number)[][] = [];
@@ -176,7 +195,7 @@ function SawnWoodCalculator() {
     doc.autoTable({
         head: [tableColumn],
         body: tableRows,
-        startY: 40,
+        startY: 50,
         didDrawPage: function (data) {
             let str = `Page ${doc.internal.getNumberOfPages()}`;
             doc.setFontSize(10);
@@ -200,14 +219,14 @@ function SawnWoodCalculator() {
     return doc;
   };
 
-  const handleDownloadPdf = () => {
-    const doc = generateSawnWoodPdfDoc();
+  const handleDownloadPdf = async () => {
+    const doc = await generateSawnWoodPdfDoc();
     const today = new Date();
     doc.save(`sawn-wood-cft_${today.toISOString().split('T')[0]}.pdf`);
   };
 
   const handleSharePdf = async () => {
-    const doc = generateSawnWoodPdfDoc();
+    const doc = await generateSawnWoodPdfDoc();
     const today = new Date();
     const fileName = `sawn-wood-cft_${today.toISOString().split('T')[0]}.pdf`;
     const pdfBlob = doc.output('blob');
@@ -412,21 +431,39 @@ function RoundLogsCalculator() {
         );
       }, [entries]);
 
-      const generateRoundLogsPdfDoc = () => {
+      const generateRoundLogsPdfDoc = async () => {
         const doc = new jsPDF('p', 'mm', 'a4');
         const today = new Date();
         const dateStr = today.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
         const pageWidth = doc.internal.pageSize.getWidth();
     
-        doc.setTextColor(255, 0, 0);
-        doc.setFontSize(16);
-        doc.text("||श्री||", pageWidth / 2, 15, { align: 'center' });
-        doc.setTextColor(0, 0, 0);
+        const loadImage = (src: string): Promise<HTMLImageElement> => {
+            return new Promise((resolve, reject) => {
+                const img = new Image();
+                img.crossOrigin = "Anonymous";
+                img.onload = () => resolve(img);
+                img.onerror = (err) => reject(err);
+                img.src = src;
+            });
+          };
+          
+          try {
+              const img = await loadImage('/shree-icon.webp');
+              // NOTE: For this to work, place 'shree-icon.webp' in the 'public' folder.
+              // jsPDF has better support for JPEG/PNG. If WEBP fails, please convert the image.
+              doc.addImage(img, 'WEBP', (pageWidth / 2) - 10, 8, 20, 20);
+          } catch (error) {
+              console.error("PDF Image Error: Could not load image. Falling back to text. Ensure 'shree-icon.webp' is in the /public folder.", error);
+              doc.setTextColor(255, 0, 0);
+              doc.setFontSize(16);
+              doc.text("||श्री||", pageWidth / 2, 15, { align: 'center' });
+              doc.setTextColor(0, 0, 0);
+          }
 
         doc.setFontSize(18);
-        doc.text("Round Logs CFT Calculation", pageWidth / 2, 25, { align: 'center' });
+        doc.text("Round Logs CFT Calculation", pageWidth / 2, 35, { align: 'center' });
         doc.setFontSize(11);
-        doc.text(`Date: ${dateStr}`, pageWidth / 2, 32, { align: 'center' });
+        doc.text(`Date: ${dateStr}`, pageWidth / 2, 42, { align: 'center' });
     
         const tableColumn = ["#", "Length (ft)", "Girth (in)", "Qty", "CFT (Item)", "Total CFT"];
         const tableRows: (string | number)[][] = [];
@@ -446,7 +483,7 @@ function RoundLogsCalculator() {
         doc.autoTable({
             head: [tableColumn],
             body: tableRows,
-            startY: 40,
+            startY: 50,
             didDrawPage: function (data) {
                 let str = `Page ${doc.internal.getNumberOfPages()}`;
                 doc.setFontSize(10);
@@ -470,14 +507,14 @@ function RoundLogsCalculator() {
         return doc;
     };
 
-    const handleDownloadPdf = () => {
-        const doc = generateRoundLogsPdfDoc();
+    const handleDownloadPdf = async () => {
+        const doc = await generateRoundLogsPdfDoc();
         const today = new Date();
         doc.save(`round-logs-cft_${today.toISOString().split('T')[0]}.pdf`);
     };
 
     const handleSharePdf = async () => {
-        const doc = generateRoundLogsPdfDoc();
+        const doc = await generateRoundLogsPdfDoc();
         const today = new Date();
         const fileName = `round-logs-cft_${today.toISOString().split('T')[0]}.pdf`;
         const pdfBlob = doc.output('blob');
@@ -617,3 +654,5 @@ export default function CalculatorPage() {
         </Tabs>
     )
 }
+
+    
