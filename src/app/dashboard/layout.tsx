@@ -15,7 +15,7 @@ import {
   SidebarInset,
   SidebarTrigger
 } from "@/components/ui/sidebar";
-import { Home, Package, ImageIcon, LogOut } from "lucide-react";
+import { ImageIcon, LogOut } from "lucide-react";
 import Image from "next/image";
 import { PlaceHolderImages } from "@/lib/placeholder-images";
 import { InventoryProvider } from "@/context/InventoryContext";
@@ -45,8 +45,6 @@ export default function DashboardLayout({
 
   const navItems = [
     { href: "/dashboard", label: "Gallery", icon: ImageIcon },
-    { href: "/dashboard/inventory", label: "Inventory", icon: Home },
-    { href: "/dashboard/stock", label: "Stock", icon: Package },
   ];
 
   const mobileNavItems = navItems.filter(item => item.label !== 'Stock' && item.label !== 'Inventory');

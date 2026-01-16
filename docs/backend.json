@@ -1,53 +1,6 @@
 
 {
   "entities": {
-    "inventoryItem": {
-      "title": "Inventory Item",
-      "description": "Represents an item in the inventory.",
-      "type": "object",
-      "properties": {
-        "name": {
-          "type": "string",
-          "description": "The name of the inventory item."
-        },
-        "type": {
-          "type": "string",
-          "description": "The category of the inventory item."
-        },
-        "quantity": {
-          "type": "number",
-          "description": "The current stock quantity of the item."
-        },
-        "sellingPrice": {
-          "type": "number",
-          "description": "The selling price of the item."
-        },
-        "image": {
-          "type": "string",
-          "description": "A data URI of the product image."
-        }
-      },
-      "required": [
-        "name",
-        "type",
-        "quantity",
-        "sellingPrice"
-      ]
-    },
-    "category": {
-      "title": "Category",
-      "description": "Represents a category for inventory items.",
-      "type": "object",
-      "properties": {
-        "name": {
-          "type": "string",
-          "description": "The name of the category."
-        }
-      },
-      "required": [
-        "name"
-      ]
-    },
     "galleryImage": {
       "title": "Gallery Image",
       "description": "Represents an image in the gallery.",
@@ -98,18 +51,6 @@
     ]
   },
   "firestore": {
-    "/inventory/{itemId}": {
-      "schema": {
-        "$ref": "#/entities/inventoryItem"
-      },
-      "description": "Stores individual inventory items."
-    },
-    "/categories/{categoryId}": {
-      "schema": {
-        "$ref": "#/entities/category"
-      },
-      "description": "Stores inventory item categories."
-    },
     "/gallery/{imageId}": {
       "schema": {
         "$ref": "#/entities/galleryImage"
