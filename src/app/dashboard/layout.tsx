@@ -44,9 +44,9 @@ export default function DashboardLayout({
   };
 
   const navItems = [
-    { href: "/dashboard", label: "Inventory", icon: Home },
+    { href: "/dashboard", label: "Gallery", icon: ImageIcon },
+    { href: "/dashboard/gallery", label: "Inventory", icon: Home },
     { href: "/dashboard/stock", label: "Stock", icon: Package },
-    { href: "/dashboard/gallery", label: "Gallery", icon: ImageIcon },
   ];
 
   const mobileNavItems = navItems.filter(item => item.label !== 'Stock');
@@ -169,3 +169,5 @@ export default function DashboardLayout({
     </InventoryProvider>
   );
 }
+
+    
