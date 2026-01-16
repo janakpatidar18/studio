@@ -41,39 +41,38 @@ const reimagineDoorFlow = ai.defineFlow(
             { media: { url: input.doorImage } },
             { media: { url: input.backgroundImage } },
             { text: `
-                You are a creative assistant that transforms images. Your task is to integrate the subject from the first image (a door) into the second image (a background).
+                You are an expert photorealistic image editor. Your task is to combine a door from a primary image with a background from a secondary image, following these exact specifications to create a hyper-realistic final image.
 
-                Follow these detailed instructions:
+                **Primary Subject: The Door**
+                1.  **Isolate:** Isolate the carved door from the first image.
+                2.  **Material Transformation:** Convert the door's material to **raw, unfinished teak wood**. It must have a **matte finish** with clearly **visible wood grains**.
+                3.  **Preserve Design:** The original design, carving, and shape of the door must be kept **identical**.
+                4.  **Correction:** Correct any misaligned or imbalanced geometric areas in the door, but preserve its authentic design.
 
-                1.  **Subject (Door):**
-                    *   Identify the carved door in the first image.
-                    *   Convert its material to a **raw, unfinished teak wood door** with a **matte finish** and **visible grains**.
-                    *   **Preserve the original design, carving, and shape perfectly.**
-                    *   Correct any misaligned or imbalanced areas in the door's geometry while maintaining its authentic design.
+                **Secondary Subject: Hand Interaction**
+                1.  **Introduction:** Add a realistic adult **man's hand** holding the door. The grip should look natural, holding it from the side or top edge.
+                2.  **Appearance:** Only the hand and a small part of the wrist should be visible. The hand must have realistic skin texture and be clean, with no accessories (rings, watches, etc.).
 
-                2.  **Hand Interaction:**
-                    *   Introduce a realistic adult **man's hand** holding the door naturally from the side or top edge.
-                    *   The hand should have a natural grip and realistic skin texture. Only the hand and a small part of the wrist should be visible. No accessories on the hand.
+                **Background and Integration**
+                1.  **Use Provided Background:** You **must** use the exact background provided in the second image. Do not alter, replace, or generate a new one.
+                2.  **Seamless Blend:** The door and hand must be seamlessly and realistically integrated into the provided background.
 
-                3.  **Background Integration:**
-                    *   Use the **exact background provided in the second image**. Do not alter or replace it.
-                    *   Blend the door and the hand seamlessly into this background.
+                **Lighting and Shadows (Crucial for Realism)**
+                1.  **Adaptive Lighting:** The lighting on the door and hand must **perfectly match the lighting direction, temperature, and style** of the background image.
+                2.  **Realistic Shadows:** Generate soft, realistic shadows for both the door and the hand that are consistent with the background's light source. The shadows must make the door look physically grounded in the scene. The shadow opacity should be between 35% and 70% depending on the lighting strength.
 
-                4.  **Watermark:**
-                    *   Overlay a semi-transparent watermark with the text "SVLSM".
-                    *   **Placement:** Bottom center of the door surface.
-                    *   **Style:** Uppercase, bold, using a font similar to Poppins. The opacity should be between 35% and 55%. The color should be white or a light warm tone that is visible but not distracting. This should be a flat overlay, not look engraved.
+                **Mandatory Watermark**
+                1.  **Text:** "SVLSM"
+                2.  **Style:** Add it as a flat, semi-transparent overlay (not engraved). The text should be **uppercase, bold**, and in a font similar to **Poppins**.
+                3.  **Placement:** Position it at the **bottom center** of the door's surface.
+                4.  **Appearance:** Opacity must be between **35% and 55%**. The color should be white or a light warm tone that is visible but not distracting.
 
-                5.  **Lighting and Shadows:**
-                    *   The lighting on the door and hand must **match the lighting direction, style, and temperature of the provided background image.**
-                    *   Generate realistic, soft shadows for both the door and the hand that are consistent with the background's light source. The door should look physically grounded.
-
-                6.  **Final Composition:**
-                    *   **Render Style:** Hyper-realistic photograph.
-                    *   **Camera:** Maintain a straight, front-on angle.
-                    *   **Quality:** 4K ultra-detailed.
-                    *   **Aspect Ratio:** 1080x1920 (portrait).
-                    *   Ensure the final output is a clean, premium, and realistic presentation.
+                **Final Output Specifications**
+                1.  **Render Style:** Hyper-realistic photograph.
+                2.  **Camera & Framing:** Use a straight, front-on camera angle. The door should be centered. The final image should look like it was taken with a 35mm-50mm lens.
+                3.  **Quality:** 4K ultra-detailed.
+                4.  **Aspect Ratio:** **1080x1920 (portrait)**.
+                5.  **Tone:** The overall mood should be that of a clean, premium, handcrafted raw teak product presentation.
             `},
         ],
         config: {
