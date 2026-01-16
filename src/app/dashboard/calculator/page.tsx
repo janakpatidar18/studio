@@ -21,7 +21,6 @@ import { Badge } from "@/components/ui/badge";
 
 
 const SawnWoodEntrySchema = z.object({
-  commodity: z.string().min(1, "Commodity is required"),
   length: z.coerce.number().min(0.01, "Length must be positive"),
   width: z.coerce.number().min(0.01, "Width must be positive"),
   height: z.coerce.number().min(0.01, "Height must be positive"),
@@ -31,7 +30,6 @@ const SawnWoodEntrySchema = z.object({
 type SawnWoodEntry = z.infer<typeof SawnWoodEntrySchema> & { id: number; cft: number };
 
 const RoundLogEntrySchema = z.object({
-  commodity: z.string().min(1, "Commodity is required"),
   length: z.coerce.number().min(0.01, "Length must be positive"),
   girth: z.coerce.number().min(0.01, "Girth must be positive"),
   quantity: z.coerce.number().int().min(1, "Quantity must be at least 1"),
@@ -41,7 +39,7 @@ type RoundLogEntry = z.infer<typeof RoundLogEntrySchema> & { id: number; cft: nu
 
 
 function SawnWoodCalculator() {
-  const initialFormState = { commodity: "", length: "", width: "", height: "", quantity: "1" };
+  const initialFormState = { length: "", width: "", height: "", quantity: "1" };
   const [formValues, setFormValues] = useState(initialFormState);
   const [entries, setEntries] = useState<SawnWoodEntry[]>([]);
   const [formError, setFormError] = useState<string | null>(null);
@@ -61,12 +59,11 @@ function SawnWoodCalculator() {
     }
     
     setFormError(null);
-    const { length, width, height, quantity, commodity } = parsed.data;
+    const { length, width, height, quantity } = parsed.data;
     const cft = ((length * width * height) / 144);
     
     setEntries(prev => [...prev, {
         id: Date.now(),
-        commodity,
         length,
         width,
         height,
@@ -105,11 +102,7 @@ function SawnWoodCalculator() {
       </CardHeader>
       <CardContent className="p-4 space-y-4">
         <form onSubmit={handleAddEntry} className="p-4 border rounded-lg bg-muted/50 space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-3">
-                <div className="space-y-1 lg:col-span-2 md:col-span-3">
-                    <Label htmlFor="sawn-commodity">Commodity</Label>
-                    <Input id="sawn-commodity" value={formValues.commodity} onChange={e => handleFormChange('commodity', e.target.value)} placeholder="e.g., Teak wood" />
-                </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
                  <div className="space-y-1">
                     <Label htmlFor="sawn-length">Length (ft)</Label>
                     <Input id="sawn-length" value={formValues.length} onChange={e => handleFormChange('length', e.target.value)} type="number" step="any" placeholder="e.g., 10" />
@@ -122,7 +115,7 @@ function SawnWoodCalculator() {
                     <Label htmlFor="sawn-height">Thickness (in)</Label>
                     <Input id="sawn-height" value={formValues.height} onChange={e => handleFormChange('height', e.target.value)} type="number" step="any" placeholder="e.g., 2" />
                 </div>
-                 <div className="space-y-1 md:col-span-2 lg:col-span-1">
+                 <div className="space-y-1">
                     <Label htmlFor="sawn-quantity">Quantity</Label>
                     <Input id="sawn-quantity" value={formValues.quantity} onChange={e => handleFormChange('quantity', e.target.value)} type="number" min="1" placeholder="e.g., 1" />
                 </div>
@@ -143,7 +136,6 @@ function SawnWoodCalculator() {
                 <TableHeader>
                     <TableRow>
                         <TableHead className="w-12 text-center">#</TableHead>
-                        <TableHead>Commodity</TableHead>
                         <TableHead className="text-right">Length (ft)</TableHead>
                         <TableHead className="text-right">Width (in)</TableHead>
                         <TableHead className="text-right">Thickness (in)</TableHead>
@@ -156,12 +148,11 @@ function SawnWoodCalculator() {
                 <TableBody>
                     {entries.length === 0 ? (
                         <TableRow>
-                            <TableCell colSpan={9} className="text-center h-24 text-muted-foreground">No entries added yet.</TableCell>
+                            <TableCell colSpan={8} className="text-center h-24 text-muted-foreground">No entries added yet.</TableCell>
                         </TableRow>
                     ) : entries.map((entry, index) => (
                       <TableRow key={entry.id}>
                         <TableCell className="text-center font-medium">{index + 1}</TableCell>
-                        <TableCell>{entry.commodity}</TableCell>
                         <TableCell className="text-right">{entry.length.toFixed(2)}</TableCell>
                         <TableCell className="text-right">{entry.width.toFixed(2)}</TableCell>
                         <TableCell className="text-right">{entry.height.toFixed(2)}</TableCell>
@@ -197,7 +188,7 @@ function SawnWoodCalculator() {
 }
 
 function RoundLogsCalculator() {
-    const initialFormState = { commodity: "", length: "", girth: "", quantity: "1" };
+    const initialFormState = { length: "", girth: "", quantity: "1" };
     const [formValues, setFormValues] = useState(initialFormState);
     const [entries, setEntries] = useState<RoundLogEntry[]>([]);
     const [formError, setFormError] = useState<string | null>(null);
@@ -217,12 +208,11 @@ function RoundLogsCalculator() {
         }
 
         setFormError(null);
-        const { length, girth, quantity, commodity } = parsed.data;
+        const { length, girth, quantity } = parsed.data;
         const cft = ((girth * girth * length) / 2304);
 
         setEntries(prev => [...prev, {
             id: Date.now(),
-            commodity,
             length,
             girth,
             quantity,
@@ -260,11 +250,7 @@ function RoundLogsCalculator() {
             </CardHeader>
             <CardContent className="p-4 space-y-4">
                 <form onSubmit={handleAddEntry} className="p-4 border rounded-lg bg-muted/50 space-y-4">
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
-                        <div className="space-y-1 md:col-span-2 lg:col-span-2">
-                            <Label htmlFor="log-commodity">Commodity</Label>
-                            <Input id="log-commodity" value={formValues.commodity} onChange={e => handleFormChange('commodity', e.target.value)} placeholder="e.g., Pine wood" />
-                        </div>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                         <div className="space-y-1">
                             <Label htmlFor="log-length">Length (ft)</Label>
                             <Input id="log-length" value={formValues.length} onChange={e => handleFormChange('length', e.target.value)} type="number" step="any" placeholder="e.g., 12" />
@@ -294,7 +280,6 @@ function RoundLogsCalculator() {
                         <TableHeader>
                             <TableRow>
                                 <TableHead className="w-12 text-center">#</TableHead>
-                                <TableHead>Commodity</TableHead>
                                 <TableHead className="text-right">Length (ft)</TableHead>
                                 <TableHead className="text-right">Girth (in)</TableHead>
                                 <TableHead className="text-right">Qty</TableHead>
@@ -306,12 +291,11 @@ function RoundLogsCalculator() {
                         <TableBody>
                             {entries.length === 0 ? (
                                 <TableRow>
-                                    <TableCell colSpan={8} className="text-center h-24 text-muted-foreground">No entries added yet.</TableCell>
+                                    <TableCell colSpan={7} className="text-center h-24 text-muted-foreground">No entries added yet.</TableCell>
                                 </TableRow>
                             ) : entries.map((entry, index) => (
                               <TableRow key={entry.id}>
                                 <TableCell className="text-center font-medium">{index + 1}</TableCell>
-                                <TableCell>{entry.commodity}</TableCell>
                                 <TableCell className="text-right">{entry.length.toFixed(2)}</TableCell>
                                 <TableCell className="text-right">{entry.girth.toFixed(2)}</TableCell>
                                 <TableCell className="text-right">{entry.quantity}</TableCell>
@@ -361,5 +345,3 @@ export default function CalculatorPage() {
         </Tabs>
     )
 }
-
-    
