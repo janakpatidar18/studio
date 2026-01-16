@@ -30,19 +30,19 @@ export default function DoorReimaginerPage() {
                   Generate a New Design
               </CardTitle>
               <CardDescription>
-                  Upload an image of a door and provide a text prompt to transform it.
+                  Upload an image of a door and an image for the background to transform it.
               </CardDescription>
           </CardHeader>
           <CardContent>
               <form className="space-y-6">
                   <div className="grid md:grid-cols-2 gap-6">
                       <div className="space-y-3">
-                          <Label htmlFor="door-image">Door Image</Label>
-                          <Input id="door-image" name="door-image" type="file" accept="image/*" required className="h-auto p-0 file:h-12 file:px-4 file:border-0"/>
+                          <Label htmlFor="door-input">Door Input</Label>
+                          <Input id="door-input" name="door-input" type="file" accept="image/*" required className="h-auto p-0 file:h-12 file:px-4 file:border-0"/>
                       </div>
                       <div className="space-y-3">
-                          <Label htmlFor="prompt">Transformation Prompt</Label>
-                          <Input id="prompt" name="prompt" placeholder="e.g., make it a rustic, antique door" required />
+                          <Label htmlFor="background-input">Background Input</Label>
+                          <Input id="background-input" name="background-input" type="file" accept="image/*" required className="h-auto p-0 file:h-12 file:px-4 file:border-0" />
                       </div>
                   </div>
                    <Button type="submit" className="w-full">Reimagine</Button>
