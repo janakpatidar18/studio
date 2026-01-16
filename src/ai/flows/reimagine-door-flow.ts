@@ -36,7 +36,7 @@ const reimagineDoorFlow = ai.defineFlow(
   },
   async (input) => {
     const { media } = await ai.generate({
-        model: 'googleai/gemini-2.5-flash-image-preview',
+        model: 'googleai/gemini-2.5-flash-image',
         prompt: [
             { media: { url: input.doorImage } },
             { media: { url: input.backgroundImage } },
@@ -59,7 +59,7 @@ const reimagineDoorFlow = ai.defineFlow(
                     *   The hand must have realistic skin texture and be clean, with no rings, watches, or accessories.
 
                 4.  **Use the Provided Background:**
-                    *   You **must** use the background from the second image. Do not change, alter, or generate a new background.
+                    *   You **must** use the background from the second input image. Do not change, alter, or generate a new background.
                     *   Seamlessly and realistically blend the door and hand into this background.
 
                 5.  **Lighting and Shadows:**
