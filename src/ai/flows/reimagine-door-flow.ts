@@ -41,42 +41,65 @@ const reimagineDoorFlow = ai.defineFlow(
             { media: { url: input.doorImage } },
             { media: { url: input.backgroundImage } },
             { text: `
-                You are an expert photorealistic image editor. Your task is to combine a door from a primary image with a background from a secondary image, following these exact specifications to create a hyper-realistic final image.
+                You are a master photorealistic image editor. Your task is to combine a door from the first input image with a background from the second input image. Create a new, hyper-realistic final image following these exact instructions:
 
-                **Primary Subject: The Door**
-                1.  **Isolate:** Isolate the carved door from the first image.
-                2.  **Material Transformation:** Convert the door's material to **raw, unfinished teak wood**. It must have a **matte finish** with clearly **visible wood grains**.
-                3.  **Preserve Design:** The original design, carving, and shape of the door must be kept **identical**.
-                4.  **Correction:** Correct any misaligned or imbalanced geometric areas in the door, but preserve its authentic design.
+                **Instructions:**
 
-                **Secondary Subject: Hand Interaction**
-                1.  **Introduction:** Add a realistic adult **man's hand** holding the door. The grip should look natural, holding it from the side or top edge.
-                2.  **Appearance:** Only the hand and a small part of the wrist should be visible. The hand must have realistic skin texture and be clean, with no accessories (rings, watches, etc.).
+                1.  **Isolate the Door:** From the first image, perfectly isolate the carved door.
 
-                **Background and Integration**
-                1.  **Use Provided Background:** You **must** use the exact background provided in the second image. Do not alter, replace, or generate a new one.
-                2.  **Seamless Blend:** The door and hand must be seamlessly and realistically integrated into the provided background.
+                2.  **Transform the Door:**
+                    *   Change the door's material to **raw, unfinished teak wood**.
+                    *   The finish must be **matte** with **clearly visible wood grains**.
+                    *   Keep the original carving, design, and shape **identical**.
+                    *   Correct any minor geometric misalignments, but preserve the door's authentic design.
 
-                **Lighting and Shadows (Crucial for Realism)**
-                1.  **Adaptive Lighting:** The lighting on the door and hand must **perfectly match the lighting direction, temperature, and style** of the background image.
-                2.  **Realistic Shadows:** Generate soft, realistic shadows for both the door and the hand that are consistent with the background's light source. The shadows must make the door look physically grounded in the scene. The shadow opacity should be between 35% and 70% depending on the lighting strength.
+                3.  **Add a Hand:**
+                    *   Introduce a realistic adult **man's hand** holding the door from the side or top edge. The grip must look natural.
+                    *   Show only the hand and a small part of the wrist.
+                    *   The hand must have realistic skin texture and be clean, with no rings, watches, or accessories.
 
-                **Mandatory Watermark**
-                1.  **Text:** "SVLSM"
-                2.  **Style:** Add it as a flat, semi-transparent overlay (not engraved). The text should be **uppercase, bold**, and in a font similar to **Poppins**.
-                3.  **Placement:** Position it at the **bottom center** of the door's surface.
-                4.  **Appearance:** Opacity must be between **35% and 55%**. The color should be white or a light warm tone that is visible but not distracting.
+                4.  **Use the Provided Background:**
+                    *   You **must** use the background from the second image. Do not change, alter, or generate a new background.
+                    *   Seamlessly and realistically blend the door and hand into this background.
 
-                **Final Output Specifications**
-                1.  **Render Style:** Hyper-realistic photograph.
-                2.  **Camera & Framing:** Use a straight, front-on camera angle. The door should be centered. The final image should look like it was taken with a 35mm-50mm lens.
-                3.  **Quality:** 4K ultra-detailed.
-                4.  **Aspect Ratio:** **1080x1920 (portrait)**.
-                5.  **Tone:** The overall mood should be that of a clean, premium, handcrafted raw teak product presentation.
+                5.  **Lighting and Shadows:**
+                    *   The lighting on the door and hand must **perfectly match the lighting direction, temperature, and style** of the background image.
+                    *   Generate soft, realistic shadows for the door and hand that are consistent with the background's light source, making them look grounded in the scene. The shadow opacity should be between 35% and 70%.
+
+                6.  **Add Watermark:**
+                    *   **Text:** "SVLSM"
+                    *   **Style:** Add it as a flat, semi-transparent overlay (not engraved). The text must be **uppercase, bold**, and in a font like **Poppins**.
+                    *   **Placement:** Position it at the **bottom center** of the door.
+                    *   **Appearance:** Opacity must be between **35% and 55%**. The color should be white or a light warm tone, visible but not distracting.
+
+                7.  **Final Image Specifications:**
+                    *   **Render Style:** Hyper-realistic photograph.
+                    *   **Camera:** Straight, front-on angle with the door centered. Simulate a 35mm-50mm lens.
+                    *   **Quality:** 4K ultra-detailed.
+                    *   **Aspect Ratio:** **1080x1920 (portrait)**.
+                    *   **Tone:** The mood should be a clean, premium presentation of a handcrafted raw teak product.
             `},
         ],
         config: {
             responseModalities: ['TEXT', 'IMAGE'],
+            safetySettings: [
+                {
+                    category: 'HARM_CATEGORY_HATE_SPEECH',
+                    threshold: 'BLOCK_NONE',
+                },
+                {
+                    category: 'HARM_CATEGORY_DANGEROUS_CONTENT',
+                    threshold: 'BLOCK_NONE',
+                },
+                {
+                    category: 'HARM_CATEGORY_HARASSMENT',
+                    threshold: 'BLOCK_NONE',
+                },
+                {
+                    category: 'HARM_CATEGORY_SEXUALLY_EXPLICIT',
+                    threshold: 'BLOCK_NONE',
+                },
+            ],
         },
     });
 
