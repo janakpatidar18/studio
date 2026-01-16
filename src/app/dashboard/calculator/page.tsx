@@ -164,7 +164,6 @@ function SawnWoodCalculator() {
         // jsPDF has better support for JPEG/PNG. If WEBP fails, please convert the image.
         doc.addImage(img, 'WEBP', (pageWidth / 2) - 10, 8, 20, 20);
     } catch (error) {
-        console.error("PDF Image Error: Could not load image. Falling back to text. Ensure 'shree-icon.webp' is in the /public folder.", error);
         doc.setTextColor(255, 0, 0);
         doc.setFontSize(16);
         doc.text("||श्री||", pageWidth / 2, 15, { align: 'center' });
@@ -453,7 +452,6 @@ function RoundLogsCalculator() {
               // jsPDF has better support for JPEG/PNG. If WEBP fails, please convert the image.
               doc.addImage(img, 'WEBP', (pageWidth / 2) - 10, 8, 20, 20);
           } catch (error) {
-              console.error("PDF Image Error: Could not load image. Falling back to text. Ensure 'shree-icon.webp' is in the /public folder.", error);
               doc.setTextColor(255, 0, 0);
               doc.setFontSize(16);
               doc.text("||श्री||", pageWidth / 2, 15, { align: 'center' });
@@ -654,5 +652,4 @@ export default function CalculatorPage() {
         </Tabs>
     )
 }
-
     
