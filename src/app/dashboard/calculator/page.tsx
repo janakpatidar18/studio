@@ -148,10 +148,15 @@ function SawnWoodCalculator() {
     const dateStr = today.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
     const pageWidth = doc.internal.pageSize.getWidth();
 
+    doc.setFontSize(16);
+    doc.setTextColor(255, 0, 0);
+    doc.text("||श्री||", pageWidth / 2, 15, { align: 'center' });
+
+    doc.setTextColor(0, 0, 0);
     doc.setFontSize(18);
-    doc.text("Sawn Wood CFT Calculation", pageWidth / 2, 20, { align: 'center' });
+    doc.text("Sawn Wood CFT Calculation", pageWidth / 2, 25, { align: 'center' });
     doc.setFontSize(11);
-    doc.text(`Date: ${dateStr}`, pageWidth / 2, 27, { align: 'center' });
+    doc.text(`Date: ${dateStr}`, pageWidth / 2, 32, { align: 'center' });
 
     const tableColumn = ["#", "Length (ft)", "Width (in)", "Thickness (in)", "Qty", "CFT (Item)", "Total CFT"];
     const tableRows: (string | number)[][] = [];
@@ -172,7 +177,7 @@ function SawnWoodCalculator() {
     doc.autoTable({
         head: [tableColumn],
         body: tableRows,
-        startY: 35,
+        startY: 40,
         didDrawPage: function (data) {
             const pageHeight = doc.internal.pageSize.getHeight();
             const pageWidth = doc.internal.pageSize.getWidth();
@@ -180,6 +185,7 @@ function SawnWoodCalculator() {
             // Page Number
             let str = `Page ${doc.internal.getNumberOfPages()}`;
             doc.setFontSize(10);
+            doc.setTextColor(0, 0, 0);
             doc.text(str, data.settings.margin.left, pageHeight - 10);
             
             // Footer
@@ -422,11 +428,16 @@ function RoundLogsCalculator() {
         const today = new Date();
         const dateStr = today.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
         const pageWidth = doc.internal.pageSize.getWidth();
+
+        doc.setFontSize(16);
+        doc.setTextColor(255, 0, 0);
+        doc.text("||श्री||", pageWidth / 2, 15, { align: 'center' });
     
+        doc.setTextColor(0, 0, 0);
         doc.setFontSize(18);
-        doc.text("Round Logs CFT Calculation", pageWidth / 2, 20, { align: 'center' });
+        doc.text("Round Logs CFT Calculation", pageWidth / 2, 25, { align: 'center' });
         doc.setFontSize(11);
-        doc.text(`Date: ${dateStr}`, pageWidth / 2, 27, { align: 'center' });
+        doc.text(`Date: ${dateStr}`, pageWidth / 2, 32, { align: 'center' });
     
         const tableColumn = ["#", "Length (ft)", "Girth (in)", "Qty", "CFT (Item)", "Total CFT"];
         const tableRows: (string | number)[][] = [];
@@ -446,7 +457,7 @@ function RoundLogsCalculator() {
         doc.autoTable({
             head: [tableColumn],
             body: tableRows,
-            startY: 35,
+            startY: 40,
             didDrawPage: function (data) {
                 const pageHeight = doc.internal.pageSize.getHeight();
                 const pageWidth = doc.internal.pageSize.getWidth();
@@ -454,6 +465,7 @@ function RoundLogsCalculator() {
                 // Page Number
                 let str = `Page ${doc.internal.getNumberOfPages()}`;
                 doc.setFontSize(10);
+                doc.setTextColor(0, 0, 0);
                 doc.text(str, data.settings.margin.left, pageHeight - 10);
                 
                 // Footer
