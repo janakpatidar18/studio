@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Wand2, X, Image as ImageIcon, CheckCircle2, RotateCw } from "lucide-react";
+import { Wand2, X, Image as ImageIcon, CheckCircle2, RotateCw, RefreshCw } from "lucide-react";
 import Image from "next/image";
 import { useToast } from "@/hooks/use-toast";
 import { reimagineDoor, ReimagineDoorOutput } from "@/ai/flows/reimagine-door-flow";
@@ -69,9 +69,8 @@ export default function DoorReimaginerPage() {
       if(input) input.value = '';
     }
   }
-  
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
+
+  const handleGenerate = async () => {
     setError(null);
 
     if (!doorImage || !backgroundImage) {
@@ -108,6 +107,15 @@ export default function DoorReimaginerPage() {
     } finally {
         setLoading(false);
     }
+  };
+  
+  const handleRegenerate = () => {
+    handleGenerate();
+  };
+
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    handleGenerate();
   };
 
   const handleStartOver = () => {
@@ -180,6 +188,9 @@ export default function DoorReimaginerPage() {
                          >
                             <Button className="w-full">Download Image</Button>
                          </a>
+                         <Button onClick={handleRegenerate} variant="secondary" className="w-full">
+                            <RefreshCw className="mr-2 h-4 w-4" /> Regenerate
+                        </Button>
                         <Button onClick={handleStartOver} variant="outline" className="w-full">
                             <RotateCw className="mr-2 h-4 w-4" /> Start Over
                         </Button>
