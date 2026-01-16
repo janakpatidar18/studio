@@ -270,4 +270,96 @@ function RoundLogsCalculator() {
                             <Input id="log-length" value={formValues.length} onChange={e => handleFormChange('length', e.target.value)} type="number" step="any" placeholder="e.g., 12" />
                         </div>
                         <div className="space-y-1">
-                            <Label htmlFor
+                            <Label htmlFor="log-girth">Girth (in)</Label>
+                            <Input id="log-girth" value={formValues.girth} onChange={e => handleFormChange('girth', e.target.value)} type="number" step="any" placeholder="e.g., 24" />
+                        </div>
+                        <div className="space-y-1">
+                            <Label htmlFor="log-quantity">Quantity</Label>
+                            <Input id="log-quantity" value={formValues.quantity} onChange={e => handleFormChange('quantity', e.target.value)} type="number" min="1" placeholder="e.g., 1" />
+                        </div>
+                    </div>
+                    {formError && <p className="text-sm text-destructive">{formError}</p>}
+                    <div className="flex justify-end gap-2">
+                        <Button type="button" variant="ghost" onClick={clearForm}>
+                            <X className="mr-2 h-4 w-4" /> Clear
+                        </Button>
+                        <Button type="submit">
+                            <Plus className="mr-2 h-4 w-4" /> Add Entry
+                        </Button>
+                    </div>
+                </form>
+
+                <div className="overflow-auto border rounded-lg">
+                    <Table>
+                        <TableHeader>
+                            <TableRow>
+                                <TableHead className="w-12 text-center">#</TableHead>
+                                <TableHead>Commodity</TableHead>
+                                <TableHead className="text-right">Length (ft)</TableHead>
+                                <TableHead className="text-right">Girth (in)</TableHead>
+                                <TableHead className="text-right">Qty</TableHead>
+                                <TableHead className="text-right">CFT (Item)</TableHead>
+                                <TableHead className="text-right">Total CFT</TableHead>
+                                <TableHead className="w-20 text-center">Action</TableHead>
+                            </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                            {entries.length === 0 ? (
+                                <TableRow>
+                                    <TableCell colSpan={8} className="text-center h-24 text-muted-foreground">No entries added yet.</TableCell>
+                                </TableRow>
+                            ) : entries.map((entry, index) => (
+                              <TableRow key={entry.id}>
+                                <TableCell className="text-center font-medium">{index + 1}</TableCell>
+                                <TableCell>{entry.commodity}</TableCell>
+                                <TableCell className="text-right">{entry.length.toFixed(2)}</TableCell>
+                                <TableCell className="text-right">{entry.girth.toFixed(2)}</TableCell>
+                                <TableCell className="text-right">{entry.quantity}</TableCell>
+                                <TableCell className="text-right">{entry.cft.toFixed(4)}</TableCell>
+                                <TableCell className="text-right font-medium">{(entry.cft * entry.quantity).toFixed(4)}</TableCell>
+                                <TableCell className="text-center">
+                                   <Button variant="ghost" size="icon" type="button" onClick={() => removeEntry(entry.id)} className="text-muted-foreground hover:text-destructive h-8 w-8">
+                                     <Trash2 className="h-4 w-4" />
+                                     <span className="sr-only">Remove</span>
+                                   </Button>
+                                </TableCell>
+                              </TableRow>
+                            ))}
+                        </TableBody>
+                    </Table>
+                </div>
+            </CardContent>
+            {entries.length > 0 && (
+                <CardFooter className="flex-col items-stretch p-4 border-t bg-muted/50 space-y-2">
+                    <div className="flex justify-between text-lg">
+                        <span className="text-muted-foreground">Total Quantity</span>
+                        <span className="font-bold">{totalQuantity}</span>
+                    </div>
+                    <div className="flex justify-between text-2xl">
+                        <span className="text-muted-foreground">Total CFT</span>
+                        <span className="font-bold font-headline text-primary">{totalCft.toFixed(4)}</span>
+                    </div>
+                </CardFooter>
+            )}
+        </Card>
+    );
+}
+
+export default function CalculatorPage() {
+    return (
+        <Tabs defaultValue="sawn-wood" className="w-full">
+            <TabsList className="grid w-full grid-cols-2">
+                <TabsTrigger value="sawn-wood">Sawn Wood</TabsTrigger>
+                <TabsTrigger value="round-logs">Round Logs</TabsTrigger>
+            </TabsList>
+            <TabsContent value="sawn-wood">
+                <SawnWoodCalculator />
+            </TabsContent>
+            <TabsContent value="round-logs">
+                <RoundLogsCalculator />
+            </TabsContent>
+        </Tabs>
+    )
+}
+
+    
