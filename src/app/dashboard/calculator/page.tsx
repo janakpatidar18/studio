@@ -125,19 +125,19 @@ function SawnWoodCalculator() {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
                  <div className="space-y-1">
                     <Label htmlFor="sawn-length">Length (ft)</Label>
-                    <Input id="sawn-length" value={formValues.length} onChange={e => handleFormChange('length', e.target.value)} onKeyDown={handleInputKeyDown} type="number" step="any" placeholder="e.g., 10" />
+                    <Input id="sawn-length" value={formValues.length} onChange={e => handleFormChange('length', e.target.value)} onKeyDown={handleInputKeyDown} type="number" inputMode="decimal" step="any" placeholder="e.g., 10" />
                 </div>
                 <div className="space-y-1">
                     <Label htmlFor="sawn-width">Width (in)</Label>
-                    <Input id="sawn-width" value={formValues.width} onChange={e => handleFormChange('width', e.target.value)} onKeyDown={handleInputKeyDown} type="number" step="any" placeholder="e.g., 6" />
+                    <Input id="sawn-width" value={formValues.width} onChange={e => handleFormChange('width', e.target.value)} onKeyDown={handleInputKeyDown} type="number" inputMode="decimal" step="any" placeholder="e.g., 6" />
                 </div>
                 <div className="space-y-1">
                     <Label htmlFor="sawn-height">Thickness (in)</Label>
-                    <Input id="sawn-height" value={formValues.height} onChange={e => handleFormChange('height', e.target.value)} onKeyDown={handleInputKeyDown} type="number" step="any" placeholder="e.g., 2" />
+                    <Input id="sawn-height" value={formValues.height} onChange={e => handleFormChange('height', e.target.value)} onKeyDown={handleInputKeyDown} type="number" inputMode="decimal" step="any" placeholder="e.g., 2" />
                 </div>
                  <div className="space-y-1">
                     <Label htmlFor="sawn-quantity">Quantity</Label>
-                    <Input id="sawn-quantity" value={formValues.quantity} onChange={e => handleFormChange('quantity', e.target.value)} onKeyDown={handleInputKeyDown} type="number" min="1" placeholder="e.g., 1" />
+                    <Input id="sawn-quantity" value={formValues.quantity} onChange={e => handleFormChange('quantity', e.target.value)} onKeyDown={handleInputKeyDown} type="number" inputMode="numeric" min="1" placeholder="e.g., 1" />
                 </div>
             </div>
             {formError && <p className="text-sm text-destructive">{formError}</p>}
@@ -274,15 +274,15 @@ function RoundLogsCalculator() {
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                         <div className="space-y-1">
                             <Label htmlFor="log-length">Length (ft)</Label>
-                            <Input id="log-length" value={formValues.length} onChange={e => handleFormChange('length', e.target.value)} onKeyDown={handleInputKeyDown} type="number" step="any" placeholder="e.g., 12" />
+                            <Input id="log-length" value={formValues.length} onChange={e => handleFormChange('length', e.target.value)} onKeyDown={handleInputKeyDown} type="number" inputMode="decimal" step="any" placeholder="e.g., 12" />
                         </div>
                         <div className="space-y-1">
                             <Label htmlFor="log-girth">Girth (in)</Label>
-                            <Input id="log-girth" value={formValues.girth} onChange={e => handleFormChange('girth', e.target.value)} onKeyDown={handleInputKeyDown} type="number" step="any" placeholder="e.g., 24" />
+                            <Input id="log-girth" value={formValues.girth} onChange={e => handleFormChange('girth', e.target.value)} onKeyDown={handleInputKeyDown} type="number" inputMode="decimal" step="any" placeholder="e.g., 24" />
                         </div>
                         <div className="space-y-1">
                             <Label htmlFor="log-quantity">Quantity</Label>
-                            <Input id="log-quantity" value={formValues.quantity} onChange={e => handleFormChange('quantity', e.target.value)} onKeyDown={handleInputKeyDown} type="number" min="1" placeholder="e.g., 1" />
+                            <Input id="log-quantity" value={formValues.quantity} onChange={e => handleFormChange('quantity', e.target.value)} onKeyDown={handleInputKeyDown} type="number" inputMode="numeric" min="1" placeholder="e.g., 1" />
                         </div>
                     </div>
                     {formError && <p className="text-sm text-destructive">{formError}</p>}
