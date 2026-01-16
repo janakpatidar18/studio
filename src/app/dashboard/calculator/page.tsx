@@ -91,6 +91,7 @@ function SawnWoodCalculator() {
     }]);
 
     setFormValues(initialFormState);
+    (e.currentTarget.elements[0] as HTMLInputElement)?.focus();
   };
 
   const removeEntry = (id: number) => {
@@ -239,6 +240,7 @@ function RoundLogsCalculator() {
         }]);
 
         setFormValues(initialFormState);
+        (e.currentTarget.elements[0] as HTMLInputElement)?.focus();
     };
 
     const removeEntry = (id: number) => {
@@ -364,6 +366,8 @@ export default function CalculatorPage() {
         </Tabs>
     )
 }
+
+    
 
     
 
