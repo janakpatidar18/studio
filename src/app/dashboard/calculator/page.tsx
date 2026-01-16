@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { z } from "zod";
-import { Plus, Trash2, X, Edit } from "lucide-react";
+import { Plus, Trash2, X, Edit, Download } from "lucide-react";
 import {
   Table,
   TableBody,
@@ -18,7 +18,14 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
+import jsPDF from "jspdf";
+import "jspdf-autotable";
 
+declare module 'jspdf' {
+  interface jsPDF {
+    autoTable: (options: any) => jsPDF;
+  }
+}
 
 const SawnWoodEntrySchema = z.object({
   length: z.coerce.number().min(0.01, "Length must be positive"),
@@ -136,6 +143,59 @@ function SawnWoodCalculator() {
     );
   }, [entries]);
 
+  const handleDownloadPdf = () => {
+    const doc = new jsPDF();
+    const today = new Date();
+    const dateStr = today.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+
+    doc.setFontSize(18);
+    doc.text("Sawn Wood CFT Calculation", 14, 22);
+    doc.setFontSize(11);
+    doc.text(`Date: ${dateStr}`, 14, 29);
+
+    const tableColumn = ["#", "Length (ft)", "Width (in)", "Thickness (in)", "Qty", "CFT (Item)", "Total CFT"];
+    const tableRows: (string | number)[][] = [];
+
+    entries.forEach((entry, index) => {
+        const rowData = [
+            index + 1,
+            entry.length.toFixed(2),
+            entry.width.toFixed(2),
+            entry.height.toFixed(2),
+            entry.quantity,
+            entry.cft.toFixed(4),
+            (entry.cft * entry.quantity).toFixed(4)
+        ];
+        tableRows.push(rowData);
+    });
+
+    doc.autoTable({
+        head: [tableColumn],
+        body: tableRows,
+        startY: 35,
+        didDrawPage: function (data) {
+            let str = `Page ${doc.internal.getNumberOfPages()}`;
+            doc.setFontSize(10);
+            doc.text(str, data.settings.margin.left, doc.internal.pageSize.height - 10);
+        }
+    });
+    
+    const finalY = (doc as any).lastAutoTable.finalY;
+    doc.setFontSize(12);
+    doc.text("Summary", 14, finalY + 15);
+    doc.autoTable({
+        body: [
+            ["Total Quantity", totalQuantity],
+            ["Total CFT", totalCft.toFixed(4)]
+        ],
+        startY: finalY + 20,
+        theme: 'grid',
+        styles: { fontStyle: 'bold' }
+    });
+
+    doc.save(`sawn-wood-cft_${today.toISOString().split('T')[0]}.pdf`);
+  };
+
   return (
     <Card>
       <CardHeader>
@@ -227,6 +287,10 @@ function SawnWoodCalculator() {
                 <span className="text-muted-foreground">Total CFT</span>
                 <span className="font-bold font-headline text-primary">{totalCft.toFixed(4)}</span>
             </div>
+            <Button onClick={handleDownloadPdf} variant="outline" className="mt-2 w-full">
+                <Download className="mr-2 h-4 w-4" />
+                Download as PDF
+            </Button>
           </CardFooter>
       )}
     </Card>
@@ -309,6 +373,58 @@ function RoundLogsCalculator() {
           { totalCft: 0, totalQuantity: 0 }
         );
       }, [entries]);
+
+      const handleDownloadPdf = () => {
+        const doc = new jsPDF();
+        const today = new Date();
+        const dateStr = today.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+    
+        doc.setFontSize(18);
+        doc.text("Round Logs CFT Calculation", 14, 22);
+        doc.setFontSize(11);
+        doc.text(`Date: ${dateStr}`, 14, 29);
+    
+        const tableColumn = ["#", "Length (ft)", "Girth (in)", "Qty", "CFT (Item)", "Total CFT"];
+        const tableRows: (string | number)[][] = [];
+    
+        entries.forEach((entry, index) => {
+            const rowData = [
+                index + 1,
+                entry.length.toFixed(2),
+                entry.girth.toFixed(2),
+                entry.quantity,
+                entry.cft.toFixed(4),
+                (entry.cft * entry.quantity).toFixed(4)
+            ];
+            tableRows.push(rowData);
+        });
+    
+        doc.autoTable({
+            head: [tableColumn],
+            body: tableRows,
+            startY: 35,
+            didDrawPage: function (data) {
+                let str = `Page ${doc.internal.getNumberOfPages()}`;
+                doc.setFontSize(10);
+                doc.text(str, data.settings.margin.left, doc.internal.pageSize.height - 10);
+            }
+        });
+    
+        const finalY = (doc as any).lastAutoTable.finalY;
+        doc.setFontSize(12);
+        doc.text("Summary", 14, finalY + 15);
+        doc.autoTable({
+            body: [
+                ["Total Quantity", totalQuantity],
+                ["Total CFT", totalCft.toFixed(4)]
+            ],
+            startY: finalY + 20,
+            theme: 'grid',
+            styles: { fontStyle: 'bold' }
+        });
+        
+        doc.save(`round-logs-cft_${today.toISOString().split('T')[0]}.pdf`);
+    };
 
     return (
         <Card>
@@ -395,6 +511,10 @@ function RoundLogsCalculator() {
                         <span className="text-muted-foreground">Total CFT</span>
                         <span className="font-bold font-headline text-primary">{totalCft.toFixed(4)}</span>
                     </div>
+                    <Button onClick={handleDownloadPdf} variant="outline" className="mt-2 w-full">
+                        <Download className="mr-2 h-4 w-4" />
+                        Download as PDF
+                    </Button>
                 </CardFooter>
             )}
         </Card>
