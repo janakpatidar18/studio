@@ -150,7 +150,7 @@ function SawnWoodCalculator() {
         head: [['#', 'Dimensions (L×W×T)', 'Qty', 'Total CFT']],
         body: entries.map((entry, index) => [
             index + 1,
-            `${entry.length.toFixed(2)}ft × ${entry.width.toFixed(2)}in × ${entry.height.toFixed(2)}in`,
+            `${entry.length.toFixed(1)}ft × ${entry.width.toFixed(1)}in × ${entry.height.toFixed(1)}in`,
             entry.quantity,
             (entry.cft * entry.quantity).toFixed(4)
         ]),
@@ -230,19 +230,19 @@ function SawnWoodCalculator() {
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                  <div className="space-y-1">
                     <Label htmlFor="sawn-length">Length (ft)</Label>
-                    <Input id="sawn-length" value={formValues.length} onChange={e => handleFormChange('length', e.target.value)} onKeyDown={handleInputKeyDown} type="number" inputMode="decimal" step="any" placeholder="e.g., 10.5" />
+                    <Input id="sawn-length" value={formValues.length} onChange={e => handleFormChange('length', e.target.value)} onKeyDown={handleInputKeyDown} type="number" inputMode="decimal" step="any" placeholder="" />
                 </div>
                 <div className="space-y-1">
                     <Label htmlFor="sawn-width">Width (in)</Label>
-                    <Input id="sawn-width" value={formValues.width} onChange={e => handleFormChange('width', e.target.value)} onKeyDown={handleInputKeyDown} type="number" inputMode="decimal" step="any" placeholder="e.g., 6" />
+                    <Input id="sawn-width" value={formValues.width} onChange={e => handleFormChange('width', e.target.value)} onKeyDown={handleInputKeyDown} type="number" inputMode="decimal" step="any" placeholder="" />
                 </div>
                 <div className="space-y-1">
                     <Label htmlFor="sawn-height">Thickness (in)</Label>
-                    <Input id="sawn-height" value={formValues.height} onChange={e => handleFormChange('height', e.target.value)} onKeyDown={handleInputKeyDown} type="number" inputMode="decimal" step="any" placeholder="e.g., 2.25" />
+                    <Input id="sawn-height" value={formValues.height} onChange={e => handleFormChange('height', e.target.value)} onKeyDown={handleInputKeyDown} type="number" inputMode="decimal" step="any" placeholder="" />
                 </div>
                  <div className="space-y-1">
                     <Label htmlFor="sawn-quantity">Quantity</Label>
-                    <Input id="sawn-quantity" value={formValues.quantity} onChange={e => handleFormChange('quantity', e.target.value)} onKeyDown={handleInputKeyDown} type="number" inputMode="numeric" min="1" placeholder="e.g., 5" />
+                    <Input id="sawn-quantity" value={formValues.quantity} onChange={e => handleFormChange('quantity', e.target.value)} onKeyDown={handleInputKeyDown} type="number" inputMode="numeric" min="1" placeholder="" />
                 </div>
             </div>
             {formError && <p className="text-sm text-destructive">{formError}</p>}
@@ -276,7 +276,7 @@ function SawnWoodCalculator() {
                       <TableRow key={entry.id}>
                         <TableCell className="p-2 sm:p-4 text-center font-medium">{index + 1}</TableCell>
                         <TableCell className="p-2 sm:p-4">
-                            <div className="font-medium whitespace-normal">{entry.length.toFixed(2)}ft × {entry.width.toFixed(2)}in × {entry.height.toFixed(2)}in</div>
+                            <div className="font-medium whitespace-normal">{entry.length.toFixed(1)}ft × {entry.width.toFixed(1)}in × {entry.height.toFixed(1)}in</div>
                             <div className="text-xs text-muted-foreground">Item CFT: {entry.cft.toFixed(4)}</div>
                         </TableCell>
                         <TableCell className="p-2 sm:p-4 text-right">{entry.quantity}</TableCell>
@@ -447,7 +447,7 @@ function RoundLogsCalculator() {
             head: [['#', 'Dimensions (L×G)', 'Qty', 'Total CFT']],
             body: entries.map((entry, index) => [
                 index + 1,
-                `${entry.length.toFixed(2)}ft × ${entry.girth.toFixed(2)}in`,
+                `${entry.length.toFixed(1)}ft × ${entry.girth.toFixed(1)}in`,
                 entry.quantity,
                 (entry.cft * entry.quantity).toFixed(4)
             ]),
@@ -526,15 +526,15 @@ function RoundLogsCalculator() {
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                         <div className="space-y-1">
                             <Label htmlFor="log-length">Length (ft)</Label>
-                            <Input id="log-length" value={formValues.length} onChange={e => handleFormChange('length', e.target.value)} onKeyDown={handleInputKeyDown} type="number" inputMode="decimal" step="any" placeholder="e.g., 12" />
+                            <Input id="log-length" value={formValues.length} onChange={e => handleFormChange('length', e.target.value)} onKeyDown={handleInputKeyDown} type="number" inputMode="decimal" step="any" placeholder="" />
                         </div>
                         <div className="space-y-1">
                             <Label htmlFor="log-girth">Girth (in)</Label>
-                            <Input id="log-girth" value={formValues.girth} onChange={e => handleFormChange('girth', e.target.value)} onKeyDown={handleInputKeyDown} type="number" inputMode="decimal" step="any" placeholder="e.g., 24" />
+                            <Input id="log-girth" value={formValues.girth} onChange={e => handleFormChange('girth', e.target.value)} onKeyDown={handleInputKeyDown} type="number" inputMode="decimal" step="any" placeholder="" />
                         </div>
                         <div className="space-y-1">
                             <Label htmlFor="log-quantity">Quantity</Label>
-                            <Input id="log-quantity" value={formValues.quantity} onChange={e => handleFormChange('quantity', e.target.value)} onKeyDown={handleInputKeyDown} type="number" inputMode="numeric" min="1" placeholder="e.g., 3" />
+                            <Input id="log-quantity" value={formValues.quantity} onChange={e => handleFormChange('quantity', e.target.value)} onKeyDown={handleInputKeyDown} type="number" inputMode="numeric" min="1" placeholder="" />
                         </div>
                     </div>
                     {formError && <p className="text-sm text-destructive">{formError}</p>}
@@ -568,7 +568,7 @@ function RoundLogsCalculator() {
                               <TableRow key={entry.id}>
                                 <TableCell className="p-2 sm:p-4 text-center font-medium">{index + 1}</TableCell>
                                 <TableCell className="p-2 sm:p-4">
-                                    <div className="font-medium whitespace-normal">{entry.length.toFixed(2)}ft × {entry.girth.toFixed(2)}in</div>
+                                    <div className="font-medium whitespace-normal">{entry.length.toFixed(1)}ft × {entry.girth.toFixed(1)}in</div>
                                     <div className="text-xs text-muted-foreground">Item CFT: {entry.cft.toFixed(4)}</div>
                                 </TableCell>
                                 <TableCell className="p-2 sm:p-4 text-right">{entry.quantity}</TableCell>
@@ -669,3 +669,6 @@ export default function CalculatorPage() {
 
     
 
+
+
+    
