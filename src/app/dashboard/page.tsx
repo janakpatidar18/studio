@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { useInventory } from "@/context/InventoryContext";
-import { Edit, PlusCircle, Trash2, Upload, X, Download, Filter } from "lucide-react";
+import { Edit, PlusCircle, Trash2, Upload, X, Filter } from "lucide-react";
 import Image from "next/image";
 import { useToast } from "@/hooks/use-toast";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -347,15 +347,6 @@ export default function GalleryPage() {
                                 />
                             </div>
                             <div className="absolute top-2 right-2 z-10 flex flex-col gap-2">
-                                <a
-                                    href={image.image}
-                                    download={`${image.title.replace(/\s+/g, '_')}.jpg`}
-                                >
-                                    <Button variant="secondary" size="icon" className="h-9 w-9">
-                                        <Download className="w-4 h-4" />
-                                        <span className="sr-only">Download Image</span>
-                                    </Button>
-                                </a>
                                 {isEditMode && (
                                     <>
                                         <EditGalleryImageDialog image={image}>

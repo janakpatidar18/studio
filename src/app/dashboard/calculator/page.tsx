@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { z } from "zod";
-import { Plus, Trash2, X, Edit, Download, Share2 } from "lucide-react";
+import { Plus, Trash2, X, Edit } from "lucide-react";
 import {
   Table,
   TableBody,
@@ -17,14 +17,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import jsPDF from "jspdf";
-import "jspdf-autotable";
-
-declare module 'jspdf' {
-  interface jsPDF {
-    autoTable: (options: any) => jsPDF;
-  }
-}
 
 const SawnWoodEntrySchema = z.object({
   length: z.coerce.number().min(0.01, "Length must be positive"),
@@ -142,100 +134,6 @@ function SawnWoodCalculator() {
     );
   }, [entries]);
 
-  const generateSawnWoodPdfDoc = async () => {
-    const doc = new jsPDF('p', 'mm', 'a4');
-    const today = new Date();
-    const dateStr = today.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
-    const pageWidth = doc.internal.pageSize.getWidth();
-
-    doc.setTextColor(0, 0, 0);
-    doc.setFontSize(18);
-    doc.text("Sawn Wood CFT Calculation", pageWidth / 2, 15, { align: 'center' });
-    doc.setFontSize(11);
-    doc.text(`Date: ${dateStr}`, pageWidth / 2, 22, { align: 'center' });
-
-    const tableColumn = ["#", "Length (ft)", "Width (in)", "Thickness (in)", "Qty", "CFT (Item)", "Total CFT"];
-    const tableRows: (string | number)[][] = [];
-
-    entries.forEach((entry, index) => {
-        const rowData = [
-            index + 1,
-            entry.length.toFixed(2),
-            entry.width.toFixed(2),
-            entry.height.toFixed(2),
-            entry.quantity,
-            entry.cft.toFixed(4),
-            (entry.cft * entry.quantity).toFixed(4)
-        ];
-        tableRows.push(rowData);
-    });
-
-    doc.autoTable({
-        head: [tableColumn],
-        body: tableRows,
-        startY: 30,
-        didDrawPage: function (data) {
-            const pageHeight = doc.internal.pageSize.getHeight();
-            const pageWidth = doc.internal.pageSize.getWidth();
-            
-            // Page Number
-            let str = `Page ${doc.internal.getNumberOfPages()}`;
-            doc.setFontSize(10);
-            doc.setTextColor(0, 0, 0);
-            doc.text(str, data.settings.margin.left, pageHeight - 10);
-            
-            // Footer
-            doc.setFontSize(9);
-            doc.setTextColor(128);
-            doc.text("©2026 JanakPatidar.Design Studio", pageWidth / 2, pageHeight - 10, { align: 'center' });
-        }
-    });
-    
-    const finalY = (doc as any).lastAutoTable.finalY;
-    doc.setFontSize(12);
-    doc.text("Summary", 14, finalY + 15);
-    doc.autoTable({
-        body: [
-            ["Total Quantity", totalQuantity],
-            ["Total CFT", totalCft.toFixed(4)]
-        ],
-        startY: finalY + 20,
-        theme: 'grid',
-        styles: { fontStyle: 'bold' }
-    });
-
-    return doc;
-  };
-
-  const handleDownloadPdf = async () => {
-    const doc = await generateSawnWoodPdfDoc();
-    const today = new Date();
-    doc.save(`sawn-wood-cft_${today.toISOString().split('T')[0]}.pdf`);
-  };
-
-  const handleSharePdf = async () => {
-    const doc = await generateSawnWoodPdfDoc();
-    const today = new Date();
-    const fileName = `sawn-wood-cft_${today.toISOString().split('T')[0]}.pdf`;
-    const pdfBlob = doc.output('blob');
-    const pdfFile = new File([pdfBlob], fileName, { type: 'application/pdf' });
-
-    if (navigator.share && navigator.canShare({ files: [pdfFile] })) {
-      try {
-        await navigator.share({
-          title: 'Sawn Wood CFT Calculation',
-          text: 'Here is the Sawn Wood CFT Calculation PDF.',
-          files: [pdfFile],
-        });
-      } catch (error) {
-        console.error('Error sharing PDF:', error);
-      }
-    } else {
-      alert("Web Share API is not supported in this browser. Downloading the PDF instead.");
-      handleDownloadPdf();
-    }
-  };
-
   return (
     <Card>
       <CardHeader>
@@ -325,16 +223,6 @@ function SawnWoodCalculator() {
             <div className="flex justify-between text-xl sm:text-2xl">
                 <span className="text-muted-foreground">Total CFT</span>
                 <span className="font-bold font-headline text-primary">{totalCft.toFixed(4)}</span>
-            </div>
-            <div className="mt-4 flex flex-col gap-2 sm:flex-row">
-                <Button onClick={handleDownloadPdf} variant="outline" className="w-full">
-                    <Download className="mr-2 h-4 w-4" />
-                    Download PDF
-                </Button>
-                <Button onClick={handleSharePdf} className="w-full">
-                    <Share2 className="mr-2 h-4 w-4" />
-                    Share PDF
-                </Button>
             </div>
           </CardFooter>
       )}
@@ -452,99 +340,6 @@ function RoundLogsCalculator() {
         );
       }, [entries]);
 
-      const generateRoundLogsPdfDoc = async () => {
-        const doc = new jsPDF('p', 'mm', 'a4');
-        const today = new Date();
-        const dateStr = today.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
-        const pageWidth = doc.internal.pageSize.getWidth();
-
-        doc.setTextColor(0, 0, 0);
-        doc.setFontSize(18);
-        doc.text("Round Logs CFT Calculation", pageWidth / 2, 15, { align: 'center' });
-        doc.setFontSize(11);
-        doc.text(`Date: ${dateStr}`, pageWidth / 2, 22, { align: 'center' });
-    
-        const tableColumn = ["#", "Length (ft)", "Girth (in)", "Qty", "CFT (Item)", "Total CFT"];
-        const tableRows: (string | number)[][] = [];
-    
-        entries.forEach((entry, index) => {
-            const rowData = [
-                index + 1,
-                entry.length.toFixed(2),
-                entry.girth.toFixed(2),
-                entry.quantity,
-                entry.cft.toFixed(4),
-                (entry.cft * entry.quantity).toFixed(4)
-            ];
-            tableRows.push(rowData);
-        });
-    
-        doc.autoTable({
-            head: [tableColumn],
-            body: tableRows,
-            startY: 30,
-            didDrawPage: function (data) {
-                const pageHeight = doc.internal.pageSize.getHeight();
-                const pageWidth = doc.internal.pageSize.getWidth();
-                
-                // Page Number
-                let str = `Page ${doc.internal.getNumberOfPages()}`;
-                doc.setFontSize(10);
-                doc.setTextColor(0, 0, 0);
-                doc.text(str, data.settings.margin.left, pageHeight - 10);
-                
-                // Footer
-                doc.setFontSize(9);
-                doc.setTextColor(128);
-                doc.text("©2026 JanakPatidar.Design Studio", pageWidth / 2, pageHeight - 10, { align: 'center' });
-            }
-        });
-    
-        const finalY = (doc as any).lastAutoTable.finalY;
-        doc.setFontSize(12);
-        doc.text("Summary", 14, finalY + 15);
-        doc.autoTable({
-            body: [
-                ["Total Quantity", totalQuantity],
-                ["Total CFT", totalCft.toFixed(4)]
-            ],
-            startY: finalY + 20,
-            theme: 'grid',
-            styles: { fontStyle: 'bold' }
-        });
-        
-        return doc;
-    };
-
-    const handleDownloadPdf = async () => {
-        const doc = await generateRoundLogsPdfDoc();
-        const today = new Date();
-        doc.save(`round-logs-cft_${today.toISOString().split('T')[0]}.pdf`);
-    };
-
-    const handleSharePdf = async () => {
-        const doc = await generateRoundLogsPdfDoc();
-        const today = new Date();
-        const fileName = `round-logs-cft_${today.toISOString().split('T')[0]}.pdf`;
-        const pdfBlob = doc.output('blob');
-        const pdfFile = new File([pdfBlob], fileName, { type: 'application/pdf' });
-
-        if (navigator.share && navigator.canShare({ files: [pdfFile] })) {
-            try {
-                await navigator.share({
-                    title: 'Round Logs CFT Calculation',
-                    text: 'Here is the Round Logs CFT Calculation PDF.',
-                    files: [pdfFile],
-                });
-            } catch (error) {
-                console.error('Error sharing PDF:', error);
-            }
-        } else {
-            alert("Web Share API is not supported in this browser. Downloading the PDF instead.");
-            handleDownloadPdf();
-        }
-    };
-
     return (
         <Card>
             <CardHeader>
@@ -630,16 +425,6 @@ function RoundLogsCalculator() {
                     <div className="flex justify-between text-xl sm:text-2xl">
                         <span className="text-muted-foreground">Total CFT</span>
                         <span className="font-bold font-headline text-primary">{totalCft.toFixed(4)}</span>
-                    </div>
-                    <div className="mt-4 flex flex-col gap-2 sm:flex-row">
-                        <Button onClick={handleDownloadPdf} variant="outline" className="w-full">
-                            <Download className="mr-2 h-4 w-4" />
-                            Download PDF
-                        </Button>
-                        <Button onClick={handleSharePdf} className="w-full">
-                            <Share2 className="mr-2 h-4 w-4" />
-                            Share PDF
-                        </Button>
                     </div>
                 </CardFooter>
             )}
