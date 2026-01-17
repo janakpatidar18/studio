@@ -13,7 +13,7 @@ import {
   SidebarInset,
   SidebarTrigger
 } from "@/components/ui/sidebar";
-import { ImageIcon, Calculator } from "lucide-react";
+import { ImageIcon, Calculator, Shield } from "lucide-react";
 import Image from "next/image";
 import { PlaceHolderImages } from "@/lib/placeholder-images";
 import { InventoryProvider } from "@/context/InventoryContext";
@@ -30,9 +30,10 @@ export default function DashboardLayout({
   const navItems = [
     { href: "/dashboard", label: "Gallery", icon: ImageIcon },
     { href: "/dashboard/calculator", label: "Calculator", icon: Calculator },
+    { href: "/dashboard/admin", label: "Admin", icon: Shield },
   ];
 
-  const mobileNavItems = navItems;
+  const mobileNavItems = navItems.filter(item => item.href !== '/dashboard/admin');
   
   return (
     <InventoryProvider>
