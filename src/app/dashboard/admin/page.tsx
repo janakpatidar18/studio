@@ -379,7 +379,7 @@ function AdminImageManager() {
 
     return (
         <Card>
-            <CardHeader className="flex-row items-center justify-between">
+            <CardHeader className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                 <div>
                     <CardTitle>Manage Gallery Images</CardTitle>
                     <CardDescription>Add, edit, or delete gallery images.</CardDescription>
