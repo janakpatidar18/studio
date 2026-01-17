@@ -7,7 +7,7 @@ export default function LoginPage() {
   const router = useRouter();
 
   useEffect(() => {
-    router.replace('/dashboard');
+    router.replace('/dashboard/gallery');
   }, [router]);
 
   return null;

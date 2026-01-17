@@ -28,7 +28,7 @@ export default function DashboardLayout({
   const woodTextureBg = PlaceHolderImages.find(p => p.id === 'wood-texture-bg');
   
   const navItems = [
-    { href: "/dashboard", label: "Gallery", icon: ImageIcon },
+    { href: "/dashboard/gallery", label: "Gallery", icon: ImageIcon },
     { href: "/dashboard/calculator", label: "Calculator", icon: Calculator },
     { href: "/dashboard/admin", label: "Admin", icon: Shield },
   ];
