@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { z } from "zod";
-import { Plus, Trash2, X, Edit } from "lucide-react";
+import { Plus, Trash2, X, Edit, FileDown, Share2 } from "lucide-react";
 import {
   Table,
   TableBody,
@@ -17,6 +17,9 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import jsPDF from "jspdf";
+import "jspdf-autotable";
+
 
 const SawnWoodEntrySchema = z.object({
   length: z.coerce.number().min(0.01, "Length must be positive"),
@@ -134,6 +137,88 @@ function SawnWoodCalculator() {
     );
   }, [entries]);
 
+  const generateSawnWoodPdfDoc = () => {
+    const doc = new jsPDF();
+    const pageWidth = doc.internal.pageSize.getWidth();
+
+    doc.setFontSize(20);
+    doc.text("Sawn Wood CFT Calculation", pageWidth / 2, 22, { align: 'center' });
+    doc.setFontSize(10);
+    doc.text(`Date: ${new Date().toLocaleDateString()}`, pageWidth / 2, 28, { align: 'center' });
+
+    (doc as any).autoTable({
+        head: [['#', 'Dimensions (L×W×T)', 'Qty', 'Total CFT']],
+        body: entries.map((entry, index) => [
+            index + 1,
+            `${entry.length.toFixed(2)}ft × ${entry.width.toFixed(2)}in × ${entry.height.toFixed(2)}in`,
+            entry.quantity,
+            (entry.cft * entry.quantity).toFixed(4)
+        ]),
+        startY: 35,
+        headStyles: { fillColor: [36, 69, 76] },
+        theme: 'grid'
+    });
+
+    const finalY = (doc as any).lastAutoTable.finalY;
+    doc.autoTable({
+        body: [
+            ['Total Quantity', `${totalQuantity}`],
+            ['Total CFT', `${totalCft.toFixed(4)}`],
+        ],
+        startY: finalY + 5,
+        theme: 'plain',
+        bodyStyles: {
+            fontStyle: 'bold',
+            fontSize: 12,
+        },
+        columnStyles: {
+            0: { halign: 'right' },
+            1: { halign: 'right' },
+        }
+    });
+
+    const pageCount = (doc as any).internal.getNumberOfPages();
+    for (let i = 1; i <= pageCount; i++) {
+        doc.setPage(i);
+        doc.setFontSize(8);
+        doc.setTextColor(150);
+        doc.text(
+            '©2026 JanakPatidar.Design Studio',
+            pageWidth / 2,
+            doc.internal.pageSize.getHeight() - 10,
+            { align: 'center' }
+        );
+    }
+
+    return doc;
+  };
+
+  const handleDownloadPdf = () => {
+    const doc = generateSawnWoodPdfDoc();
+    doc.save(`SawnWood_Calculation_${new Date().toLocaleDateString()}.pdf`);
+  };
+  
+  const handleSharePdf = async () => {
+    const doc = generateSawnWoodPdfDoc();
+    const pdfBlob = doc.output('blob');
+    const pdfFile = new File([pdfBlob], `SawnWood_Calculation_${new Date().toLocaleDateString()}.pdf`, { type: 'application/pdf' });
+
+    if (navigator.share) {
+        try {
+            await navigator.share({
+                title: 'Sawn Wood Calculation',
+                text: 'Here is the Sawn Wood CFT calculation.',
+                files: [pdfFile],
+            });
+        } catch (error) {
+            console.log('Sharing failed, falling back to download', error);
+            handleDownloadPdf();
+        }
+    } else {
+        handleDownloadPdf();
+    }
+  };
+
   return (
     <Card>
       <CardHeader>
@@ -145,19 +230,19 @@ function SawnWoodCalculator() {
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                  <div className="space-y-1">
                     <Label htmlFor="sawn-length">Length (ft)</Label>
-                    <Input id="sawn-length" value={formValues.length} onChange={e => handleFormChange('length', e.target.value)} onKeyDown={handleInputKeyDown} type="number" inputMode="decimal" step="any" />
+                    <Input id="sawn-length" value={formValues.length} onChange={e => handleFormChange('length', e.target.value)} onKeyDown={handleInputKeyDown} type="number" inputMode="decimal" step="any" placeholder="e.g., 10.5" />
                 </div>
                 <div className="space-y-1">
                     <Label htmlFor="sawn-width">Width (in)</Label>
-                    <Input id="sawn-width" value={formValues.width} onChange={e => handleFormChange('width', e.target.value)} onKeyDown={handleInputKeyDown} type="number" inputMode="decimal" step="any" />
+                    <Input id="sawn-width" value={formValues.width} onChange={e => handleFormChange('width', e.target.value)} onKeyDown={handleInputKeyDown} type="number" inputMode="decimal" step="any" placeholder="e.g., 6" />
                 </div>
                 <div className="space-y-1">
                     <Label htmlFor="sawn-height">Thickness (in)</Label>
-                    <Input id="sawn-height" value={formValues.height} onChange={e => handleFormChange('height', e.target.value)} onKeyDown={handleInputKeyDown} type="number" inputMode="decimal" step="any" />
+                    <Input id="sawn-height" value={formValues.height} onChange={e => handleFormChange('height', e.target.value)} onKeyDown={handleInputKeyDown} type="number" inputMode="decimal" step="any" placeholder="e.g., 2.25" />
                 </div>
                  <div className="space-y-1">
                     <Label htmlFor="sawn-quantity">Quantity</Label>
-                    <Input id="sawn-quantity" value={formValues.quantity} onChange={e => handleFormChange('quantity', e.target.value)} onKeyDown={handleInputKeyDown} type="number" inputMode="numeric" min="1" />
+                    <Input id="sawn-quantity" value={formValues.quantity} onChange={e => handleFormChange('quantity', e.target.value)} onKeyDown={handleInputKeyDown} type="number" inputMode="numeric" min="1" placeholder="e.g., 5" />
                 </div>
             </div>
             {formError && <p className="text-sm text-destructive">{formError}</p>}
@@ -223,6 +308,14 @@ function SawnWoodCalculator() {
             <div className="flex justify-between text-xl sm:text-2xl">
                 <span className="text-muted-foreground">Total CFT</span>
                 <span className="font-bold font-headline text-primary">{totalCft.toFixed(4)}</span>
+            </div>
+            <div className="flex justify-end gap-2 mt-4">
+                <Button onClick={handleDownloadPdf} variant="outline">
+                    <FileDown className="mr-2 h-4 w-4" /> Download PDF
+                </Button>
+                <Button onClick={handleSharePdf}>
+                    <Share2 className="mr-2 h-4 w-4" /> Share PDF
+                </Button>
             </div>
           </CardFooter>
       )}
@@ -340,6 +433,87 @@ function RoundLogsCalculator() {
         );
       }, [entries]);
 
+    const generateRoundLogPdfDoc = () => {
+        const doc = new jsPDF();
+        const pageWidth = doc.internal.pageSize.getWidth();
+        
+        doc.setFontSize(20);
+        doc.text("Round Logs CFT Calculation", pageWidth / 2, 22, { align: 'center' });
+        doc.setFontSize(10);
+        doc.text(`Date: ${new Date().toLocaleDateString()}`, pageWidth / 2, 28, { align: 'center' });
+
+        (doc as any).autoTable({
+            head: [['#', 'Dimensions (L×G)', 'Qty', 'Total CFT']],
+            body: entries.map((entry, index) => [
+                index + 1,
+                `${entry.length.toFixed(2)}ft × ${entry.girth.toFixed(2)}in`,
+                entry.quantity,
+                (entry.cft * entry.quantity).toFixed(4)
+            ]),
+            startY: 35,
+            headStyles: { fillColor: [36, 69, 76] },
+            theme: 'grid'
+        });
+
+        const finalY = (doc as any).lastAutoTable.finalY;
+        doc.autoTable({
+            body: [
+                ['Total Quantity', `${totalQuantity}`],
+                ['Total CFT', `${totalCft.toFixed(4)}`],
+            ],
+            startY: finalY + 5,
+            theme: 'plain',
+            bodyStyles: {
+                fontStyle: 'bold',
+                fontSize: 12,
+            },
+            columnStyles: {
+                0: { halign: 'right' },
+                1: { halign: 'right' },
+            }
+        });
+
+        const pageCount = (doc as any).internal.getNumberOfPages();
+        for (let i = 1; i <= pageCount; i++) {
+            doc.setPage(i);
+            doc.setFontSize(8);
+            doc.setTextColor(150);
+            doc.text(
+                '©2026 JanakPatidar.Design Studio',
+                pageWidth / 2,
+                doc.internal.pageSize.getHeight() - 10,
+                { align: 'center' }
+            );
+        }
+        return doc;
+    };
+    
+    const handleDownloadPdf = () => {
+        const doc = generateRoundLogPdfDoc();
+        doc.save(`RoundLogs_Calculation_${new Date().toLocaleDateString()}.pdf`);
+    };
+
+    const handleSharePdf = async () => {
+        const doc = generateRoundLogPdfDoc();
+        const pdfBlob = doc.output('blob');
+        const pdfFile = new File([pdfBlob], `RoundLogs_Calculation_${new Date().toLocaleDateString()}.pdf`, { type: 'application/pdf' });
+
+        if (navigator.share) {
+            try {
+                await navigator.share({
+                    title: 'Round Logs Calculation',
+                    text: 'Here is the Round Logs CFT calculation.',
+                    files: [pdfFile],
+                });
+            } catch (error) {
+                console.log('Sharing failed, falling back to download', error);
+                handleDownloadPdf();
+            }
+        } else {
+            handleDownloadPdf();
+        }
+    };
+
     return (
         <Card>
             <CardHeader>
@@ -351,15 +525,15 @@ function RoundLogsCalculator() {
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                         <div className="space-y-1">
                             <Label htmlFor="log-length">Length (ft)</Label>
-                            <Input id="log-length" value={formValues.length} onChange={e => handleFormChange('length', e.target.value)} onKeyDown={handleInputKeyDown} type="number" inputMode="decimal" step="any" />
+                            <Input id="log-length" value={formValues.length} onChange={e => handleFormChange('length', e.target.value)} onKeyDown={handleInputKeyDown} type="number" inputMode="decimal" step="any" placeholder="e.g., 12" />
                         </div>
                         <div className="space-y-1">
                             <Label htmlFor="log-girth">Girth (in)</Label>
-                            <Input id="log-girth" value={formValues.girth} onChange={e => handleFormChange('girth', e.target.value)} onKeyDown={handleInputKeyDown} type="number" inputMode="decimal" step="any" />
+                            <Input id="log-girth" value={formValues.girth} onChange={e => handleFormChange('girth', e.target.value)} onKeyDown={handleInputKeyDown} type="number" inputMode="decimal" step="any" placeholder="e.g., 24" />
                         </div>
                         <div className="space-y-1">
                             <Label htmlFor="log-quantity">Quantity</Label>
-                            <Input id="log-quantity" value={formValues.quantity} onChange={e => handleFormChange('quantity', e.target.value)} onKeyDown={handleInputKeyDown} type="number" inputMode="numeric" min="1" />
+                            <Input id="log-quantity" value={formValues.quantity} onChange={e => handleFormChange('quantity', e.target.value)} onKeyDown={handleInputKeyDown} type="number" inputMode="numeric" min="1" placeholder="e.g., 3" />
                         </div>
                     </div>
                     {formError && <p className="text-sm text-destructive">{formError}</p>}
@@ -425,6 +599,14 @@ function RoundLogsCalculator() {
                     <div className="flex justify-between text-xl sm:text-2xl">
                         <span className="text-muted-foreground">Total CFT</span>
                         <span className="font-bold font-headline text-primary">{totalCft.toFixed(4)}</span>
+                    </div>
+                     <div className="flex justify-end gap-2 mt-4">
+                        <Button onClick={handleDownloadPdf} variant="outline">
+                            <FileDown className="mr-2 h-4 w-4" /> Download PDF
+                        </Button>
+                        <Button onClick={handleSharePdf}>
+                            <Share2 className="mr-2 h-4 w-4" /> Share PDF
+                        </Button>
                     </div>
                 </CardFooter>
             )}
