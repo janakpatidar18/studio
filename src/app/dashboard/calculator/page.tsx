@@ -319,6 +319,7 @@ function SawnWoodCalculator() {
             </div>
           </CardFooter>
       )}
+      <div className="h-28 md:hidden"></div>
       <form onSubmit={handleFormSubmit} className="fixed bottom-20 left-0 right-0 z-40 p-2 bg-background/80 backdrop-blur-sm border-t md:hidden">
         <div className="max-w-xl mx-auto p-2 rounded-lg bg-card/90 border-2 border-primary/50">
             <div className="flex items-end gap-2">
@@ -610,6 +611,7 @@ function RoundLogsCalculator() {
                     </div>
                 </CardFooter>
             )}
+            <div className="h-28 md:hidden" />
              <form onSubmit={handleFormSubmit} className="fixed bottom-20 left-0 right-0 z-40 p-2 bg-background/80 backdrop-blur-sm border-t md:hidden">
                 <div className="max-w-xl mx-auto p-2 rounded-lg bg-card/90 border-2 border-primary/50">
                     <div className="flex items-end gap-2">
@@ -666,3 +668,4 @@ export default function CalculatorPage() {
     
 
     
+
