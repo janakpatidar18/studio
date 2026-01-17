@@ -242,8 +242,8 @@ function SawnWoodCalculator() {
         <CardTitle>Sawn Wood CFT Calculator</CardTitle>
         <CardDescription>Add multiple timber sizes to calculate the total cubic feet (CFT).</CardDescription>
       </CardHeader>
-      <CardContent className="p-4 sm:p-6 space-y-6">
-        <form onSubmit={handleFormSubmit} className="p-4 sm:p-6 border rounded-lg bg-muted/50 space-y-4">
+      <CardContent className="p-2 sm:p-6 space-y-4">
+        <form onSubmit={handleFormSubmit} className="p-2 sm:p-4 border rounded-lg bg-muted/50 space-y-4">
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                  <div className="space-y-1">
                     <Label htmlFor="sawn-length">Length (ft)</Label>
@@ -277,28 +277,28 @@ function SawnWoodCalculator() {
             <Table>
                 <TableHeader>
                     <TableRow>
-                        <TableHead className="w-12 text-center">#</TableHead>
-                        <TableHead>Dimensions</TableHead>
-                        <TableHead className="text-right">Qty</TableHead>
-                        <TableHead className="text-right">Total CFT</TableHead>
-                        <TableHead className="w-28 text-center">Actions</TableHead>
+                        <TableHead className="w-12 text-center px-2 sm:px-4">#</TableHead>
+                        <TableHead className="px-2 sm:px-4">Dimensions</TableHead>
+                        <TableHead className="text-right px-2 sm:px-4">Qty</TableHead>
+                        <TableHead className="text-right px-2 sm:px-4">Total CFT</TableHead>
+                        <TableHead className="w-28 text-center px-2 sm:px-4">Actions</TableHead>
                     </TableRow>
                 </TableHeader>
                 <TableBody>
                     {entries.length === 0 ? (
                         <TableRow>
-                            <TableCell colSpan={5} className="text-center h-24 text-muted-foreground">No entries added yet.</TableCell>
+                            <TableCell colSpan={5} className="text-center h-24 text-muted-foreground p-4">No entries added yet.</TableCell>
                         </TableRow>
                     ) : entries.map((entry, index) => (
                       <TableRow key={entry.id}>
-                        <TableCell className="text-center font-medium">{index + 1}</TableCell>
-                        <TableCell>
+                        <TableCell className="p-2 sm:p-4 text-center font-medium">{index + 1}</TableCell>
+                        <TableCell className="p-2 sm:p-4">
                             <div className="font-medium whitespace-normal">{entry.length.toFixed(2)}ft × {entry.width.toFixed(2)}in × {entry.height.toFixed(2)}in</div>
                             <div className="text-xs text-muted-foreground">Item CFT: {entry.cft.toFixed(4)}</div>
                         </TableCell>
-                        <TableCell className="text-right">{entry.quantity}</TableCell>
-                        <TableCell className="text-right font-medium">{(entry.cft * entry.quantity).toFixed(4)}</TableCell>
-                        <TableCell className="text-center">
+                        <TableCell className="p-2 sm:p-4 text-right">{entry.quantity}</TableCell>
+                        <TableCell className="p-2 sm:p-4 text-right font-medium">{(entry.cft * entry.quantity).toFixed(4)}</TableCell>
+                        <TableCell className="p-2 sm:p-4 text-center">
                           <div className="flex items-center justify-center">
                             <Button variant="ghost" size="icon" type="button" onClick={() => handleEditClick(entry)} className="text-muted-foreground hover:text-primary h-8 w-8">
                               <Edit className="h-4 w-4" />
@@ -317,12 +317,12 @@ function SawnWoodCalculator() {
         </div>
       </CardContent>
       {entries.length > 0 && (
-          <CardFooter className="flex-col items-stretch p-4 sm:p-6 border-t bg-muted/50 space-y-2">
-            <div className="flex justify-between text-lg">
+          <CardFooter className="flex-col items-stretch p-2 sm:p-6 border-t bg-muted/50 space-y-2">
+            <div className="flex justify-between text-base sm:text-lg">
                 <span className="text-muted-foreground">Total Quantity</span>
                 <span className="font-bold">{totalQuantity}</span>
             </div>
-            <div className="flex justify-between text-2xl">
+            <div className="flex justify-between text-xl sm:text-2xl">
                 <span className="text-muted-foreground">Total CFT</span>
                 <span className="font-bold font-headline text-primary">{totalCft.toFixed(4)}</span>
             </div>
@@ -518,8 +518,8 @@ function RoundLogsCalculator() {
                 <CardTitle>Round Logs CFT Calculator</CardTitle>
                 <CardDescription>Add multiple log sizes to calculate the total CFT using the Hoppus formula.</CardDescription>
             </CardHeader>
-            <CardContent className="p-4 sm:p-6 space-y-6">
-                <form onSubmit={handleFormSubmit} className="p-4 sm:p-6 border rounded-lg bg-muted/50 space-y-4">
+            <CardContent className="p-2 sm:p-6 space-y-4">
+                <form onSubmit={handleFormSubmit} className="p-2 sm:p-4 border rounded-lg bg-muted/50 space-y-4">
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                         <div className="space-y-1">
                             <Label htmlFor="log-length">Length (ft)</Label>
@@ -549,28 +549,28 @@ function RoundLogsCalculator() {
                     <Table>
                         <TableHeader>
                             <TableRow>
-                                <TableHead className="w-12 text-center">#</TableHead>
-                                <TableHead>Dimensions</TableHead>
-                                <TableHead className="text-right">Qty</TableHead>
-                                <TableHead className="text-right">Total CFT</TableHead>
-                                <TableHead className="w-28 text-center">Actions</TableHead>
+                                <TableHead className="w-12 text-center px-2 sm:px-4">#</TableHead>
+                                <TableHead className="px-2 sm:px-4">Dimensions</TableHead>
+                                <TableHead className="text-right px-2 sm:px-4">Qty</TableHead>
+                                <TableHead className="text-right px-2 sm:px-4">Total CFT</TableHead>
+                                <TableHead className="w-28 text-center px-2 sm:px-4">Actions</TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>
                             {entries.length === 0 ? (
                                 <TableRow>
-                                    <TableCell colSpan={5} className="text-center h-24 text-muted-foreground">No entries added yet.</TableCell>
+                                    <TableCell colSpan={5} className="text-center h-24 text-muted-foreground p-4">No entries added yet.</TableCell>
                                 </TableRow>
                             ) : entries.map((entry, index) => (
                               <TableRow key={entry.id}>
-                                <TableCell className="text-center font-medium">{index + 1}</TableCell>
-                                <TableCell>
+                                <TableCell className="p-2 sm:p-4 text-center font-medium">{index + 1}</TableCell>
+                                <TableCell className="p-2 sm:p-4">
                                     <div className="font-medium whitespace-normal">{entry.length.toFixed(2)}ft × {entry.girth.toFixed(2)}in</div>
                                     <div className="text-xs text-muted-foreground">Item CFT: {entry.cft.toFixed(4)}</div>
                                 </TableCell>
-                                <TableCell className="text-right">{entry.quantity}</TableCell>
-                                <TableCell className="text-right font-medium">{(entry.cft * entry.quantity).toFixed(4)}</TableCell>
-                                <TableCell className="text-center">
+                                <TableCell className="p-2 sm:p-4 text-right">{entry.quantity}</TableCell>
+                                <TableCell className="p-2 sm:p-4 text-right font-medium">{(entry.cft * entry.quantity).toFixed(4)}</TableCell>
+                                <TableCell className="p-2 sm:p-4 text-center">
                                   <div className="flex items-center justify-center">
                                     <Button variant="ghost" size="icon" type="button" onClick={() => handleEditClick(entry)} className="text-muted-foreground hover:text-primary h-8 w-8">
                                       <Edit className="h-4 w-4" />
@@ -589,12 +589,12 @@ function RoundLogsCalculator() {
                 </div>
             </CardContent>
             {entries.length > 0 && (
-                <CardFooter className="flex-col items-stretch p-4 sm:p-6 border-t bg-muted/50 space-y-2">
-                    <div className="flex justify-between text-lg">
+                <CardFooter className="flex-col items-stretch p-2 sm:p-6 border-t bg-muted/50 space-y-2">
+                    <div className="flex justify-between text-base sm:text-lg">
                         <span className="text-muted-foreground">Total Quantity</span>
                         <span className="font-bold">{totalQuantity}</span>
                     </div>
-                    <div className="flex justify-between text-2xl">
+                    <div className="flex justify-between text-xl sm:text-2xl">
                         <span className="text-muted-foreground">Total CFT</span>
                         <span className="font-bold font-headline text-primary">{totalCft.toFixed(4)}</span>
                     </div>
@@ -630,6 +630,8 @@ export default function CalculatorPage() {
         </Tabs>
     )
 }
+    
+
     
 
     
