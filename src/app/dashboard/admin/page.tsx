@@ -1,13 +1,13 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useInventory } from '@/context/InventoryContext';
 import { useToast } from '@/hooks/use-toast';
-import { Trash2, PlusCircle, Unlock, KeyRound, Edit, X } from 'lucide-react';
+import { Trash2, PlusCircle, KeyRound, Edit, X } from 'lucide-react';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -485,19 +485,34 @@ export default function AdminPage() {
     const [isAuthenticated, setIsAuthenticated] = useState(false);
     const [error, setError] = useState('');
     const { toast } = useToast();
-    
-    const handlePinSubmit = (e: React.FormEvent) => {
-        e.preventDefault();
-        if (pin === ADMIN_PIN) {
-            setIsAuthenticated(true);
-            setError('');
-            toast({
-                title: "Access Granted",
-                description: "Welcome to the Admin Panel.",
-            });
-        } else {
-            setError('Invalid PIN. Please try again.');
-            setPin('');
+
+    useEffect(() => {
+        if (pin.length === 4) {
+            if (pin === ADMIN_PIN) {
+                setIsAuthenticated(true);
+                setError('');
+                toast({
+                    title: "Access Granted",
+                    description: "Welcome to the Admin Panel.",
+                });
+            } else {
+                setError('Invalid PIN. Please try again.');
+                const timer = setTimeout(() => {
+                    setPin('');
+                }, 800);
+                return () => clearTimeout(timer);
+            }
+        }
+    }, [pin, toast]);
+
+    const handlePinChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const value = e.target.value;
+        // Allow only numeric input
+        if (/^\d*$/.test(value)) {
+            setPin(value);
+            if (error) {
+                setError('');
+            }
         }
     };
 
@@ -511,25 +526,22 @@ export default function AdminPage() {
                         </CardTitle>
                         <CardDescription>Please enter the admin PIN to continue.</CardDescription>
                     </CardHeader>
-                    <CardContent>
-                        <form onSubmit={handlePinSubmit} className="space-y-4">
-                            <div className="space-y-2">
-                                <Label htmlFor="pin">Admin PIN</Label>
-                                <Input
-                                    id="pin"
-                                    type="password"
-                                    value={pin}
-                                    onChange={(e) => setPin(e.target.value)}
-                                    placeholder="••••"
-                                    maxLength={4}
-                                    inputMode="numeric"
-                                />
-                            </div>
-                            {error && <p className="text-sm text-destructive">{error}</p>}
-                            <Button type="submit" className="w-full">
-                                <Unlock className="mr-2 h-4 w-4" /> Unlock
-                            </Button>
-                        </form>
+                    <CardContent className="flex flex-col items-center justify-center pt-8 space-y-4">
+                        <div className="space-y-2">
+                            <Label htmlFor="pin" className="sr-only">Admin PIN</Label>
+                            <Input
+                                id="pin"
+                                type="password"
+                                value={pin}
+                                onChange={handlePinChange}
+                                placeholder="••••"
+                                maxLength={4}
+                                inputMode="numeric"
+                                autoFocus
+                                className="w-48 h-14 text-center text-2xl tracking-[0.8em]"
+                            />
+                        </div>
+                        <p className="text-sm text-destructive h-5">{error}</p>
                     </CardContent>
                 </Card>
             </div>
