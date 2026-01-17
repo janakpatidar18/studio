@@ -243,7 +243,7 @@ function SawnWoodCalculator() {
         <CardDescription>Add multiple timber sizes to calculate the total cubic feet (CFT).</CardDescription>
       </CardHeader>
       <CardContent className="p-2 sm:p-6 space-y-4">
-        <form onSubmit={handleFormSubmit} className="p-2 sm:p-4 border rounded-lg bg-muted/50 space-y-4">
+        <form onSubmit={handleFormSubmit} className="hidden md:block p-2 sm:p-4 border rounded-lg bg-muted/50 space-y-4">
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                  <div className="space-y-1">
                     <Label htmlFor="sawn-length">Length (ft)</Label>
@@ -338,6 +338,39 @@ function SawnWoodCalculator() {
             </div>
           </CardFooter>
       )}
+      <form onSubmit={handleFormSubmit} className="fixed bottom-20 left-0 right-0 z-40 p-2 bg-background/80 backdrop-blur-sm border-t md:hidden">
+        <div className="max-w-xl mx-auto p-2 rounded-lg bg-card/90 border-2 border-primary/50">
+            <div className="flex items-end gap-2">
+                <div className="grid flex-1 grid-cols-4 gap-2">
+                    <div className="space-y-1">
+                        <Label htmlFor="sawn-length-float" className="text-xs px-1 text-center block">Length (ft)</Label>
+                        <Input id="sawn-length-float" value={formValues.length} onChange={e => handleFormChange('length', e.target.value)} onKeyDown={handleInputKeyDown} type="number" inputMode="decimal" step="any" className="h-11 text-center" />
+                    </div>
+                    <div className="space-y-1">
+                        <Label htmlFor="sawn-width-float" className="text-xs px-1 text-center block">Width (in)</Label>
+                        <Input id="sawn-width-float" value={formValues.width} onChange={e => handleFormChange('width', e.target.value)} onKeyDown={handleInputKeyDown} type="number" inputMode="decimal" step="any" className="h-11 text-center" />
+                    </div>
+                    <div className="space-y-1">
+                        <Label htmlFor="sawn-height-float" className="text-xs px-1 text-center block">Thickness (in)</Label>
+                        <Input id="sawn-height-float" value={formValues.height} onChange={e => handleFormChange('height', e.target.value)} onKeyDown={handleInputKeyDown} type="number" inputMode="decimal" step="any" className="h-11 text-center" />
+                    </div>
+                    <div className="space-y-1">
+                        <Label htmlFor="sawn-quantity-float" className="text-xs px-1 text-center block">Qty</Label>
+                        <Input id="sawn-quantity-float" value={formValues.quantity} onChange={e => handleFormChange('quantity', e.target.value)} onKeyDown={handleInputKeyDown} type="number" inputMode="numeric" min="1" className="h-11 text-center" />
+                    </div>
+                </div>
+                <div className="flex flex-col gap-1 w-[80px]">
+                    <Button type="button" variant="outline" size="sm" className="h-auto py-2" onClick={clearForm}>
+                        {editingId ? 'Cancel' : 'Clear'}
+                    </Button>
+                    <Button type="submit" size="sm" className="h-auto py-2">
+                        {editingId ? 'Update' : 'Enter'}
+                    </Button>
+                </div>
+            </div>
+            {formError && <p className="text-xs text-destructive mt-1 text-center">{formError}</p>}
+        </div>
+      </form>
     </Card>
   );
 }
@@ -519,7 +552,7 @@ function RoundLogsCalculator() {
                 <CardDescription>Add multiple log sizes to calculate the total CFT using the Hoppus formula.</CardDescription>
             </CardHeader>
             <CardContent className="p-2 sm:p-6 space-y-4">
-                <form onSubmit={handleFormSubmit} className="p-2 sm:p-4 border rounded-lg bg-muted/50 space-y-4">
+                <form onSubmit={handleFormSubmit} className="hidden md:block p-2 sm:p-4 border rounded-lg bg-muted/50 space-y-4">
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                         <div className="space-y-1">
                             <Label htmlFor="log-length">Length (ft)</Label>
@@ -610,6 +643,35 @@ function RoundLogsCalculator() {
                     </div>
                 </CardFooter>
             )}
+             <form onSubmit={handleFormSubmit} className="fixed bottom-20 left-0 right-0 z-40 p-2 bg-background/80 backdrop-blur-sm border-t md:hidden">
+                <div className="max-w-xl mx-auto p-2 rounded-lg bg-card/90 border-2 border-primary/50">
+                    <div className="flex items-end gap-2">
+                        <div className="grid flex-1 grid-cols-3 gap-2">
+                            <div className="space-y-1">
+                                <Label htmlFor="log-length-float" className="text-xs px-1 text-center block">Length (ft)</Label>
+                                <Input id="log-length-float" value={formValues.length} onChange={e => handleFormChange('length', e.target.value)} onKeyDown={handleInputKeyDown} type="number" inputMode="decimal" step="any" className="h-11 text-center" />
+                            </div>
+                            <div className="space-y-1">
+                                <Label htmlFor="log-girth-float" className="text-xs px-1 text-center block">Girth (in)</Label>
+                                <Input id="log-girth-float" value={formValues.girth} onChange={e => handleFormChange('girth', e.target.value)} onKeyDown={handleInputKeyDown} type="number" inputMode="decimal" step="any" className="h-11 text-center" />
+                            </div>
+                            <div className="space-y-1">
+                                <Label htmlFor="log-quantity-float" className="text-xs px-1 text-center block">Quantity</Label>
+                                <Input id="log-quantity-float" value={formValues.quantity} onChange={e => handleFormChange('quantity', e.target.value)} onKeyDown={handleInputKeyDown} type="number" inputMode="numeric" min="1" className="h-11 text-center" />
+                            </div>
+                        </div>
+                        <div className="flex flex-col gap-1 w-[80px]">
+                            <Button type="button" variant="outline" size="sm" className="h-auto py-2" onClick={clearForm}>
+                                {editingId ? 'Cancel' : 'Clear'}
+                            </Button>
+                            <Button type="submit" size="sm" className="h-auto py-2">
+                                {editingId ? 'Update' : 'Enter'}
+                            </Button>
+                        </div>
+                    </div>
+                    {formError && <p className="text-xs text-destructive mt-1 text-center">{formError}</p>}
+                </div>
+            </form>
         </Card>
     );
 }
@@ -630,6 +692,8 @@ export default function CalculatorPage() {
         </Tabs>
     )
 }
+    
+
     
 
     
