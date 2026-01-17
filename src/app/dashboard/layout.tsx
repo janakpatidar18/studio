@@ -11,13 +11,52 @@ import {
   SidebarMenuItem,
   SidebarMenuButton,
   SidebarInset,
-  SidebarTrigger
+  SidebarTrigger,
+  useSidebar,
 } from "@/components/ui/sidebar";
 import { ImageIcon, Calculator, Shield } from "lucide-react";
 import Image from "next/image";
 import { PlaceHolderImages } from "@/lib/placeholder-images";
 import { InventoryProvider } from "@/context/InventoryContext";
 import { cn } from "@/lib/utils";
+
+function SidebarItems() {
+  const pathname = usePathname();
+  const { isMobile, setOpenMobile } = useSidebar();
+
+  const handleLinkClick = () => {
+    if (isMobile) {
+      setOpenMobile(false);
+    }
+  };
+
+  const navItems = [
+    { href: "/dashboard/gallery", label: "Gallery", icon: ImageIcon },
+    { href: "/dashboard/calculator", label: "Calculator", icon: Calculator },
+    { href: "/dashboard/admin", label: "Admin", icon: Shield },
+  ];
+
+  return (
+    <SidebarMenu>
+      {navItems.map((item) => (
+        <SidebarMenuItem key={item.href}>
+          <Link href={item.href} passHref>
+            <SidebarMenuButton
+              onClick={handleLinkClick}
+              isActive={pathname === item.href}
+              tooltip={{ children: item.label }}
+              className="text-lg h-14"
+            >
+              <item.icon className="w-6 h-6" />
+              <span>{item.label}</span>
+            </SidebarMenuButton>
+          </Link>
+        </SidebarMenuItem>
+      ))}
+    </SidebarMenu>
+  );
+}
+
 
 export default function DashboardLayout({
   children,
@@ -45,22 +84,7 @@ export default function DashboardLayout({
             </div>
           </SidebarHeader>
           <SidebarContent>
-            <SidebarMenu>
-              {navItems.map((item) => (
-                <SidebarMenuItem key={item.href}>
-                  <Link href={item.href} passHref>
-                    <SidebarMenuButton
-                      isActive={pathname === item.href}
-                      tooltip={{ children: item.label }}
-                      className="text-lg h-14"
-                    >
-                      <item.icon className="w-6 h-6" />
-                      <span>{item.label}</span>
-                    </SidebarMenuButton>
-                  </Link>
-                </SidebarMenuItem>
-              ))}
-            </SidebarMenu>
+            <SidebarItems />
           </SidebarContent>
         </Sidebar>
         <SidebarInset className="relative">
