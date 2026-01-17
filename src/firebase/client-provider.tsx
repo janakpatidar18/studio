@@ -1,7 +1,6 @@
 
 "use client";
 
-import { AuthProvider } from "@/context/AuthContext";
 import { initializeFirebase } from "@/firebase";
 import { FirebaseProvider } from "@/firebase/provider";
 import { FirebaseErrorListener } from "@/components/FirebaseErrorListener";
@@ -17,11 +16,9 @@ export function FirebaseClientProvider({
 }) {
   return (
     <FirebaseProvider value={{ firebaseApp, auth, firestore }}>
-      <AuthProvider>
         {children}
         <Toaster />
         <FirebaseErrorListener />
-      </AuthProvider>
     </FirebaseProvider>
   );
 }

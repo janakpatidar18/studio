@@ -1,7 +1,7 @@
 "use client";
-import React, { useEffect } from "react";
+import React from "react";
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import {
   SidebarProvider,
   Sidebar,
@@ -10,38 +10,23 @@ import {
   SidebarMenu,
   SidebarMenuItem,
   SidebarMenuButton,
-  SidebarFooter,
   SidebarInset,
   SidebarTrigger
 } from "@/components/ui/sidebar";
-import { ImageIcon, LogOut, Calculator } from "lucide-react";
+import { ImageIcon, Calculator } from "lucide-react";
 import Image from "next/image";
 import { PlaceHolderImages } from "@/lib/placeholder-images";
 import { InventoryProvider } from "@/context/InventoryContext";
 import { cn } from "@/lib/utils";
-import { useAuth } from "@/context/AuthContext";
 
 export default function DashboardLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const router = useRouter();
   const pathname = usePathname();
-  const { user, loading, logout } = useAuth();
   const woodTextureBg = PlaceHolderImages.find(p => p.id === 'wood-texture-bg');
   
-  useEffect(() => {
-    if (!loading && !user) {
-      router.replace("/login");
-    }
-  }, [user, loading, router]);
-  
-  const handleLogout = () => {
-    logout();
-    router.replace("/login");
-  };
-
   const navItems = [
     { href: "/dashboard", label: "Gallery", icon: ImageIcon },
     { href: "/dashboard/calculator", label: "Calculator", icon: Calculator },
@@ -49,36 +34,6 @@ export default function DashboardLayout({
 
   const mobileNavItems = navItems;
   
-  if (loading || !user) {
-    return (
-        <div className="flex h-screen w-full items-center justify-center bg-background">
-            <div className="flex flex-col items-center gap-4">
-                <svg
-                    className="h-12 w-12 animate-spin text-primary"
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                >
-                    <circle
-                        className="opacity-25"
-                        cx="12"
-                        cy="12"
-                        r="10"
-                        stroke="currentColor"
-                        strokeWidth="4"
-                    ></circle>
-                    <path
-                        className="opacity-75"
-                        fill="currentColor"
-                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                    ></path>
-                </svg>
-                <p className="text-muted-foreground">Verifying session...</p>
-            </div>
-        </div>
-    );
-  }
-
   return (
     <InventoryProvider>
       <SidebarProvider>
@@ -106,16 +61,6 @@ export default function DashboardLayout({
               ))}
             </SidebarMenu>
           </SidebarContent>
-          <SidebarFooter>
-              <SidebarMenu>
-                  <SidebarMenuItem>
-                      <SidebarMenuButton onClick={handleLogout} tooltip={{children: 'Logout'}} className="text-lg h-14">
-                          <LogOut className="w-6 h-6" />
-                          <span>Logout</span>
-                      </SidebarMenuButton>
-                  </SidebarMenuItem>
-              </SidebarMenu>
-          </SidebarFooter>
         </Sidebar>
         <SidebarInset className="relative">
           {woodTextureBg && (
@@ -167,5 +112,3 @@ export default function DashboardLayout({
     </InventoryProvider>
   );
 }
-
-    
