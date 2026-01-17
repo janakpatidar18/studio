@@ -325,19 +325,19 @@ function SawnWoodCalculator() {
             <div className="flex items-end gap-2">
                 <div className="grid flex-1 grid-cols-4 gap-2">
                     <div className="space-y-1">
-                        <Label htmlFor="sawn-length-float" className="text-xs px-1 text-center block">Length (ft)</Label>
+                        <Label htmlFor="sawn-length-float" className="text-xs px-1 text-center h-8 flex items-center justify-center">Length (ft)</Label>
                         <Input id="sawn-length-float" value={formValues.length} onChange={e => handleFormChange('length', e.target.value)} onKeyDown={handleInputKeyDown} type="number" inputMode="decimal" step="any" className="h-11 text-center" />
                     </div>
                     <div className="space-y-1">
-                        <Label htmlFor="sawn-width-float" className="text-xs px-1 text-center block">Width (in)</Label>
+                        <Label htmlFor="sawn-width-float" className="text-xs px-1 text-center h-8 flex items-center justify-center">Width (in)</Label>
                         <Input id="sawn-width-float" value={formValues.width} onChange={e => handleFormChange('width', e.target.value)} onKeyDown={handleInputKeyDown} type="number" inputMode="decimal" step="any" className="h-11 text-center" />
                     </div>
                     <div className="space-y-1">
-                        <Label htmlFor="sawn-height-float" className="text-xs px-1 text-center block">Thickness (in)</Label>
+                        <Label htmlFor="sawn-height-float" className="text-xs px-1 text-center h-8 flex items-center justify-center">Thickness (in)</Label>
                         <Input id="sawn-height-float" value={formValues.height} onChange={e => handleFormChange('height', e.target.value)} onKeyDown={handleInputKeyDown} type="number" inputMode="decimal" step="any" className="h-11 text-center" />
                     </div>
                     <div className="space-y-1">
-                        <Label htmlFor="sawn-quantity-float" className="text-xs px-1 text-center block">Qty</Label>
+                        <Label htmlFor="sawn-quantity-float" className="text-xs px-1 text-center h-8 flex items-center justify-center">Qty</Label>
                         <Input id="sawn-quantity-float" value={formValues.quantity} onChange={e => handleFormChange('quantity', e.target.value)} onKeyDown={handleInputKeyDown} type="number" inputMode="numeric" min="1" className="h-11 text-center" />
                     </div>
                 </div>
@@ -617,15 +617,15 @@ function RoundLogsCalculator() {
                     <div className="flex items-end gap-2">
                         <div className="grid flex-1 grid-cols-3 gap-2">
                             <div className="space-y-1">
-                                <Label htmlFor="log-length-float" className="text-xs px-1 text-center block">Length (ft)</Label>
+                                <Label htmlFor="log-length-float" className="text-xs px-1 text-center h-8 flex items-center justify-center">Length (ft)</Label>
                                 <Input id="log-length-float" value={formValues.length} onChange={e => handleFormChange('length', e.target.value)} onKeyDown={handleInputKeyDown} type="number" inputMode="decimal" step="any" className="h-11 text-center" />
                             </div>
                             <div className="space-y-1">
-                                <Label htmlFor="log-girth-float" className="text-xs px-1 text-center block">Girth (in)</Label>
+                                <Label htmlFor="log-girth-float" className="text-xs px-1 text-center h-8 flex items-center justify-center">Girth (in)</Label>
                                 <Input id="log-girth-float" value={formValues.girth} onChange={e => handleFormChange('girth', e.target.value)} onKeyDown={handleInputKeyDown} type="number" inputMode="decimal" step="any" className="h-11 text-center" />
                             </div>
                             <div className="space-y-1">
-                                <Label htmlFor="log-quantity-float" className="text-xs px-1 text-center block">Quantity</Label>
+                                <Label htmlFor="log-quantity-float" className="text-xs px-1 text-center h-8 flex items-center justify-center">Quantity</Label>
                                 <Input id="log-quantity-float" value={formValues.quantity} onChange={e => handleFormChange('quantity', e.target.value)} onKeyDown={handleInputKeyDown} type="number" inputMode="numeric" min="1" className="h-11 text-center" />
                             </div>
                         </div>
