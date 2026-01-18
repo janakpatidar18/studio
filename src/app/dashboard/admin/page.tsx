@@ -122,13 +122,14 @@ function AddToGalleryDialog({ children }: { children: React.ReactNode }) {
 
         const doorNumbers = galleryImages
             ?.map(image => {
-                const match = image.title.match(/^Door (\d+)$/i);
+                const match = image.title.match(/^SVLSM\s(\d{4})$/i);
                 return match ? parseInt(match[1], 10) : 0;
             })
             .filter(num => num > 0) || [];
 
         const maxNumber = doorNumbers.length > 0 ? Math.max(...doorNumbers) : 0;
-        const title = `Door ${maxNumber + 1}`;
+        const newNumber = maxNumber + 1;
+        const title = `SVLSM ${String(newNumber).padStart(4, '0')}`;
 
         try {
             const image = await toBase64(imageFile);
@@ -211,20 +212,19 @@ function EditGalleryImageDialog({ image, children }: { image: GalleryImage; chil
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         const formData = new FormData(e.currentTarget);
-        const title = formData.get("title") as string;
         const category = formData.get("category") as string;
 
-        if (!title || !category) {
+        if (!category) {
             toast({
                 title: "All Fields Required",
-                description: "Please provide a title and category.",
+                description: "Please provide a category.",
                 variant: "destructive",
             });
             return;
         }
 
         try {
-            await updateGalleryImage(image.id, { title, category });
+            await updateGalleryImage(image.id, { category });
             toast({
                 title: "Image Updated",
                 description: "The image details have been successfully updated.",
@@ -254,7 +254,7 @@ function EditGalleryImageDialog({ image, children }: { image: GalleryImage; chil
                     </div>
                     <div className="space-y-3">
                         <Label htmlFor="edit-title">Title</Label>
-                        <Input id="edit-title" name="title" defaultValue={image.title} required />
+                        <Input id="edit-title" name="title" value={image.title} readOnly disabled className="cursor-default" />
                     </div>
                     <div className="space-y-3">
                         <Label htmlFor="edit-category">Category</Label>
@@ -567,5 +567,7 @@ export default function AdminPage() {
         </div>
     );
 }
+
+    
 
     
