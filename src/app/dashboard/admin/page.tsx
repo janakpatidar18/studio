@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useEffect } from 'react';
@@ -72,7 +73,7 @@ const toBase64 = (file: File): Promise<string> => new Promise((resolve, reject) 
 
 
 function AddToGalleryDialog({ children }: { children: React.ReactNode }) {
-    const { addGalleryImage, galleryCategories } = useInventory();
+    const { addGalleryImage, galleryCategories, galleryImages } = useInventory();
     const { toast } = useToast();
     const [imageFile, setImageFile] = useState<File | null>(null);
     const [imagePreview, setImagePreview] = useState<string | null>(null);
@@ -99,7 +100,6 @@ function AddToGalleryDialog({ children }: { children: React.ReactNode }) {
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         const formData = new FormData(e.currentTarget);
-        const title = formData.get("title") as string;
         const category = formData.get("category") as string;
 
         if (!imageFile) {
@@ -111,14 +111,24 @@ function AddToGalleryDialog({ children }: { children: React.ReactNode }) {
             return;
         }
 
-        if (!title || !category) {
+        if (!category) {
             toast({
                 title: "All Fields Required",
-                description: "Please provide a title and category for the image.",
+                description: "Please provide a category for the image.",
                 variant: "destructive",
             });
             return;
         }
+
+        const doorNumbers = galleryImages
+            ?.map(image => {
+                const match = image.title.match(/^Door (\d+)$/i);
+                return match ? parseInt(match[1], 10) : 0;
+            })
+            .filter(num => num > 0) || [];
+
+        const maxNumber = doorNumbers.length > 0 ? Math.max(...doorNumbers) : 0;
+        const title = `Door ${maxNumber + 1}`;
 
         try {
             const image = await toBase64(imageFile);
@@ -126,7 +136,7 @@ function AddToGalleryDialog({ children }: { children: React.ReactNode }) {
 
             toast({
                 title: "Image Added",
-                description: "The image has been successfully added to the gallery.",
+                description: `"${title}" has been successfully added to the gallery.`,
             });
             
             (e.target as HTMLFormElement).reset();
@@ -172,10 +182,6 @@ function AddToGalleryDialog({ children }: { children: React.ReactNode }) {
                                 </Button>
                             </div>
                         )}
-                    </div>
-                    <div className="space-y-3">
-                        <Label htmlFor="title">Title</Label>
-                        <Input id="title" name="title" placeholder="e.g., Custom Teak Door" required />
                     </div>
                     <div className="space-y-3">
                         <Label htmlFor="category">Category</Label>
@@ -561,3 +567,5 @@ export default function AdminPage() {
         </div>
     );
 }
+
+    
