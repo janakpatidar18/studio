@@ -27,7 +27,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { GalleryImage } from "@/lib/data";
 import { Badge } from "@/components/ui/badge";
 
-const ADMIN_PIN = "1234"; // A real app should use a more secure method
+const ADMIN_PIN = "2424"; // A real app should use a more secure method
 
 // Helper to convert file to data URI
 const toBase64 = (file: File): Promise<string> => new Promise((resolve, reject) => {
@@ -567,6 +567,8 @@ export default function AdminPage() {
         </div>
     );
 }
+
+    
 
     
 
