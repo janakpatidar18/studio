@@ -11,7 +11,7 @@ export default function RootLayout({
   return (
     <html lang="en" className="dark">
       <head>
-        <title>SVLSM Stock Manager</title>
+        <title>SVLSM</title>
         <meta name="description" content="Manage your stock with ease." />
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
         <link rel="manifest" href="/manifest.json" />
