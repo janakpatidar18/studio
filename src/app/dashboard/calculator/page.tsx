@@ -163,7 +163,7 @@ function SawnWoodCalculator() {
             index + 1,
             `${entry.length}ft × ${entry.width}in × ${entry.height}in`,
             entry.quantity,
-            (entry.cft * entry.quantity)
+            (entry.cft * entry.quantity).toFixed(4)
         ]),
         startY: currentY,
         headStyles: { fillColor: [36, 69, 76] },
@@ -174,7 +174,7 @@ function SawnWoodCalculator() {
     doc.autoTable({
         body: [
             ['Total Quantity', `${totalQuantity}`],
-            ['Total CFT', `${totalCft}`],
+            ['Total CFT', `${totalCft.toFixed(4)}`],
         ],
         startY: finalY + 5,
         theme: 'plain',
@@ -206,14 +206,14 @@ function SawnWoodCalculator() {
 
   const handleDownloadPdf = () => {
     const doc = generateSawnWoodPdfDoc(customerName);
-    const fileName = customerName.trim() ? `${customerName.trim()}.pdf` : `SawnWood_${totalCft.toFixed(2)}CFT.pdf`;
+    const fileName = customerName.trim() ? `${customerName.trim()}.pdf` : `SawnWood_${totalCft.toFixed(4)}CFT.pdf`;
     doc.save(fileName);
   };
   
   const handleSharePdf = async () => {
     const doc = generateSawnWoodPdfDoc(customerName);
     const pdfBlob = doc.output('blob');
-    const fileName = customerName.trim() ? `${customerName.trim()}.pdf` : `SawnWood_${totalCft.toFixed(2)}CFT.pdf`;
+    const fileName = customerName.trim() ? `${customerName.trim()}.pdf` : `SawnWood_${totalCft.toFixed(4)}CFT.pdf`;
     const pdfFile = new File([pdfBlob], fileName, { type: 'application/pdf' });
 
     if (navigator.share) {
@@ -290,10 +290,10 @@ function SawnWoodCalculator() {
                         <TableCell className="p-2 sm:p-4 text-center font-medium">{index + 1}</TableCell>
                         <TableCell className="p-2 sm:p-4">
                             <div className="font-medium whitespace-normal">{entry.length}ft × {entry.width}in × {entry.height}in</div>
-                            <div className="text-xs text-muted-foreground">Item CFT: {entry.cft}</div>
+                            <div className="text-xs text-muted-foreground">Item CFT: {entry.cft.toFixed(4)}</div>
                         </TableCell>
                         <TableCell className="p-2 sm:p-4 text-right">{entry.quantity}</TableCell>
-                        <TableCell className="p-2 sm:p-4 text-right font-medium">{entry.cft * entry.quantity}</TableCell>
+                        <TableCell className="p-2 sm:p-4 text-right font-medium">{(entry.cft * entry.quantity).toFixed(4)}</TableCell>
                         <TableCell className="p-2 sm:p-4 text-center">
                           <div className="flex items-center justify-center">
                             <Button variant="ghost" size="icon" type="button" onClick={() => handleEditClick(entry)} className="text-muted-foreground hover:text-primary h-8 w-8">
@@ -320,7 +320,7 @@ function SawnWoodCalculator() {
             </div>
             <div className="flex justify-between text-xl sm:text-2xl">
                 <span className="text-muted-foreground">Total CFT</span>
-                <span className="font-bold font-headline text-primary">{totalCft}</span>
+                <span className="font-bold font-headline text-primary">{totalCft.toFixed(4)}</span>
             </div>
             <div className="flex justify-end gap-2 mt-4">
                 <Button onClick={handleDownloadPdf} variant="outline">
@@ -483,7 +483,7 @@ function RoundLogsCalculator() {
                 index + 1,
                 `${entry.length}ft × ${entry.girth}in`,
                 entry.quantity,
-                (entry.cft * entry.quantity)
+                (entry.cft * entry.quantity).toFixed(4)
             ]),
             startY: currentY,
             headStyles: { fillColor: [36, 69, 76] },
@@ -494,7 +494,7 @@ function RoundLogsCalculator() {
         doc.autoTable({
             body: [
                 ['Total Quantity', `${totalQuantity}`],
-                ['Total CFT', `${totalCft}`],
+                ['Total CFT', `${totalCft.toFixed(4)}`],
             ],
             startY: finalY + 5,
             theme: 'plain',
@@ -525,14 +525,14 @@ function RoundLogsCalculator() {
     
     const handleDownloadPdf = () => {
         const doc = generateRoundLogPdfDoc(customerName);
-        const fileName = customerName.trim() ? `${customerName.trim()}.pdf` : `RoundLogs_${totalCft.toFixed(2)}CFT.pdf`;
+        const fileName = customerName.trim() ? `${customerName.trim()}.pdf` : `RoundLogs_${totalCft.toFixed(4)}CFT.pdf`;
         doc.save(fileName);
     };
 
     const handleSharePdf = async () => {
         const doc = generateRoundLogPdfDoc(customerName);
         const pdfBlob = doc.output('blob');
-        const fileName = customerName.trim() ? `${customerName.trim()}.pdf` : `RoundLogs_${totalCft.toFixed(2)}CFT.pdf`;
+        const fileName = customerName.trim() ? `${customerName.trim()}.pdf` : `RoundLogs_${totalCft.toFixed(4)}CFT.pdf`;
         const pdfFile = new File([pdfBlob], fileName, { type: 'application/pdf' });
 
         if (navigator.share) {
@@ -605,10 +605,10 @@ function RoundLogsCalculator() {
                                 <TableCell className="p-2 sm:p-4 text-center font-medium">{index + 1}</TableCell>
                                 <TableCell className="p-2 sm:p-4">
                                     <div className="font-medium whitespace-normal">{entry.length}ft × {entry.girth}in</div>
-                                    <div className="text-xs text-muted-foreground">Item CFT: {entry.cft}</div>
+                                    <div className="text-xs text-muted-foreground">Item CFT: {entry.cft.toFixed(4)}</div>
                                 </TableCell>
                                 <TableCell className="p-2 sm:p-4 text-right">{entry.quantity}</TableCell>
-                                <TableCell className="p-2 sm:p-4 text-right font-medium">{entry.cft * entry.quantity}</TableCell>
+                                <TableCell className="p-2 sm:p-4 text-right font-medium">{(entry.cft * entry.quantity).toFixed(4)}</TableCell>
                                 <TableCell className="p-2 sm:p-4 text-center">
                                   <div className="flex items-center justify-center">
                                     <Button variant="ghost" size="icon" type="button" onClick={() => handleEditClick(entry)} className="text-muted-foreground hover:text-primary h-8 w-8">
@@ -635,7 +635,7 @@ function RoundLogsCalculator() {
                     </div>
                     <div className="flex justify-between text-xl sm:text-2xl">
                         <span className="text-muted-foreground">Total CFT</span>
-                        <span className="font-bold font-headline text-primary">{totalCft}</span>
+                        <span className="font-bold font-headline text-primary">{totalCft.toFixed(4)}</span>
                     </div>
                      <div className="flex justify-end gap-2 mt-4">
                         <Button onClick={handleDownloadPdf} variant="outline">
@@ -716,6 +716,8 @@ export default function CalculatorPage() {
     
 
 
+
+    
 
     
 
