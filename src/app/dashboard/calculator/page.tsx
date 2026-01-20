@@ -64,6 +64,7 @@ function SawnWoodCalculator() {
   const [entries, setEntries] = useState<SawnWoodEntry[]>([]);
   const [formError, setFormError] = useState<string | null>(null);
   const [editingId, setEditingId] = useState<number | null>(null);
+  const [customerName, setCustomerName] = useState("");
 
   const handleFormChange = (field: string, value: string) => {
     setFormValues(prev => ({ ...prev, [field]: value }));
@@ -137,14 +138,24 @@ function SawnWoodCalculator() {
     );
   }, [entries]);
 
-  const generateSawnWoodPdfDoc = () => {
+  const generateSawnWoodPdfDoc = (customerName: string) => {
     const doc = new jsPDF();
     const pageWidth = doc.internal.pageSize.getWidth();
+    let currentY = 22;
 
     doc.setFontSize(20);
-    doc.text("Sawn Wood CFT Calculation", pageWidth / 2, 22, { align: 'center' });
+    doc.text("Sawn Wood CFT Calculation", pageWidth / 2, currentY, { align: 'center' });
+    currentY += 6;
+
+    if (customerName) {
+        doc.setFontSize(12);
+        doc.text(`Customer: ${customerName}`, pageWidth / 2, currentY, { align: 'center' });
+        currentY += 6;
+    }
+    
     doc.setFontSize(10);
-    doc.text(`Date: ${new Date().toLocaleDateString()}`, pageWidth / 2, 28, { align: 'center' });
+    doc.text(`Date: ${new Date().toLocaleDateString()}`, pageWidth / 2, currentY, { align: 'center' });
+    currentY += 7;
 
     (doc as any).autoTable({
         head: [['#', 'Dimensions (L×W×T)', 'Qty', 'Total CFT']],
@@ -154,7 +165,7 @@ function SawnWoodCalculator() {
             entry.quantity,
             (entry.cft * entry.quantity)
         ]),
-        startY: 35,
+        startY: currentY,
         headStyles: { fillColor: [36, 69, 76] },
         theme: 'grid'
     });
@@ -194,20 +205,22 @@ function SawnWoodCalculator() {
   };
 
   const handleDownloadPdf = () => {
-    const doc = generateSawnWoodPdfDoc();
-    doc.save(`SawnWood_Calculation_${new Date().toLocaleDateString()}.pdf`);
+    const doc = generateSawnWoodPdfDoc(customerName);
+    const fileName = customerName.trim() ? `${customerName.trim()}.pdf` : `SawnWood_${totalCft.toFixed(2)}CFT.pdf`;
+    doc.save(fileName);
   };
   
   const handleSharePdf = async () => {
-    const doc = generateSawnWoodPdfDoc();
+    const doc = generateSawnWoodPdfDoc(customerName);
     const pdfBlob = doc.output('blob');
-    const pdfFile = new File([pdfBlob], `SawnWood_Calculation_${new Date().toLocaleDateString()}.pdf`, { type: 'application/pdf' });
+    const fileName = customerName.trim() ? `${customerName.trim()}.pdf` : `SawnWood_${totalCft.toFixed(2)}CFT.pdf`;
+    const pdfFile = new File([pdfBlob], fileName, { type: 'application/pdf' });
 
     if (navigator.share) {
         try {
             await navigator.share({
                 title: 'Sawn Wood Calculation',
-                text: 'Here is the Sawn Wood CFT calculation.',
+                text: `Sawn Wood CFT calculation for ${customerName.trim() || 'your project'}.`,
                 files: [pdfFile],
             });
         } catch (error) {
@@ -317,6 +330,16 @@ function SawnWoodCalculator() {
                     <Share2 className="mr-2 h-4 w-4" /> Share PDF
                 </Button>
             </div>
+            <div className="space-y-2 pt-4">
+                <Label htmlFor="sawn-customer-name">Customer Name (for PDF)</Label>
+                <Input 
+                    id="sawn-customer-name"
+                    value={customerName}
+                    onChange={(e) => setCustomerName(e.target.value)}
+                    placeholder="Optional: Enter name for PDF filename"
+                    className="h-11"
+                />
+            </div>
           </CardFooter>
       )}
       <div className="h-40 md:hidden"></div>
@@ -363,6 +386,7 @@ function RoundLogsCalculator() {
     const [entries, setEntries] = useState<RoundLogEntry[]>([]);
     const [formError, setFormError] = useState<string | null>(null);
     const [editingId, setEditingId] = useState<number | null>(null);
+    const [customerName, setCustomerName] = useState("");
 
     const handleFormChange = (field: string, value: string) => {
         setFormValues(prev => ({ ...prev, [field]: value }));
@@ -434,14 +458,24 @@ function RoundLogsCalculator() {
         );
       }, [entries]);
 
-    const generateRoundLogPdfDoc = () => {
+    const generateRoundLogPdfDoc = (customerName: string) => {
         const doc = new jsPDF();
         const pageWidth = doc.internal.pageSize.getWidth();
+        let currentY = 22;
         
         doc.setFontSize(20);
-        doc.text("Round Logs CFT Calculation", pageWidth / 2, 22, { align: 'center' });
+        doc.text("Round Logs CFT Calculation", pageWidth / 2, currentY, { align: 'center' });
+        currentY += 6;
+
+        if (customerName) {
+            doc.setFontSize(12);
+            doc.text(`Customer: ${customerName}`, pageWidth / 2, currentY, { align: 'center' });
+            currentY += 6;
+        }
+
         doc.setFontSize(10);
-        doc.text(`Date: ${new Date().toLocaleDateString()}`, pageWidth / 2, 28, { align: 'center' });
+        doc.text(`Date: ${new Date().toLocaleDateString()}`, pageWidth / 2, currentY, { align: 'center' });
+        currentY += 7;
 
         (doc as any).autoTable({
             head: [['#', 'Dimensions (L×G)', 'Qty', 'Total CFT']],
@@ -451,7 +485,7 @@ function RoundLogsCalculator() {
                 entry.quantity,
                 (entry.cft * entry.quantity)
             ]),
-            startY: 35,
+            startY: currentY,
             headStyles: { fillColor: [36, 69, 76] },
             theme: 'grid'
         });
@@ -490,20 +524,22 @@ function RoundLogsCalculator() {
     };
     
     const handleDownloadPdf = () => {
-        const doc = generateRoundLogPdfDoc();
-        doc.save(`RoundLogs_Calculation_${new Date().toLocaleDateString()}.pdf`);
+        const doc = generateRoundLogPdfDoc(customerName);
+        const fileName = customerName.trim() ? `${customerName.trim()}.pdf` : `RoundLogs_${totalCft.toFixed(2)}CFT.pdf`;
+        doc.save(fileName);
     };
 
     const handleSharePdf = async () => {
-        const doc = generateRoundLogPdfDoc();
+        const doc = generateRoundLogPdfDoc(customerName);
         const pdfBlob = doc.output('blob');
-        const pdfFile = new File([pdfBlob], `RoundLogs_Calculation_${new Date().toLocaleDateString()}.pdf`, { type: 'application/pdf' });
+        const fileName = customerName.trim() ? `${customerName.trim()}.pdf` : `RoundLogs_${totalCft.toFixed(2)}CFT.pdf`;
+        const pdfFile = new File([pdfBlob], fileName, { type: 'application/pdf' });
 
         if (navigator.share) {
             try {
                 await navigator.share({
                     title: 'Round Logs Calculation',
-                    text: 'Here is the Round Logs CFT calculation.',
+                    text: `Round Logs CFT calculation for ${customerName.trim() || 'your project'}.`,
                     files: [pdfFile],
                 });
             } catch (error) {
@@ -608,6 +644,16 @@ function RoundLogsCalculator() {
                         <Button onClick={handleSharePdf}>
                             <Share2 className="mr-2 h-4 w-4" /> Share PDF
                         </Button>
+                    </div>
+                    <div className="space-y-2 pt-4">
+                        <Label htmlFor="round-customer-name">Customer Name (for PDF)</Label>
+                        <Input 
+                            id="round-customer-name"
+                            value={customerName}
+                            onChange={(e) => setCustomerName(e.target.value)}
+                            placeholder="Optional: Enter name for PDF filename"
+                            className="h-11"
+                        />
                     </div>
                 </CardFooter>
             )}
