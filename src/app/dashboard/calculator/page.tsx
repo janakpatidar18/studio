@@ -150,7 +150,7 @@ function SawnWoodCalculator() {
         head: [['#', 'Dimensions (L×W×T)', 'Qty', 'Total CFT']],
         body: entries.map((entry, index) => [
             index + 1,
-            `${entry.length.toFixed(1)}ft × ${entry.width.toFixed(1)}in × ${entry.height.toFixed(1)}in`,
+            `${entry.length}ft × ${entry.width}in × ${entry.height}in`,
             entry.quantity,
             (entry.cft * entry.quantity).toFixed(4)
         ]),
@@ -276,7 +276,7 @@ function SawnWoodCalculator() {
                       <TableRow key={entry.id}>
                         <TableCell className="p-2 sm:p-4 text-center font-medium">{index + 1}</TableCell>
                         <TableCell className="p-2 sm:p-4">
-                            <div className="font-medium whitespace-normal">{entry.length.toFixed(1)}ft × {entry.width.toFixed(1)}in × {entry.height.toFixed(1)}in</div>
+                            <div className="font-medium whitespace-normal">{entry.length}ft × {entry.width}in × {entry.height}in</div>
                             <div className="text-xs text-muted-foreground">Item CFT: {entry.cft.toFixed(4)}</div>
                         </TableCell>
                         <TableCell className="p-2 sm:p-4 text-right">{entry.quantity}</TableCell>
@@ -319,7 +319,7 @@ function SawnWoodCalculator() {
             </div>
           </CardFooter>
       )}
-      <div className="h-28 md:hidden"></div>
+      <div className="h-40 md:hidden"></div>
       <form onSubmit={handleFormSubmit} className="fixed bottom-20 left-0 right-0 z-40 p-2 bg-background/80 backdrop-blur-sm border-t md:hidden">
         <div className="max-w-xl mx-auto p-2 rounded-lg bg-card/90 border-2 border-primary/50">
             <div className="flex items-end gap-2">
@@ -447,7 +447,7 @@ function RoundLogsCalculator() {
             head: [['#', 'Dimensions (L×G)', 'Qty', 'Total CFT']],
             body: entries.map((entry, index) => [
                 index + 1,
-                `${entry.length.toFixed(1)}ft × ${entry.girth.toFixed(1)}in`,
+                `${entry.length}ft × ${entry.girth}in`,
                 entry.quantity,
                 (entry.cft * entry.quantity).toFixed(4)
             ]),
@@ -568,7 +568,7 @@ function RoundLogsCalculator() {
                               <TableRow key={entry.id}>
                                 <TableCell className="p-2 sm:p-4 text-center font-medium">{index + 1}</TableCell>
                                 <TableCell className="p-2 sm:p-4">
-                                    <div className="font-medium whitespace-normal">{entry.length.toFixed(1)}ft × {entry.girth.toFixed(1)}in</div>
+                                    <div className="font-medium whitespace-normal">{entry.length}ft × {entry.girth}in</div>
                                     <div className="text-xs text-muted-foreground">Item CFT: {entry.cft.toFixed(4)}</div>
                                 </TableCell>
                                 <TableCell className="p-2 sm:p-4 text-right">{entry.quantity}</TableCell>
@@ -611,7 +611,7 @@ function RoundLogsCalculator() {
                     </div>
                 </CardFooter>
             )}
-            <div className="h-28 md:hidden" />
+            <div className="h-40 md:hidden" />
              <form onSubmit={handleFormSubmit} className="fixed bottom-20 left-0 right-0 z-40 p-2 bg-background/80 backdrop-blur-sm border-t md:hidden">
                 <div className="max-w-xl mx-auto p-2 rounded-lg bg-card/90 border-2 border-primary/50">
                     <div className="flex items-end gap-2">
@@ -670,5 +670,7 @@ export default function CalculatorPage() {
     
 
 
+
+    
 
     
