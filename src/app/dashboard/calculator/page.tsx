@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -26,17 +26,19 @@ const SawnWoodEntrySchema = z.object({
   width: z.coerce.number().min(0.01, "Width must be positive"),
   height: z.coerce.number().min(0.01, "Height must be positive"),
   quantity: z.coerce.number().int().min(1, "Quantity must be at least 1"),
+  rate: z.coerce.number().min(0, "Rate must be non-negative").optional(),
 });
 
-type SawnWoodEntry = z.infer<typeof SawnWoodEntrySchema> & { id: number; cft: number };
+type SawnWoodEntry = z.infer<typeof SawnWoodEntrySchema> & { id: number; cft: number; totalAmount: number };
 
 const RoundLogEntrySchema = z.object({
   length: z.coerce.number().min(0.01, "Length must be positive"),
   girth: z.coerce.number().min(0.01, "Girth must be positive"),
   quantity: z.coerce.number().int().min(1, "Quantity must be at least 1"),
+  rate: z.coerce.number().min(0, "Rate must be non-negative").optional(),
 });
 
-type RoundLogEntry = z.infer<typeof RoundLogEntrySchema> & { id: number; cft: number };
+type RoundLogEntry = z.infer<typeof RoundLogEntrySchema> & { id: number; cft: number; totalAmount: number };
 
 const handleInputKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
@@ -59,12 +61,19 @@ const handleInputKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
 };
 
 function SawnWoodCalculator() {
-  const initialFormState = { length: "", width: "", height: "", quantity: "" };
+  const initialFormState = { length: "", width: "", height: "", quantity: "", rate: "" };
   const [formValues, setFormValues] = useState(initialFormState);
   const [entries, setEntries] = useState<SawnWoodEntry[]>([]);
   const [formError, setFormError] = useState<string | null>(null);
   const [editingId, setEditingId] = useState<number | null>(null);
   const [customerName, setCustomerName] = useState("");
+  const [lastUsedRate, setLastUsedRate] = useState("");
+
+  useEffect(() => {
+    if (!editingId) {
+      setFormValues(prev => ({ ...prev, rate: lastUsedRate }));
+    }
+  }, [lastUsedRate, editingId]);
 
   const handleFormChange = (field: string, value: string) => {
     setFormValues(prev => ({ ...prev, [field]: value }));
@@ -81,13 +90,18 @@ function SawnWoodCalculator() {
     }
     
     setFormError(null);
-    const { length, width, height, quantity } = parsed.data;
+    const { length, width, height, quantity, rate } = parsed.data;
     const cft = ((length * width * height) / 144);
+    const totalAmount = cft * quantity * (rate || 0);
+
+    if (rate !== undefined) {
+      setLastUsedRate(String(rate));
+    }
     
     if (editingId) {
         setEntries(prev => prev.map(entry => 
             entry.id === editingId 
-            ? { ...entry, length, width, height, quantity, cft } 
+            ? { ...entry, length, width, height, quantity, cft, rate, totalAmount } 
             : entry
         ));
     } else {
@@ -98,6 +112,8 @@ function SawnWoodCalculator() {
             height,
             quantity,
             cft,
+            rate,
+            totalAmount
         }]);
     }
 
@@ -112,6 +128,7 @@ function SawnWoodCalculator() {
         width: String(entry.width),
         height: String(entry.height),
         quantity: String(entry.quantity),
+        rate: String(entry.rate ?? ''),
     });
     setFormError(null);
     (document.getElementById('sawn-length') as HTMLInputElement)?.focus();
@@ -122,19 +139,20 @@ function SawnWoodCalculator() {
   };
   
   const clearForm = () => {
-      setFormValues(initialFormState);
+      setFormValues({ ...initialFormState, rate: lastUsedRate });
       setFormError(null);
       setEditingId(null);
   }
   
-  const { totalCft, totalQuantity } = useMemo(() => {
+  const { totalCft, totalQuantity, totalAmount } = useMemo(() => {
     return entries.reduce(
       (acc, entry) => {
         acc.totalCft += entry.cft * entry.quantity;
         acc.totalQuantity += entry.quantity;
+        acc.totalAmount += entry.totalAmount;
         return acc;
       },
-      { totalCft: 0, totalQuantity: 0 }
+      { totalCft: 0, totalQuantity: 0, totalAmount: 0 }
     );
   }, [entries]);
 
@@ -158,16 +176,23 @@ function SawnWoodCalculator() {
     currentY += 7;
 
     (doc as any).autoTable({
-        head: [['#', 'Dimensions (L×W×T)', 'Qty', 'Total CFT']],
+        head: [['#', 'Dimensions (L×W×T)', 'Qty', 'Rate', 'Total CFT', 'Total Amt']],
         body: entries.map((entry, index) => [
             index + 1,
             `${entry.length}" × ${entry.width}' × ${entry.height}'`,
             entry.quantity,
-            (entry.cft * entry.quantity).toFixed(4)
+            entry.rate?.toFixed(2) ?? '-',
+            (entry.cft * entry.quantity).toFixed(4),
+            entry.totalAmount.toFixed(2),
         ]),
         startY: currentY,
         headStyles: { fillColor: [36, 69, 76] },
-        theme: 'grid'
+        theme: 'grid',
+        styles: { halign: 'right' },
+        columnStyles: {
+            0: { halign: 'center' },
+            1: { halign: 'left' },
+        }
     });
 
     const finalY = (doc as any).lastAutoTable.finalY;
@@ -175,6 +200,7 @@ function SawnWoodCalculator() {
         body: [
             ['Total Nos.', `${totalQuantity}`],
             ['Total CFT', `${totalCft.toFixed(4)}`],
+            ['Grand Total', `₹ ${totalAmount.toFixed(2)}`],
         ],
         startY: finalY + 5,
         theme: 'plain',
@@ -240,7 +266,7 @@ function SawnWoodCalculator() {
       </CardHeader>
       <CardContent className="p-2 sm:p-6 space-y-4">
         <form onSubmit={handleFormSubmit} className="hidden md:block p-2 sm:p-4 border rounded-lg bg-muted/50 space-y-4">
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
                  <div className="space-y-1">
                     <Label htmlFor="sawn-length">Length (ft)</Label>
                     <Input id="sawn-length" value={formValues.length} onChange={e => handleFormChange('length', e.target.value)} onKeyDown={handleInputKeyDown} type="number" inputMode="decimal" step="any" placeholder="" />
@@ -256,6 +282,10 @@ function SawnWoodCalculator() {
                  <div className="space-y-1">
                     <Label htmlFor="sawn-quantity">Quantity</Label>
                     <Input id="sawn-quantity" value={formValues.quantity} onChange={e => handleFormChange('quantity', e.target.value)} onKeyDown={handleInputKeyDown} type="number" inputMode="numeric" min="1" placeholder="" />
+                </div>
+                <div className="space-y-1">
+                    <Label htmlFor="sawn-rate">Rate</Label>
+                    <Input id="sawn-rate" value={formValues.rate} onChange={e => handleFormChange('rate', e.target.value)} onKeyDown={handleInputKeyDown} type="number" inputMode="decimal" step="any" placeholder="per CFT" />
                 </div>
             </div>
             {formError && <p className="text-sm text-destructive">{formError}</p>}
@@ -276,14 +306,16 @@ function SawnWoodCalculator() {
                         <TableHead className="w-12 text-center px-2 sm:px-4">#</TableHead>
                         <TableHead className="px-2 sm:px-4">Dimensions</TableHead>
                         <TableHead className="text-right px-2 sm:px-4">Qty</TableHead>
+                        <TableHead className="text-right px-2 sm:px-4">Rate</TableHead>
                         <TableHead className="text-right px-2 sm:px-4">Total CFT</TableHead>
+                        <TableHead className="text-right px-2 sm:px-4">Total Amt</TableHead>
                         <TableHead className="w-28 text-center px-2 sm:px-4">Actions</TableHead>
                     </TableRow>
                 </TableHeader>
                 <TableBody>
                     {entries.length === 0 ? (
                         <TableRow>
-                            <TableCell colSpan={5} className="text-center h-24 text-muted-foreground p-4">No entries added yet.</TableCell>
+                            <TableCell colSpan={7} className="text-center h-24 text-muted-foreground p-4">No entries added yet.</TableCell>
                         </TableRow>
                     ) : entries.map((entry, index) => (
                       <TableRow key={entry.id}>
@@ -293,7 +325,9 @@ function SawnWoodCalculator() {
                             <div className="text-xs text-muted-foreground">Item CFT: {entry.cft.toFixed(4)}</div>
                         </TableCell>
                         <TableCell className="p-2 sm:p-4 text-right">{entry.quantity}</TableCell>
+                        <TableCell className="p-2 sm:p-4 text-right">{entry.rate?.toFixed(2) ?? '-'}</TableCell>
                         <TableCell className="p-2 sm:p-4 text-right font-medium">{(entry.cft * entry.quantity).toFixed(4)}</TableCell>
+                        <TableCell className="p-2 sm:p-4 text-right font-bold">₹{entry.totalAmount.toFixed(2)}</TableCell>
                         <TableCell className="p-2 sm:p-4 text-center">
                           <div className="flex items-center justify-center">
                             <Button variant="ghost" size="icon" type="button" onClick={() => handleEditClick(entry)} className="text-muted-foreground hover:text-primary h-8 w-8">
@@ -320,7 +354,11 @@ function SawnWoodCalculator() {
             </div>
             <div className="flex justify-between text-xl sm:text-2xl">
                 <span className="text-muted-foreground">Total CFT</span>
-                <span className="font-bold font-headline text-primary">{totalCft.toFixed(4)}</span>
+                <span className="font-bold font-headline">{totalCft.toFixed(4)}</span>
+            </div>
+            <div className="flex justify-between text-2xl sm:text-3xl">
+                <span className="text-muted-foreground">Total Amount</span>
+                <span className="font-bold font-headline text-primary">₹ {totalAmount.toFixed(2)}</span>
             </div>
             <div className="flex justify-end gap-2 mt-4">
                 <Button onClick={handleDownloadPdf} variant="outline">
@@ -342,26 +380,30 @@ function SawnWoodCalculator() {
             </div>
           </CardFooter>
       )}
-      <div className="h-40 md:hidden"></div>
+      <div className="h-44 md:hidden"></div>
       <form onSubmit={handleFormSubmit} className="fixed bottom-20 left-0 right-0 z-40 p-2 bg-background/80 backdrop-blur-sm border-t md:hidden">
         <div className="max-w-xl mx-auto p-2 rounded-lg bg-card/90 border-2 border-primary/50">
             <div className="flex items-end gap-2">
-                <div className="grid flex-1 grid-cols-4 gap-2">
+                <div className="grid flex-1 grid-cols-5 gap-1">
                     <div className="space-y-1">
                         <Label htmlFor="sawn-length-float" className="text-xs px-1 text-center h-8 flex items-center justify-center">Length (ft)</Label>
-                        <Input id="sawn-length-float" value={formValues.length} onChange={e => handleFormChange('length', e.target.value)} onKeyDown={handleInputKeyDown} type="number" inputMode="decimal" step="any" className="h-11 text-center" />
+                        <Input id="sawn-length-float" value={formValues.length} onChange={e => handleFormChange('length', e.target.value)} onKeyDown={handleInputKeyDown} type="number" inputMode="decimal" step="any" className="h-11 text-center text-sm" />
                     </div>
                     <div className="space-y-1">
                         <Label htmlFor="sawn-width-float" className="text-xs px-1 text-center h-8 flex items-center justify-center">Width (in)</Label>
-                        <Input id="sawn-width-float" value={formValues.width} onChange={e => handleFormChange('width', e.target.value)} onKeyDown={handleInputKeyDown} type="number" inputMode="decimal" step="any" className="h-11 text-center" />
+                        <Input id="sawn-width-float" value={formValues.width} onChange={e => handleFormChange('width', e.target.value)} onKeyDown={handleInputKeyDown} type="number" inputMode="decimal" step="any" className="h-11 text-center text-sm" />
                     </div>
                     <div className="space-y-1">
-                        <Label htmlFor="sawn-height-float" className="text-xs px-1 text-center h-8 flex items-center justify-center">Thickness (in)</Label>
-                        <Input id="sawn-height-float" value={formValues.height} onChange={e => handleFormChange('height', e.target.value)} onKeyDown={handleInputKeyDown} type="number" inputMode="decimal" step="any" className="h-11 text-center" />
+                        <Label htmlFor="sawn-height-float" className="text-xs px-1 text-center h-8 flex items-center justify-center">Thick (in)</Label>
+                        <Input id="sawn-height-float" value={formValues.height} onChange={e => handleFormChange('height', e.target.value)} onKeyDown={handleInputKeyDown} type="number" inputMode="decimal" step="any" className="h-11 text-center text-sm" />
                     </div>
                     <div className="space-y-1">
                         <Label htmlFor="sawn-quantity-float" className="text-xs px-1 text-center h-8 flex items-center justify-center">Qty</Label>
-                        <Input id="sawn-quantity-float" value={formValues.quantity} onChange={e => handleFormChange('quantity', e.target.value)} onKeyDown={handleInputKeyDown} type="number" inputMode="numeric" min="1" className="h-11 text-center" />
+                        <Input id="sawn-quantity-float" value={formValues.quantity} onChange={e => handleFormChange('quantity', e.target.value)} onKeyDown={handleInputKeyDown} type="number" inputMode="numeric" min="1" className="h-11 text-center text-sm" />
+                    </div>
+                    <div className="space-y-1">
+                        <Label htmlFor="sawn-rate-float" className="text-xs px-1 text-center h-8 flex items-center justify-center">Rate</Label>
+                        <Input id="sawn-rate-float" value={formValues.rate} onChange={e => handleFormChange('rate', e.target.value)} onKeyDown={handleInputKeyDown} type="number" inputMode="decimal" step="any" className="h-11 text-center text-sm" />
                     </div>
                 </div>
                 <div className="flex flex-col gap-1 w-[80px]">
@@ -381,12 +423,19 @@ function SawnWoodCalculator() {
 }
 
 function RoundLogsCalculator() {
-    const initialFormState = { length: "", girth: "", quantity: "" };
+    const initialFormState = { length: "", girth: "", quantity: "", rate: "" };
     const [formValues, setFormValues] = useState(initialFormState);
     const [entries, setEntries] = useState<RoundLogEntry[]>([]);
     const [formError, setFormError] = useState<string | null>(null);
     const [editingId, setEditingId] = useState<number | null>(null);
     const [customerName, setCustomerName] = useState("");
+    const [lastUsedRate, setLastUsedRate] = useState("");
+
+     useEffect(() => {
+        if (!editingId) {
+            setFormValues(prev => ({ ...prev, rate: lastUsedRate }));
+        }
+    }, [lastUsedRate, editingId]);
 
     const handleFormChange = (field: string, value: string) => {
         setFormValues(prev => ({ ...prev, [field]: value }));
@@ -403,13 +452,18 @@ function RoundLogsCalculator() {
         }
 
         setFormError(null);
-        const { length, girth, quantity } = parsed.data;
+        const { length, girth, quantity, rate } = parsed.data;
         const cft = ((girth * girth * length) / 2304);
+        const totalAmount = cft * quantity * (rate || 0);
+
+        if (rate !== undefined) {
+            setLastUsedRate(String(rate));
+        }
 
         if (editingId) {
             setEntries(prev => prev.map(entry =>
                 entry.id === editingId
-                ? { ...entry, length, girth, quantity, cft }
+                ? { ...entry, length, girth, quantity, cft, rate, totalAmount }
                 : entry
             ));
         } else {
@@ -419,6 +473,8 @@ function RoundLogsCalculator() {
                 girth,
                 quantity,
                 cft,
+                rate,
+                totalAmount
             }]);
         }
         
@@ -432,6 +488,7 @@ function RoundLogsCalculator() {
             length: String(entry.length),
             girth: String(entry.girth),
             quantity: String(entry.quantity),
+            rate: String(entry.rate ?? ''),
         });
         setFormError(null);
         (document.getElementById('log-length') as HTMLInputElement)?.focus();
@@ -442,19 +499,20 @@ function RoundLogsCalculator() {
     };
     
     const clearForm = () => {
-        setFormValues(initialFormState);
+        setFormValues({ ...initialFormState, rate: lastUsedRate });
         setFormError(null);
         setEditingId(null);
     }
 
-    const { totalCft, totalQuantity } = useMemo(() => {
+    const { totalCft, totalQuantity, totalAmount } = useMemo(() => {
         return entries.reduce(
           (acc, entry) => {
             acc.totalCft += entry.cft * entry.quantity;
             acc.totalQuantity += entry.quantity;
+            acc.totalAmount += entry.totalAmount;
             return acc;
           },
-          { totalCft: 0, totalQuantity: 0 }
+          { totalCft: 0, totalQuantity: 0, totalAmount: 0 }
         );
       }, [entries]);
 
@@ -478,16 +536,23 @@ function RoundLogsCalculator() {
         currentY += 7;
 
         (doc as any).autoTable({
-            head: [['#', 'Dimensions (L×G)', 'Qty', 'Total CFT']],
+            head: [['#', 'Dimensions (L×G)', 'Qty', 'Rate', 'Total CFT', 'Total Amt']],
             body: entries.map((entry, index) => [
                 index + 1,
                 `${entry.length}" × ${entry.girth}'`,
                 entry.quantity,
-                (entry.cft * entry.quantity).toFixed(4)
+                entry.rate?.toFixed(2) ?? '-',
+                (entry.cft * entry.quantity).toFixed(4),
+                entry.totalAmount.toFixed(2),
             ]),
             startY: currentY,
             headStyles: { fillColor: [36, 69, 76] },
-            theme: 'grid'
+            theme: 'grid',
+            styles: { halign: 'right' },
+            columnStyles: {
+                0: { halign: 'center' },
+                1: { halign: 'left' },
+            }
         });
 
         const finalY = (doc as any).lastAutoTable.finalY;
@@ -495,6 +560,7 @@ function RoundLogsCalculator() {
             body: [
                 ['Total Nos.', `${totalQuantity}`],
                 ['Total CFT', `${totalCft.toFixed(4)}`],
+                ['Grand Total', `₹ ${totalAmount.toFixed(2)}`],
             ],
             startY: finalY + 5,
             theme: 'plain',
@@ -559,7 +625,7 @@ function RoundLogsCalculator() {
             </CardHeader>
             <CardContent className="p-2 sm:p-6 space-y-4">
                 <form onSubmit={handleFormSubmit} className="hidden md:block p-2 sm:p-4 border rounded-lg bg-muted/50 space-y-4">
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
                         <div className="space-y-1">
                             <Label htmlFor="log-length">Length (ft)</Label>
                             <Input id="log-length" value={formValues.length} onChange={e => handleFormChange('length', e.target.value)} onKeyDown={handleInputKeyDown} type="number" inputMode="decimal" step="any" placeholder="" />
@@ -571,6 +637,10 @@ function RoundLogsCalculator() {
                         <div className="space-y-1">
                             <Label htmlFor="log-quantity">Quantity</Label>
                             <Input id="log-quantity" value={formValues.quantity} onChange={e => handleFormChange('quantity', e.target.value)} onKeyDown={handleInputKeyDown} type="number" inputMode="numeric" min="1" placeholder="" />
+                        </div>
+                        <div className="space-y-1">
+                            <Label htmlFor="log-rate">Rate</Label>
+                            <Input id="log-rate" value={formValues.rate} onChange={e => handleFormChange('rate', e.target.value)} onKeyDown={handleInputKeyDown} type="number" inputMode="decimal" step="any" placeholder="per CFT" />
                         </div>
                     </div>
                     {formError && <p className="text-sm text-destructive">{formError}</p>}
@@ -591,14 +661,16 @@ function RoundLogsCalculator() {
                                 <TableHead className="w-12 text-center px-2 sm:px-4">#</TableHead>
                                 <TableHead className="px-2 sm:px-4">Dimensions</TableHead>
                                 <TableHead className="text-right px-2 sm:px-4">Qty</TableHead>
+                                <TableHead className="text-right px-2 sm:px-4">Rate</TableHead>
                                 <TableHead className="text-right px-2 sm:px-4">Total CFT</TableHead>
+                                <TableHead className="text-right px-2 sm:px-4">Total Amt</TableHead>
                                 <TableHead className="w-28 text-center px-2 sm:px-4">Actions</TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>
                             {entries.length === 0 ? (
                                 <TableRow>
-                                    <TableCell colSpan={5} className="text-center h-24 text-muted-foreground p-4">No entries added yet.</TableCell>
+                                    <TableCell colSpan={7} className="text-center h-24 text-muted-foreground p-4">No entries added yet.</TableCell>
                                 </TableRow>
                             ) : entries.map((entry, index) => (
                               <TableRow key={entry.id}>
@@ -608,7 +680,9 @@ function RoundLogsCalculator() {
                                     <div className="text-xs text-muted-foreground">Item CFT: {entry.cft.toFixed(4)}</div>
                                 </TableCell>
                                 <TableCell className="p-2 sm:p-4 text-right">{entry.quantity}</TableCell>
+                                <TableCell className="p-2 sm:p-4 text-right">{entry.rate?.toFixed(2) ?? '-'}</TableCell>
                                 <TableCell className="p-2 sm:p-4 text-right font-medium">{(entry.cft * entry.quantity).toFixed(4)}</TableCell>
+                                <TableCell className="p-2 sm:p-4 text-right font-bold">₹{entry.totalAmount.toFixed(2)}</TableCell>
                                 <TableCell className="p-2 sm:p-4 text-center">
                                   <div className="flex items-center justify-center">
                                     <Button variant="ghost" size="icon" type="button" onClick={() => handleEditClick(entry)} className="text-muted-foreground hover:text-primary h-8 w-8">
@@ -635,7 +709,11 @@ function RoundLogsCalculator() {
                     </div>
                     <div className="flex justify-between text-xl sm:text-2xl">
                         <span className="text-muted-foreground">Total CFT</span>
-                        <span className="font-bold font-headline text-primary">{totalCft.toFixed(4)}</span>
+                        <span className="font-bold font-headline">{totalCft.toFixed(4)}</span>
+                    </div>
+                    <div className="flex justify-between text-2xl sm:text-3xl">
+                        <span className="text-muted-foreground">Total Amount</span>
+                        <span className="font-bold font-headline text-primary">₹ {totalAmount.toFixed(2)}</span>
                     </div>
                      <div className="flex justify-end gap-2 mt-4">
                         <Button onClick={handleDownloadPdf} variant="outline">
@@ -657,11 +735,11 @@ function RoundLogsCalculator() {
                     </div>
                 </CardFooter>
             )}
-            <div className="h-40 md:hidden" />
+            <div className="h-44 md:hidden" />
              <form onSubmit={handleFormSubmit} className="fixed bottom-20 left-0 right-0 z-40 p-2 bg-background/80 backdrop-blur-sm border-t md:hidden">
                 <div className="max-w-xl mx-auto p-2 rounded-lg bg-card/90 border-2 border-primary/50">
                     <div className="flex items-end gap-2">
-                        <div className="grid flex-1 grid-cols-3 gap-2">
+                        <div className="grid flex-1 grid-cols-4 gap-1">
                             <div className="space-y-1">
                                 <Label htmlFor="log-length-float" className="text-xs px-1 text-center h-8 flex items-center justify-center">Length (ft)</Label>
                                 <Input id="log-length-float" value={formValues.length} onChange={e => handleFormChange('length', e.target.value)} onKeyDown={handleInputKeyDown} type="number" inputMode="decimal" step="any" className="h-11 text-center" />
@@ -673,6 +751,10 @@ function RoundLogsCalculator() {
                             <div className="space-y-1">
                                 <Label htmlFor="log-quantity-float" className="text-xs px-1 text-center h-8 flex items-center justify-center">Quantity</Label>
                                 <Input id="log-quantity-float" value={formValues.quantity} onChange={e => handleFormChange('quantity', e.target.value)} onKeyDown={handleInputKeyDown} type="number" inputMode="numeric" min="1" className="h-11 text-center" />
+                            </div>
+                            <div className="space-y-1">
+                                <Label htmlFor="log-rate-float" className="text-xs px-1 text-center h-8 flex items-center justify-center">Rate</Label>
+                                <Input id="log-rate-float" value={formValues.rate} onChange={e => handleFormChange('rate', e.target.value)} onKeyDown={handleInputKeyDown} type="number" inputMode="decimal" step="any" className="h-11 text-center" />
                             </div>
                         </div>
                         <div className="flex flex-col gap-1 w-[80px]">
