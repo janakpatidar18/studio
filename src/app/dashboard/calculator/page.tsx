@@ -161,7 +161,7 @@ function SawnWoodCalculator() {
         head: [['#', 'Dimensions (L×W×T)', 'Qty', 'Total CFT']],
         body: entries.map((entry, index) => [
             index + 1,
-            `${entry.length}ft × ${entry.width}in × ${entry.height}in`,
+            `${entry.length}" × ${entry.width}' × ${entry.height}'`,
             entry.quantity,
             (entry.cft * entry.quantity).toFixed(4)
         ]),
@@ -289,7 +289,7 @@ function SawnWoodCalculator() {
                       <TableRow key={entry.id}>
                         <TableCell className="p-2 sm:p-4 text-center font-medium">{index + 1}</TableCell>
                         <TableCell className="p-2 sm:p-4">
-                            <div className="font-medium whitespace-normal">{entry.length}ft × {entry.width}in × {entry.height}in</div>
+                            <div className="font-medium whitespace-normal">{entry.length}" × {entry.width}' × {entry.height}'</div>
                             <div className="text-xs text-muted-foreground">Item CFT: {entry.cft.toFixed(4)}</div>
                         </TableCell>
                         <TableCell className="p-2 sm:p-4 text-right">{entry.quantity}</TableCell>
@@ -481,7 +481,7 @@ function RoundLogsCalculator() {
             head: [['#', 'Dimensions (L×G)', 'Qty', 'Total CFT']],
             body: entries.map((entry, index) => [
                 index + 1,
-                `${entry.length}ft × ${entry.girth}in`,
+                `${entry.length}" × ${entry.girth}'`,
                 entry.quantity,
                 (entry.cft * entry.quantity).toFixed(4)
             ]),
@@ -604,7 +604,7 @@ function RoundLogsCalculator() {
                               <TableRow key={entry.id}>
                                 <TableCell className="p-2 sm:p-4 text-center font-medium">{index + 1}</TableCell>
                                 <TableCell className="p-2 sm:p-4">
-                                    <div className="font-medium whitespace-normal">{entry.length}ft × {entry.girth}in</div>
+                                    <div className="font-medium whitespace-normal">{entry.length}" × {entry.girth}'</div>
                                     <div className="text-xs text-muted-foreground">Item CFT: {entry.cft.toFixed(4)}</div>
                                 </TableCell>
                                 <TableCell className="p-2 sm:p-4 text-right">{entry.quantity}</TableCell>
@@ -724,6 +724,8 @@ export default function CalculatorPage() {
     
 
 
+
+    
 
     
 
