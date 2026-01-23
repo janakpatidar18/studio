@@ -173,7 +173,7 @@ function SawnWoodCalculator() {
     const finalY = (doc as any).lastAutoTable.finalY;
     doc.autoTable({
         body: [
-            ['Total Quantity', `${totalQuantity}`],
+            ['Total Nos.', `${totalQuantity}`],
             ['Total CFT', `${totalCft.toFixed(4)}`],
         ],
         startY: finalY + 5,
@@ -315,7 +315,7 @@ function SawnWoodCalculator() {
       {entries.length > 0 && (
           <CardFooter className="flex-col items-stretch p-2 sm:p-6 border-t bg-muted/50 space-y-2">
             <div className="flex justify-between text-base sm:text-lg">
-                <span className="text-muted-foreground">Total Quantity</span>
+                <span className="text-muted-foreground">Total Nos.</span>
                 <span className="font-bold">{totalQuantity}</span>
             </div>
             <div className="flex justify-between text-xl sm:text-2xl">
@@ -493,7 +493,7 @@ function RoundLogsCalculator() {
         const finalY = (doc as any).lastAutoTable.finalY;
         doc.autoTable({
             body: [
-                ['Total Quantity', `${totalQuantity}`],
+                ['Total Nos.', `${totalQuantity}`],
                 ['Total CFT', `${totalCft.toFixed(4)}`],
             ],
             startY: finalY + 5,
@@ -630,7 +630,7 @@ function RoundLogsCalculator() {
             {entries.length > 0 && (
                 <CardFooter className="flex-col items-stretch p-2 sm:p-6 border-t bg-muted/50 space-y-2">
                     <div className="flex justify-between text-base sm:text-lg">
-                        <span className="text-muted-foreground">Total Quantity</span>
+                        <span className="text-muted-foreground">Total Nos.</span>
                         <span className="font-bold">{totalQuantity}</span>
                     </div>
                     <div className="flex justify-between text-xl sm:text-2xl">
@@ -716,6 +716,8 @@ export default function CalculatorPage() {
     
 
 
+
+    
 
     
 
