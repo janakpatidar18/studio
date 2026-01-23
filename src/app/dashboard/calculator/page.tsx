@@ -303,13 +303,13 @@ function SawnWoodCalculator() {
             <Table>
                 <TableHeader>
                     <TableRow>
-                        <TableHead className="w-12 text-center px-2 sm:px-4">#</TableHead>
-                        <TableHead className="px-2 sm:px-4">Dimensions</TableHead>
-                        <TableHead className="text-right px-2 sm:px-4">Qty</TableHead>
-                        <TableHead className="text-right px-2 sm:px-4">Rate</TableHead>
-                        <TableHead className="text-right px-2 sm:px-4">Total CFT</TableHead>
-                        <TableHead className="text-right px-2 sm:px-4">Total Amt</TableHead>
-                        <TableHead className="w-28 text-center px-2 sm:px-4">Actions</TableHead>
+                        <TableHead className="w-12 text-center px-2">#</TableHead>
+                        <TableHead className="px-2">Dimensions</TableHead>
+                        <TableHead className="text-right px-2">Qty</TableHead>
+                        <TableHead className="text-right px-2">Rate</TableHead>
+                        <TableHead className="text-right px-2">Total CFT</TableHead>
+                        <TableHead className="text-right px-2">Total Amt</TableHead>
+                        <TableHead className="w-28 text-center px-2">Actions</TableHead>
                     </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -319,16 +319,16 @@ function SawnWoodCalculator() {
                         </TableRow>
                     ) : entries.map((entry, index) => (
                       <TableRow key={entry.id}>
-                        <TableCell className="p-2 sm:p-4 text-center font-medium">{index + 1}</TableCell>
-                        <TableCell className="p-2 sm:p-4">
+                        <TableCell className="p-2 text-center font-medium">{index + 1}</TableCell>
+                        <TableCell className="p-2">
                             <div className="font-medium whitespace-normal">{entry.length}" × {entry.width}' × {entry.height}'</div>
                             <div className="text-xs text-muted-foreground">Item CFT: {entry.cft.toFixed(4)}</div>
                         </TableCell>
-                        <TableCell className="p-2 sm:p-4 text-right">{entry.quantity}</TableCell>
-                        <TableCell className="p-2 sm:p-4 text-right">{entry.rate?.toFixed(2) ?? '-'}</TableCell>
-                        <TableCell className="p-2 sm:p-4 text-right font-medium">{(entry.cft * entry.quantity).toFixed(4)}</TableCell>
-                        <TableCell className="p-2 sm:p-4 text-right font-bold">₹{entry.totalAmount.toFixed(2)}</TableCell>
-                        <TableCell className="p-2 sm:p-4 text-center">
+                        <TableCell className="p-2 text-right">{entry.quantity}</TableCell>
+                        <TableCell className="p-2 text-right">{entry.rate?.toFixed(2) ?? '-'}</TableCell>
+                        <TableCell className="p-2 text-right font-medium">{(entry.cft * entry.quantity).toFixed(4)}</TableCell>
+                        <TableCell className="p-2 text-right font-bold">₹{entry.totalAmount.toFixed(2)}</TableCell>
+                        <TableCell className="p-2 text-center">
                           <div className="flex items-center justify-center">
                             <Button variant="ghost" size="icon" type="button" onClick={() => handleEditClick(entry)} className="text-muted-foreground hover:text-primary h-8 w-8">
                               <Edit className="h-4 w-4" />
@@ -660,13 +660,13 @@ function RoundLogsCalculator() {
                     <Table>
                         <TableHeader>
                             <TableRow>
-                                <TableHead className="w-12 text-center px-2 sm:px-4">#</TableHead>
-                                <TableHead className="px-2 sm:px-4">Dimensions</TableHead>
-                                <TableHead className="text-right px-2 sm:px-4">Qty</TableHead>
-                                <TableHead className="text-right px-2 sm:px-4">Rate</TableHead>
-                                <TableHead className="text-right px-2 sm:px-4">Total CFT</TableHead>
-                                <TableHead className="text-right px-2 sm:px-4">Total Amt</TableHead>
-                                <TableHead className="w-28 text-center px-2 sm:px-4">Actions</TableHead>
+                                <TableHead className="w-12 text-center px-2">#</TableHead>
+                                <TableHead className="px-2">Dimensions</TableHead>
+                                <TableHead className="text-right px-2">Qty</TableHead>
+                                <TableHead className="text-right px-2">Rate</TableHead>
+                                <TableHead className="text-right px-2">Total CFT</TableHead>
+                                <TableHead className="text-right px-2">Total Amt</TableHead>
+                                <TableHead className="w-28 text-center px-2">Actions</TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>
@@ -676,16 +676,16 @@ function RoundLogsCalculator() {
                                 </TableRow>
                             ) : entries.map((entry, index) => (
                               <TableRow key={entry.id}>
-                                <TableCell className="p-2 sm:p-4 text-center font-medium">{index + 1}</TableCell>
-                                <TableCell className="p-2 sm:p-4">
+                                <TableCell className="p-2 text-center font-medium">{index + 1}</TableCell>
+                                <TableCell className="p-2">
                                     <div className="font-medium whitespace-normal">{entry.length}" × {entry.girth}'</div>
                                     <div className="text-xs text-muted-foreground">Item CFT: {entry.cft.toFixed(4)}</div>
                                 </TableCell>
-                                <TableCell className="p-2 sm:p-4 text-right">{entry.quantity}</TableCell>
-                                <TableCell className="p-2 sm:p-4 text-right">{entry.rate?.toFixed(2) ?? '-'}</TableCell>
-                                <TableCell className="p-2 sm:p-4 text-right font-medium">{(entry.cft * entry.quantity).toFixed(4)}</TableCell>
-                                <TableCell className="p-2 sm:p-4 text-right font-bold">₹{entry.totalAmount.toFixed(2)}</TableCell>
-                                <TableCell className="p-2 sm:p-4 text-center">
+                                <TableCell className="p-2 text-right">{entry.quantity}</TableCell>
+                                <TableCell className="p-2 text-right">{entry.rate?.toFixed(2) ?? '-'}</TableCell>
+                                <TableCell className="p-2 text-right font-medium">{(entry.cft * entry.quantity).toFixed(4)}</TableCell>
+                                <TableCell className="p-2 text-right font-bold">₹{entry.totalAmount.toFixed(2)}</TableCell>
+                                <TableCell className="p-2 text-center">
                                   <div className="flex items-center justify-center">
                                     <Button variant="ghost" size="icon" type="button" onClick={() => handleEditClick(entry)} className="text-muted-foreground hover:text-primary h-8 w-8">
                                       <Edit className="h-4 w-4" />
@@ -810,6 +810,8 @@ export default function CalculatorPage() {
     
 
 
+
+    
 
     
 
