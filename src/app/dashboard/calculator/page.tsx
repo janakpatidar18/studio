@@ -144,7 +144,7 @@ function SawnWoodCalculator() {
     let currentY = 22;
 
     doc.setFontSize(20);
-    doc.text("Sawn Wood CFT Calculation", pageWidth / 2, currentY, { align: 'center' });
+    doc.text("SVLSM Timber Pro - Sawn Wood", pageWidth / 2, currentY, { align: 'center' });
     currentY += 6;
 
     if (customerName) {
@@ -194,7 +194,7 @@ function SawnWoodCalculator() {
         doc.setFontSize(8);
         doc.setTextColor(150);
         doc.text(
-            '©2026 JanakPatidar.Design Studio',
+            'SVLSM Timber Pro',
             pageWidth / 2,
             doc.internal.pageSize.getHeight() - 10,
             { align: 'center' }
@@ -219,7 +219,7 @@ function SawnWoodCalculator() {
     if (navigator.share) {
         try {
             await navigator.share({
-                title: 'Sawn Wood Calculation',
+                title: 'SVLSM Timber Pro - Sawn Wood',
                 text: `Sawn Wood CFT calculation for ${customerName.trim() || 'your project'}.`,
                 files: [pdfFile],
             });
@@ -235,7 +235,7 @@ function SawnWoodCalculator() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Sawn Wood CFT Calculator</CardTitle>
+        <CardTitle>Sawn Wood</CardTitle>
         <CardDescription>Add multiple timber sizes to calculate the total cubic feet (CFT).</CardDescription>
       </CardHeader>
       <CardContent className="p-2 sm:p-6 space-y-4">
@@ -464,7 +464,7 @@ function RoundLogsCalculator() {
         let currentY = 22;
         
         doc.setFontSize(20);
-        doc.text("Round Logs CFT Calculation", pageWidth / 2, currentY, { align: 'center' });
+        doc.text("SVLSM Timber Pro - Round Logs", pageWidth / 2, currentY, { align: 'center' });
         currentY += 6;
 
         if (customerName) {
@@ -514,7 +514,7 @@ function RoundLogsCalculator() {
             doc.setFontSize(8);
             doc.setTextColor(150);
             doc.text(
-                '©2026 JanakPatidar.Design Studio',
+                'SVLSM Timber Pro',
                 pageWidth / 2,
                 doc.internal.pageSize.getHeight() - 10,
                 { align: 'center' }
@@ -538,7 +538,7 @@ function RoundLogsCalculator() {
         if (navigator.share) {
             try {
                 await navigator.share({
-                    title: 'Round Logs Calculation',
+                    title: 'SVLSM Timber Pro - Round Logs',
                     text: `Round Logs CFT calculation for ${customerName.trim() || 'your project'}.`,
                     files: [pdfFile],
                 });
@@ -554,7 +554,7 @@ function RoundLogsCalculator() {
     return (
         <Card>
             <CardHeader>
-                <CardTitle>Round Logs CFT Calculator</CardTitle>
+                <CardTitle>Round Logs</CardTitle>
                 <CardDescription>Add multiple log sizes to calculate the total CFT using the Hoppus formula.</CardDescription>
             </CardHeader>
             <CardContent className="p-2 sm:p-6 space-y-4">
@@ -693,18 +693,26 @@ function RoundLogsCalculator() {
 
 export default function CalculatorPage() {
     return (
-        <Tabs defaultValue="sawn-wood" className="w-full">
-            <TabsList className="grid w-full grid-cols-2">
-                <TabsTrigger value="sawn-wood">Sawn Wood</TabsTrigger>
-                <TabsTrigger value="round-logs">Round Logs</TabsTrigger>
-            </TabsList>
-            <TabsContent value="sawn-wood">
-                <SawnWoodCalculator />
-            </TabsContent>
-            <TabsContent value="round-logs">
-                <RoundLogsCalculator />
-            </TabsContent>
-        </Tabs>
+        <div className="space-y-8">
+             <header>
+                <h1 className="text-3xl sm:text-4xl font-bold font-headline">SVLSM Timber Pro</h1>
+                <p className="text-md sm:text-lg text-muted-foreground">
+                    Calculate CFT for sawn wood and round logs.
+                </p>
+            </header>
+            <Tabs defaultValue="sawn-wood" className="w-full">
+                <TabsList className="grid w-full grid-cols-2">
+                    <TabsTrigger value="sawn-wood">Sawn Wood</TabsTrigger>
+                    <TabsTrigger value="round-logs">Round Logs</TabsTrigger>
+                </TabsList>
+                <TabsContent value="sawn-wood">
+                    <SawnWoodCalculator />
+                </TabsContent>
+                <TabsContent value="round-logs">
+                    <RoundLogsCalculator />
+                </TabsContent>
+            </Tabs>
+        </div>
     )
 }
     
@@ -716,6 +724,8 @@ export default function CalculatorPage() {
     
 
 
+
+    
 
     
 
