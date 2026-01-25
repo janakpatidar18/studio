@@ -1,3 +1,4 @@
+
 "use client";
 import React from "react";
 import Link from "next/link";
@@ -87,7 +88,7 @@ export default function DashboardLayout({
             <SidebarItems />
           </SidebarContent>
         </Sidebar>
-        <SidebarInset className="relative">
+        <SidebarInset className="relative overflow-x-hidden">
           {woodTextureBg && (
             <Image
               src={woodTextureBg.imageUrl}
