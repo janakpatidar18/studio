@@ -830,7 +830,7 @@ function BeadingPattiCalculator() {
     
     setFormError(null);
     const { size, length, quantity, bundle, rate } = parsed.data;
-    const totalLength = length * quantity;
+    const totalLength = length * quantity * (bundle || 1);
     const totalAmount = totalLength * (rate || 0);
 
     if (rate !== undefined) {
