@@ -40,6 +40,15 @@ const RoundLogEntrySchema = z.object({
 
 type RoundLogEntry = z.infer<typeof RoundLogEntrySchema> & { id: number; cft: number; totalAmount: number };
 
+const BeadingPattiEntrySchema = z.object({
+  length: z.coerce.number().min(0.01, "Length must be positive"),
+  quantity: z.coerce.number().int().min(1, "Quantity must be at least 1"),
+  rate: z.coerce.number().min(0, "Rate must be non-negative").optional(),
+});
+
+type BeadingPattiEntry = z.infer<typeof BeadingPattiEntrySchema> & { id: number; totalLength: number; totalAmount: number };
+
+
 const handleInputKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
       e.preventDefault();
@@ -388,23 +397,23 @@ function SawnWoodCalculator() {
                     <div className="flex gap-2 pr-2">
                         <div className="space-y-1 w-20 shrink-0">
                             <Label htmlFor="sawn-length-float" className="text-xs px-1 text-center h-8 flex items-center justify-center">Length (ft)</Label>
-                            <Input id="sawn-length-float" value={formValues.length} onChange={e => handleFormChange('length', e.target.value)} onKeyDown={handleInputKeyDown} type="number" inputMode="decimal" step="any" className="h-11 text-center" />
+                            <Input id="sawn-length-float" value={formValues.length} onChange={e => handleFormChange('length', e.target.value)} onKeyDown={handleInputKeyDown} type="number" inputMode="decimal" step="any" className="h-11 text-center text-base" />
                         </div>
                         <div className="space-y-1 w-20 shrink-0">
                             <Label htmlFor="sawn-width-float" className="text-xs px-1 text-center h-8 flex items-center justify-center">Width (in)</Label>
-                            <Input id="sawn-width-float" value={formValues.width} onChange={e => handleFormChange('width', e.target.value)} onKeyDown={handleInputKeyDown} type="number" inputMode="decimal" step="any" className="h-11 text-center" />
+                            <Input id="sawn-width-float" value={formValues.width} onChange={e => handleFormChange('width', e.target.value)} onKeyDown={handleInputKeyDown} type="number" inputMode="decimal" step="any" className="h-11 text-center text-base" />
                         </div>
                         <div className="space-y-1 w-20 shrink-0">
                             <Label htmlFor="sawn-height-float" className="text-xs px-1 text-center h-8 flex items-center justify-center">Thick (in)</Label>
-                            <Input id="sawn-height-float" value={formValues.height} onChange={e => handleFormChange('height', e.target.value)} onKeyDown={handleInputKeyDown} type="number" inputMode="decimal" step="any" className="h-11 text-center" />
+                            <Input id="sawn-height-float" value={formValues.height} onChange={e => handleFormChange('height', e.target.value)} onKeyDown={handleInputKeyDown} type="number" inputMode="decimal" step="any" className="h-11 text-center text-base" />
                         </div>
                         <div className="space-y-1 w-20 shrink-0">
                             <Label htmlFor="sawn-quantity-float" className="text-xs px-1 text-center h-8 flex items-center justify-center">Qty</Label>
-                            <Input id="sawn-quantity-float" value={formValues.quantity} onChange={e => handleFormChange('quantity', e.target.value)} onKeyDown={handleInputKeyDown} type="number" inputMode="numeric" min="1" className="h-11 text-center" />
+                            <Input id="sawn-quantity-float" value={formValues.quantity} onChange={e => handleFormChange('quantity', e.target.value)} onKeyDown={handleInputKeyDown} type="number" inputMode="numeric" min="1" className="h-11 text-center text-base" />
                         </div>
                         <div className="space-y-1 w-20 shrink-0">
                             <Label htmlFor="sawn-rate-float" className="text-xs px-1 text-center h-8 flex items-center justify-center">Rate</Label>
-                            <Input id="sawn-rate-float" value={formValues.rate} onChange={e => handleFormChange('rate', e.target.value)} onKeyDown={handleInputKeyDown} type="number" inputMode="decimal" step="any" className="h-11 text-center" />
+                            <Input id="sawn-rate-float" value={formValues.rate} onChange={e => handleFormChange('rate', e.target.value)} onKeyDown={handleInputKeyDown} type="number" inputMode="decimal" step="any" className="h-11 text-center text-base" />
                         </div>
                     </div>
                 </div>
@@ -745,19 +754,19 @@ function RoundLogsCalculator() {
                             <div className="flex gap-2 pr-2">
                                 <div className="space-y-1 w-20 shrink-0">
                                     <Label htmlFor="log-length-float" className="text-xs px-1 text-center h-8 flex items-center justify-center">Length (ft)</Label>
-                                    <Input id="log-length-float" value={formValues.length} onChange={e => handleFormChange('length', e.target.value)} onKeyDown={handleInputKeyDown} type="number" inputMode="decimal" step="any" className="h-11 text-center" />
+                                    <Input id="log-length-float" value={formValues.length} onChange={e => handleFormChange('length', e.target.value)} onKeyDown={handleInputKeyDown} type="number" inputMode="decimal" step="any" className="h-11 text-center text-base" />
                                 </div>
                                 <div className="space-y-1 w-20 shrink-0">
                                     <Label htmlFor="log-girth-float" className="text-xs px-1 text-center h-8 flex items-center justify-center">Girth (in)</Label>
-                                    <Input id="log-girth-float" value={formValues.girth} onChange={e => handleFormChange('girth', e.target.value)} onKeyDown={handleInputKeyDown} type="number" inputMode="decimal" step="any" className="h-11 text-center" />
+                                    <Input id="log-girth-float" value={formValues.girth} onChange={e => handleFormChange('girth', e.target.value)} onKeyDown={handleInputKeyDown} type="number" inputMode="decimal" step="any" className="h-11 text-center text-base" />
                                 </div>
                                 <div className="space-y-1 w-20 shrink-0">
                                     <Label htmlFor="log-quantity-float" className="text-xs px-1 text-center h-8 flex items-center justify-center">Quantity</Label>
-                                    <Input id="log-quantity-float" value={formValues.quantity} onChange={e => handleFormChange('quantity', e.target.value)} onKeyDown={handleInputKeyDown} type="number" inputMode="numeric" min="1" className="h-11 text-center" />
+                                    <Input id="log-quantity-float" value={formValues.quantity} onChange={e => handleFormChange('quantity', e.target.value)} onKeyDown={handleInputKeyDown} type="number" inputMode="numeric" min="1" className="h-11 text-center text-base" />
                                 </div>
                                 <div className="space-y-1 w-20 shrink-0">
                                     <Label htmlFor="log-rate-float" className="text-xs px-1 text-center h-8 flex items-center justify-center">Rate</Label>
-                                    <Input id="log-rate-float" value={formValues.rate} onChange={e => handleFormChange('rate', e.target.value)} onKeyDown={handleInputKeyDown} type="number" inputMode="decimal" step="any" className="h-11 text-center" />
+                                    <Input id="log-rate-float" value={formValues.rate} onChange={e => handleFormChange('rate', e.target.value)} onKeyDown={handleInputKeyDown} type="number" inputMode="decimal" step="any" className="h-11 text-center text-base" />
                                 </div>
                             </div>
                         </div>
@@ -777,6 +786,349 @@ function RoundLogsCalculator() {
     );
 }
 
+function BeadingPattiCalculator() {
+  const initialFormState = { length: "", quantity: "", rate: "" };
+  const [formValues, setFormValues] = useState(initialFormState);
+  const [entries, setEntries] = useState<BeadingPattiEntry[]>([]);
+  const [formError, setFormError] = useState<string | null>(null);
+  const [editingId, setEditingId] = useState<number | null>(null);
+  const [customerName, setCustomerName] = useState("");
+  const [lastUsedRate, setLastUsedRate] = useState("");
+
+  useEffect(() => {
+    if (!editingId) {
+      setFormValues(prev => ({ ...prev, rate: lastUsedRate }));
+    }
+  }, [lastUsedRate, editingId]);
+
+  const handleFormChange = (field: string, value: string) => {
+    setFormValues(prev => ({ ...prev, [field]: value }));
+    setFormError(null);
+  };
+  
+  const handleFormSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const parsed = BeadingPattiEntrySchema.safeParse(formValues);
+    
+    if (!parsed.success) {
+      setFormError(parsed.error.errors[0].message);
+      return;
+    }
+    
+    setFormError(null);
+    const { length, quantity, rate } = parsed.data;
+    const totalLength = length * quantity;
+    const totalAmount = totalLength * (rate || 0);
+
+    if (rate !== undefined) {
+      setLastUsedRate(String(rate));
+    }
+    
+    if (editingId) {
+        setEntries(prev => prev.map(entry => 
+            entry.id === editingId 
+            ? { ...entry, length, quantity, rate, totalLength, totalAmount } 
+            : entry
+        ));
+    } else {
+        setEntries(prev => [...prev, {
+            id: Date.now(),
+            length,
+            quantity,
+            rate,
+            totalLength,
+            totalAmount
+        }]);
+    }
+
+    clearForm();
+    (e.currentTarget.elements[0] as HTMLInputElement)?.focus();
+  };
+
+  const handleEditClick = (entry: BeadingPattiEntry) => {
+    setEditingId(entry.id);
+    setFormValues({
+        length: String(entry.length),
+        quantity: String(entry.quantity),
+        rate: String(entry.rate ?? ''),
+    });
+    setFormError(null);
+    (document.getElementById('beading-length') as HTMLInputElement)?.focus();
+  }
+
+  const removeEntry = (id: number) => {
+    setEntries(entries.filter(entry => entry.id !== id));
+  };
+  
+  const clearForm = () => {
+      setFormValues({ ...initialFormState, rate: lastUsedRate });
+      setFormError(null);
+      setEditingId(null);
+  }
+  
+  const { totalRunningFeet, totalQuantity, totalAmount } = useMemo(() => {
+    return entries.reduce(
+      (acc, entry) => {
+        acc.totalRunningFeet += entry.totalLength;
+        acc.totalQuantity += entry.quantity;
+        acc.totalAmount += entry.totalAmount;
+        return acc;
+      },
+      { totalRunningFeet: 0, totalQuantity: 0, totalAmount: 0 }
+    );
+  }, [entries]);
+
+  const generateBeadingPattiPdfDoc = (customerName: string) => {
+    const doc = new jsPDF();
+    const pageWidth = doc.internal.pageSize.getWidth();
+    let currentY = 22;
+
+    doc.setFontSize(20);
+    doc.text("SVLSM Timber Pro - Beading Patti", pageWidth / 2, currentY, { align: 'center' });
+    currentY += 6;
+
+    if (customerName) {
+        doc.setFontSize(12);
+        doc.text(`Customer: ${customerName}`, pageWidth / 2, currentY, { align: 'center' });
+        currentY += 6;
+    }
+    
+    doc.setFontSize(10);
+    doc.text(`Date: ${new Date().toLocaleDateString()}`, pageWidth / 2, currentY, { align: 'center' });
+    currentY += 7;
+
+    (doc as any).autoTable({
+        head: [['#', 'Length (ft)', 'Qty', 'Rate (per ft)', 'Total RFT', 'Total Amt']],
+        body: entries.map((entry, index) => [
+            index + 1,
+            `${entry.length}"`,
+            entry.quantity,
+            entry.rate?.toFixed(2) ?? '-',
+            entry.totalLength.toFixed(2),
+            entry.totalAmount.toFixed(2),
+        ]),
+        startY: currentY,
+        headStyles: { fillColor: [36, 69, 76] },
+        theme: 'grid',
+        styles: { halign: 'right' },
+        columnStyles: {
+            0: { halign: 'center' },
+            1: { halign: 'left' },
+        }
+    });
+
+    const finalY = (doc as any).lastAutoTable.finalY;
+    doc.autoTable({
+        body: [
+            ['Total Nos.', `${totalQuantity}`],
+            ['Total RFT', `${totalRunningFeet.toFixed(2)}`],
+            ['Grand Total', `₹ ${totalAmount.toFixed(2)}`],
+        ],
+        startY: finalY + 5,
+        theme: 'plain',
+        bodyStyles: {
+            fontStyle: 'bold',
+            fontSize: 12,
+        },
+        columnStyles: {
+            0: { halign: 'right' },
+            1: { halign: 'right' },
+        }
+    });
+
+    const pageCount = (doc as any).internal.getNumberOfPages();
+    for (let i = 1; i <= pageCount; i++) {
+        doc.setPage(i);
+        doc.setFontSize(8);
+        doc.setTextColor(150);
+        doc.text(
+            'SVLSM Timber Pro',
+            pageWidth / 2,
+            doc.internal.pageSize.getHeight() - 10,
+            { align: 'center' }
+        );
+    }
+
+    return doc;
+  };
+
+  const handleDownloadPdf = () => {
+    const doc = generateBeadingPattiPdfDoc(customerName);
+    const fileName = customerName.trim() ? `${customerName.trim()}.pdf` : `BeadingPatti_${totalRunningFeet.toFixed(2)}RFT.pdf`;
+    doc.save(fileName);
+  };
+  
+  const handleSharePdf = async () => {
+    const doc = generateBeadingPattiPdfDoc(customerName);
+    const pdfBlob = doc.output('blob');
+    const fileName = customerName.trim() ? `${customerName.trim()}.pdf` : `BeadingPatti_${totalRunningFeet.toFixed(2)}RFT.pdf`;
+    const pdfFile = new File([pdfBlob], fileName, { type: 'application/pdf' });
+
+    if (navigator.share) {
+        try {
+            await navigator.share({
+                title: 'SVLSM Timber Pro - Beading Patti',
+                text: `Beading Patti calculation for ${customerName.trim() || 'your project'}.`,
+                files: [pdfFile],
+            });
+        } catch (error) {
+            console.log('Sharing failed, falling back to download', error);
+            handleDownloadPdf();
+        }
+    } else {
+        handleDownloadPdf();
+    }
+  };
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>Beading Patti</CardTitle>
+        <CardDescription>Calculate the total running feet (RFT) and cost for beading patti.</CardDescription>
+      </CardHeader>
+      <CardContent className="p-2 sm:p-6 space-y-4">
+        <form onSubmit={handleFormSubmit} className="hidden md:block p-2 sm:p-4 border rounded-lg bg-muted/50 space-y-4">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                 <div className="space-y-1">
+                    <Label htmlFor="beading-length">Length (ft)</Label>
+                    <Input id="beading-length" value={formValues.length} onChange={e => handleFormChange('length', e.target.value)} onKeyDown={handleInputKeyDown} type="number" inputMode="decimal" step="any" placeholder="" />
+                </div>
+                 <div className="space-y-1">
+                    <Label htmlFor="beading-quantity">Quantity</Label>
+                    <Input id="beading-quantity" value={formValues.quantity} onChange={e => handleFormChange('quantity', e.target.value)} onKeyDown={handleInputKeyDown} type="number" inputMode="numeric" min="1" placeholder="" />
+                </div>
+                <div className="space-y-1">
+                    <Label htmlFor="beading-rate">Rate (per ft)</Label>
+                    <Input id="beading-rate" value={formValues.rate} onChange={e => handleFormChange('rate', e.target.value)} onKeyDown={handleInputKeyDown} type="number" inputMode="decimal" step="any" placeholder="per RFT" />
+                </div>
+            </div>
+            {formError && <p className="text-sm text-destructive">{formError}</p>}
+             <div className="flex justify-end gap-2">
+                <Button type="button" variant="ghost" onClick={clearForm}>
+                    <X className="mr-2 h-4 w-4" /> {editingId ? 'Cancel' : 'Clear'}
+                </Button>
+                <Button type="submit">
+                    <Plus className="mr-2 h-4 w-4" /> {editingId ? 'Update Entry' : 'Add Entry'}
+                </Button>
+            </div>
+        </form>
+
+        <div className="overflow-x-auto border rounded-lg">
+            <Table>
+                <TableHeader>
+                    <TableRow>
+                        <TableHead className="w-12 text-center px-2">#</TableHead>
+                        <TableHead className="px-2">Length</TableHead>
+                        <TableHead className="text-right px-2">Qty</TableHead>
+                        <TableHead className="text-right px-2">Rate</TableHead>
+                        <TableHead className="text-right px-2">Total RFT</TableHead>
+                        <TableHead className="text-right px-2">Total Amt</TableHead>
+                        <TableHead className="w-28 text-center px-2">Actions</TableHead>
+                    </TableRow>
+                </TableHeader>
+                <TableBody>
+                    {entries.length === 0 ? (
+                        <TableRow>
+                            <TableCell colSpan={7} className="text-center h-24 text-muted-foreground p-4">No entries added yet.</TableCell>
+                        </TableRow>
+                    ) : entries.map((entry, index) => (
+                      <TableRow key={entry.id}>
+                        <TableCell className="p-2 text-center font-medium">{index + 1}</TableCell>
+                        <TableCell className="p-2">
+                            <div className="font-medium whitespace-normal">{entry.length}"</div>
+                        </TableCell>
+                        <TableCell className="p-2 text-right">{entry.quantity}</TableCell>
+                        <TableCell className="p-2 text-right">{entry.rate?.toFixed(2) ?? '-'}</TableCell>
+                        <TableCell className="p-2 text-right font-medium">{entry.totalLength.toFixed(2)}</TableCell>
+                        <TableCell className="p-2 text-right font-bold">₹{entry.totalAmount.toFixed(2)}</TableCell>
+                        <TableCell className="p-2 text-center">
+                          <div className="flex items-center justify-center">
+                            <Button variant="ghost" size="icon" type="button" onClick={() => handleEditClick(entry)} className="text-muted-foreground hover:text-primary h-8 w-8">
+                              <Edit className="h-4 w-4" />
+                              <span className="sr-only">Edit</span>
+                            </Button>
+                            <Button variant="ghost" size="icon" type="button" onClick={() => removeEntry(entry.id)} className="text-muted-foreground hover:text-destructive h-8 w-8">
+                              <Trash2 className="h-4 w-4" />
+                              <span className="sr-only">Remove</span>
+                            </Button>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                </TableBody>
+            </Table>
+        </div>
+      </CardContent>
+      {entries.length > 0 && (
+          <CardFooter className="flex-col items-stretch p-2 sm:p-6 border-t bg-muted/50 space-y-2">
+            <div className="flex justify-between text-base sm:text-lg">
+                <span className="text-muted-foreground">Total Nos.</span>
+                <span className="font-bold">{totalQuantity}</span>
+            </div>
+            <div className="flex justify-between text-xl sm:text-2xl">
+                <span className="text-muted-foreground">Total RFT</span>
+                <span className="font-bold font-headline">{totalRunningFeet.toFixed(2)}</span>
+            </div>
+            <div className="flex justify-between text-2xl sm:text-3xl">
+                <span className="text-muted-foreground">Total Amount</span>
+                <span className="font-bold font-headline text-primary">₹ {totalAmount.toFixed(2)}</span>
+            </div>
+            <div className="flex justify-end gap-2 mt-4">
+                <Button onClick={handleDownloadPdf} variant="outline">
+                    <FileDown className="mr-2 h-4 w-4" /> Download PDF
+                </Button>
+                <Button onClick={handleSharePdf}>
+                    <Share2 className="mr-2 h-4 w-4" /> Share PDF
+                </Button>
+            </div>
+            <div className="space-y-2 pt-4">
+                <Label htmlFor="beading-customer-name">Customer Name (for PDF)</Label>
+                <Input 
+                    id="beading-customer-name"
+                    value={customerName}
+                    onChange={(e) => setCustomerName(e.target.value)}
+                    placeholder="Optional: Enter name for PDF filename"
+                    className="h-11"
+                />
+            </div>
+          </CardFooter>
+      )}
+      <div className="h-44 md:hidden"></div>
+      <form onSubmit={handleFormSubmit} className="fixed bottom-20 left-0 right-0 z-40 p-2 bg-background/80 backdrop-blur-sm border-t md:hidden">
+        <div className="max-w-xl mx-auto p-2 rounded-lg bg-card/90 border-2 border-primary/50">
+            <div className="flex items-end gap-2">
+                <div className="flex-1 overflow-x-auto">
+                    <div className="flex gap-2 pr-2">
+                        <div className="space-y-1 w-24 shrink-0">
+                            <Label htmlFor="beading-length-float" className="text-xs px-1 text-center h-8 flex items-center justify-center">Length (ft)</Label>
+                            <Input id="beading-length-float" value={formValues.length} onChange={e => handleFormChange('length', e.target.value)} onKeyDown={handleInputKeyDown} type="number" inputMode="decimal" step="any" className="h-11 text-center text-base" />
+                        </div>
+                        <div className="space-y-1 w-24 shrink-0">
+                            <Label htmlFor="beading-quantity-float" className="text-xs px-1 text-center h-8 flex items-center justify-center">Qty</Label>
+                            <Input id="beading-quantity-float" value={formValues.quantity} onChange={e => handleFormChange('quantity', e.target.value)} onKeyDown={handleInputKeyDown} type="number" inputMode="numeric" min="1" className="h-11 text-center text-base" />
+                        </div>
+                        <div className="space-y-1 w-24 shrink-0">
+                            <Label htmlFor="beading-rate-float" className="text-xs px-1 text-center h-8 flex items-center justify-center">Rate</Label>
+                            <Input id="beading-rate-float" value={formValues.rate} onChange={e => handleFormChange('rate', e.target.value)} onKeyDown={handleInputKeyDown} type="number" inputMode="decimal" step="any" className="h-11 text-center text-base" />
+                        </div>
+                    </div>
+                </div>
+                <div className="flex flex-col gap-1 w-[80px]">
+                    <Button type="button" variant="outline" size="sm" className="h-auto py-2" onClick={clearForm}>
+                        {editingId ? 'Cancel' : 'Clear'}
+                    </Button>
+                    <Button type="submit" size="sm" className="h-auto py-2">
+                        {editingId ? 'Update' : 'Enter'}
+                    </Button>
+                </div>
+            </div>
+            {formError && <p className="text-xs text-destructive mt-1 text-center">{formError}</p>}
+        </div>
+      </form>
+    </Card>
+  );
+}
+
 export default function CalculatorPage() {
     return (
         <div className="space-y-8">
@@ -787,15 +1139,19 @@ export default function CalculatorPage() {
                 </p>
             </header>
             <Tabs defaultValue="sawn-wood" className="w-full">
-                <TabsList className="grid w-full grid-cols-2">
+                <TabsList className="grid w-full grid-cols-3">
                     <TabsTrigger value="sawn-wood">Sawn Wood</TabsTrigger>
                     <TabsTrigger value="round-logs">Round Logs</TabsTrigger>
+                    <TabsTrigger value="beading-patti">Beading Patti</TabsTrigger>
                 </TabsList>
                 <TabsContent value="sawn-wood">
                     <SawnWoodCalculator />
                 </TabsContent>
                 <TabsContent value="round-logs">
                     <RoundLogsCalculator />
+                </TabsContent>
+                <TabsContent value="beading-patti">
+                    <BeadingPattiCalculator />
                 </TabsContent>
             </Tabs>
         </div>
