@@ -151,7 +151,7 @@ function SawnWoodCalculator() {
   };
   
   const clearForm = () => {
-      setFormValues({ ...initialFormState, rate: lastUsedRate });
+      setFormValues(initialFormState);
       setFormError(null);
       setEditingId(null);
   }
@@ -513,7 +513,7 @@ function RoundLogsCalculator() {
     };
     
     const clearForm = () => {
-        setFormValues({ ...initialFormState, rate: lastUsedRate });
+        setFormValues(initialFormState);
         setFormError(null);
         setEditingId(null);
     }
@@ -797,6 +797,7 @@ function BeadingPattiCalculator() {
   const [editingId, setEditingId] = useState<number | null>(null);
   const [customerName, setCustomerName] = useState("");
   const [lastUsedRate, setLastUsedRate] = useState("");
+  const [lastUsedSize, setLastUsedSize] = useState("");
   
   const beadingSizes = [
     "19mm x 12mm",
@@ -810,9 +811,9 @@ function BeadingPattiCalculator() {
 
   useEffect(() => {
     if (!editingId) {
-      setFormValues(prev => ({ ...prev, rate: lastUsedRate }));
+      setFormValues(prev => ({ ...prev, rate: lastUsedRate, size: lastUsedSize }));
     }
-  }, [lastUsedRate, editingId]);
+  }, [lastUsedRate, lastUsedSize, editingId]);
 
   const handleFormChange = (field: string, value: string) => {
     setFormValues(prev => ({ ...prev, [field]: value }));
@@ -836,6 +837,7 @@ function BeadingPattiCalculator() {
     if (rate !== undefined) {
       setLastUsedRate(String(rate));
     }
+    setLastUsedSize(size);
     
     if (editingId) {
         setEntries(prev => prev.map(entry => 
@@ -870,7 +872,7 @@ function BeadingPattiCalculator() {
         rate: String(entry.rate ?? ''),
     });
     setFormError(null);
-    (document.getElementById('beading-size')?.parentElement as HTMLButtonElement)?.focus();
+    (document.getElementById('beading-length') as HTMLInputElement)?.focus();
   }
 
   const removeEntry = (id: number) => {
@@ -878,7 +880,7 @@ function BeadingPattiCalculator() {
   };
   
   const clearForm = () => {
-      setFormValues({ ...initialFormState, rate: lastUsedRate });
+      setFormValues(initialFormState);
       setFormError(null);
       setEditingId(null);
   }
@@ -1220,6 +1222,8 @@ export default function CalculatorPage() {
     
 
 
+
+    
 
     
 
