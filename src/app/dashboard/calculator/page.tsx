@@ -73,8 +73,6 @@ const handleInputKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
 };
 
 function SawnWoodCalculator() {
-  const sawnWoodWidths = ["1", "1.5", "2", "2.5", "3", "4", "5", "6", "8", "10", "12"];
-  const sawnWoodHeights = ["0.5", "0.75", "1", "1.25", "1.5", "2", "3", "4"];
   const initialFormState = { length: "", width: "", height: "", quantity: "", rate: "" };
   const [formValues, setFormValues] = useState(initialFormState);
   const [entries, setEntries] = useState<SawnWoodEntry[]>([]);
@@ -287,25 +285,11 @@ function SawnWoodCalculator() {
                 </div>
                 <div className="space-y-1">
                     <Label htmlFor="sawn-width">Width (in)</Label>
-                    <Select value={formValues.width} onValueChange={value => handleFormChange('width', value)}>
-                        <SelectTrigger id="sawn-width">
-                            <SelectValue placeholder="Select" />
-                        </SelectTrigger>
-                        <SelectContent>
-                            {sawnWoodWidths.map(w => <SelectItem key={w} value={w}>{w}"</SelectItem>)}
-                        </SelectContent>
-                    </Select>
+                    <Input id="sawn-width" value={formValues.width} onChange={e => handleFormChange('width', e.target.value)} onKeyDown={handleInputKeyDown} type="number" inputMode="decimal" step="any" placeholder="" />
                 </div>
                 <div className="space-y-1">
                     <Label htmlFor="sawn-height">Thickness (in)</Label>
-                    <Select value={formValues.height} onValueChange={value => handleFormChange('height', value)}>
-                        <SelectTrigger id="sawn-height">
-                            <SelectValue placeholder="Select" />
-                        </SelectTrigger>
-                        <SelectContent>
-                            {sawnWoodHeights.map(h => <SelectItem key={h} value={h}>{h}"</SelectItem>)}
-                        </SelectContent>
-                    </Select>
+                    <Input id="sawn-height" value={formValues.height} onChange={e => handleFormChange('height', e.target.value)} onKeyDown={handleInputKeyDown} type="number" inputMode="decimal" step="any" placeholder="" />
                 </div>
                  <div className="space-y-1">
                     <Label htmlFor="sawn-quantity">Quantity</Label>
@@ -420,25 +404,11 @@ function SawnWoodCalculator() {
                         </div>
                         <div className="space-y-1 w-24 shrink-0">
                             <Label htmlFor="sawn-width-float" className="text-xs px-1 text-center h-8 flex items-center justify-center">Width (in)</Label>
-                            <Select value={formValues.width} onValueChange={value => handleFormChange('width', value)}>
-                                <SelectTrigger id="sawn-width-float" className="h-11 text-base">
-                                    <SelectValue placeholder="Select" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    {sawnWoodWidths.map(w => <SelectItem key={w} value={w}>{w}"</SelectItem>)}
-                                </SelectContent>
-                            </Select>
+                            <Input id="sawn-width-float" value={formValues.width} onChange={e => handleFormChange('width', e.target.value)} onKeyDown={handleInputKeyDown} type="number" inputMode="decimal" step="any" className="h-11 text-center text-base" />
                         </div>
                         <div className="space-y-1 w-24 shrink-0">
                             <Label htmlFor="sawn-height-float" className="text-xs px-1 text-center h-8 flex items-center justify-center">Thick (in)</Label>
-                            <Select value={formValues.height} onValueChange={value => handleFormChange('height', value)}>
-                                <SelectTrigger id="sawn-height-float" className="h-11 text-base">
-                                    <SelectValue placeholder="Select" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    {sawnWoodHeights.map(h => <SelectItem key={h} value={h}>{h}"</SelectItem>)}
-                                </SelectContent>
-                            </Select>
+                            <Input id="sawn-height-float" value={formValues.height} onChange={e => handleFormChange('height', e.target.value)} onKeyDown={handleInputKeyDown} type="number" inputMode="decimal" step="any" className="h-11 text-center text-base" />
                         </div>
                         <div className="space-y-1 w-20 shrink-0">
                             <Label htmlFor="sawn-quantity-float" className="text-xs px-1 text-center h-8 flex items-center justify-center">Qty</Label>
