@@ -27,7 +27,6 @@ const SawnWoodEntrySchema = z.object({
   width: z.coerce.number().min(0.01, "Width is required"),
   height: z.coerce.number().min(0.01, "Thickness is required"),
   quantity: z.coerce.number().int().min(1, "Quantity must be at least 1"),
-  bundle: z.preprocess((val) => val === "" ? undefined : val, z.coerce.number().int().min(1).optional()),
   rate: z.preprocess((val) => val === "" ? undefined : val, z.coerce.number().min(0, "Rate must be non-negative").optional()),
 });
 
@@ -46,6 +45,7 @@ const BeadingPattiEntrySchema = z.object({
   size: z.string().min(1, "Size is required"),
   length: z.coerce.number().min(0.01, "Length must be positive"),
   quantity: z.coerce.number().int().min(1, "Quantity must be at least 1"),
+  bundle: z.preprocess((val) => val === "" ? undefined : val, z.coerce.number().int().min(1).optional()),
   rate: z.coerce.number().min(0, "Rate must be non-negative").optional(),
 });
 
@@ -75,7 +75,7 @@ const handleInputKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
 function SawnWoodCalculator() {
   const sawnWoodWidths = ["1", "1.5", "2", "2.5", "3", "4", "5", "6", "8", "10", "12"];
   const sawnWoodHeights = ["0.5", "0.75", "1", "1.25", "1.5", "2", "3", "4"];
-  const initialFormState = { length: "", width: "", height: "", quantity: "", bundle: "", rate: "" };
+  const initialFormState = { length: "", width: "", height: "", quantity: "", rate: "" };
   const [formValues, setFormValues] = useState(initialFormState);
   const [entries, setEntries] = useState<SawnWoodEntry[]>([]);
   const [formError, setFormError] = useState<string | null>(null);
@@ -104,7 +104,7 @@ function SawnWoodCalculator() {
     }
     
     setFormError(null);
-    const { length, width, height, quantity, bundle, rate } = parsed.data;
+    const { length, width, height, quantity, rate } = parsed.data;
     const cft = ((length * width * height) / 144);
     const totalAmount = cft * quantity * (rate || 0);
 
@@ -115,7 +115,7 @@ function SawnWoodCalculator() {
     if (editingId) {
         setEntries(prev => prev.map(entry => 
             entry.id === editingId 
-            ? { ...entry, length, width, height, quantity, bundle, cft, rate, totalAmount } 
+            ? { ...entry, length, width, height, quantity, cft, rate, totalAmount } 
             : entry
         ));
     } else {
@@ -125,7 +125,6 @@ function SawnWoodCalculator() {
             width,
             height,
             quantity,
-            bundle,
             cft,
             rate,
             totalAmount
@@ -143,7 +142,6 @@ function SawnWoodCalculator() {
         width: String(entry.width),
         height: String(entry.height),
         quantity: String(entry.quantity),
-        bundle: String(entry.bundle ?? ''),
         rate: String(entry.rate ?? ''),
     });
     setFormError(null);
@@ -192,12 +190,11 @@ function SawnWoodCalculator() {
     currentY += 7;
 
     (doc as any).autoTable({
-        head: [['#', 'Dimensions (L×W×T)', 'Qty', 'Bundle', 'Rate', 'Total CFT', 'Total Amt']],
+        head: [['#', 'Dimensions (L×W×T)', 'Qty', 'Rate', 'Total CFT', 'Total Amt']],
         body: entries.map((entry, index) => [
             index + 1,
             `${entry.length}" × ${entry.width}' × ${entry.height}'`,
             entry.quantity,
-            entry.bundle ?? '-',
             entry.rate?.toFixed(2) ?? '-',
             (entry.cft * entry.quantity).toFixed(4),
             entry.totalAmount.toFixed(2),
@@ -283,7 +280,7 @@ function SawnWoodCalculator() {
       </CardHeader>
       <CardContent className="p-2 sm:p-6 space-y-4">
         <form onSubmit={handleFormSubmit} className="hidden md:block p-2 sm:p-4 border rounded-lg bg-muted/50 space-y-4">
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
                  <div className="space-y-1">
                     <Label htmlFor="sawn-length">Length (ft)</Label>
                     <Input id="sawn-length" value={formValues.length} onChange={e => handleFormChange('length', e.target.value)} onKeyDown={handleInputKeyDown} type="number" inputMode="decimal" step="any" placeholder="" />
@@ -315,10 +312,6 @@ function SawnWoodCalculator() {
                     <Input id="sawn-quantity" value={formValues.quantity} onChange={e => handleFormChange('quantity', e.target.value)} onKeyDown={handleInputKeyDown} type="number" inputMode="numeric" min="1" placeholder="" />
                 </div>
                 <div className="space-y-1">
-                    <Label htmlFor="sawn-bundle">Bundle</Label>
-                    <Input id="sawn-bundle" value={formValues.bundle} onChange={e => handleFormChange('bundle', e.target.value)} onKeyDown={handleInputKeyDown} type="number" inputMode="numeric" min="1" placeholder="" />
-                </div>
-                <div className="space-y-1">
                     <Label htmlFor="sawn-rate">Rate</Label>
                     <Input id="sawn-rate" value={formValues.rate} onChange={e => handleFormChange('rate', e.target.value)} onKeyDown={handleInputKeyDown} type="number" inputMode="decimal" step="any" placeholder="per CFT" />
                 </div>
@@ -341,7 +334,6 @@ function SawnWoodCalculator() {
                         <TableHead className="w-12 text-center px-2">#</TableHead>
                         <TableHead className="px-2">Dimensions</TableHead>
                         <TableHead className="text-right px-2">Qty</TableHead>
-                        <TableHead className="text-right px-2">Bundle</TableHead>
                         <TableHead className="text-right px-2">Rate</TableHead>
                         <TableHead className="text-right px-2">Total CFT</TableHead>
                         <TableHead className="text-right px-2">Total Amt</TableHead>
@@ -351,7 +343,7 @@ function SawnWoodCalculator() {
                 <TableBody>
                     {entries.length === 0 ? (
                         <TableRow>
-                            <TableCell colSpan={8} className="text-center h-24 text-muted-foreground p-4">No entries added yet.</TableCell>
+                            <TableCell colSpan={7} className="text-center h-24 text-muted-foreground p-4">No entries added yet.</TableCell>
                         </TableRow>
                     ) : entries.map((entry, index) => (
                       <TableRow key={entry.id}>
@@ -361,7 +353,6 @@ function SawnWoodCalculator() {
                             <div className="text-xs text-muted-foreground">Item CFT: {entry.cft.toFixed(4)}</div>
                         </TableCell>
                         <TableCell className="p-2 text-right">{entry.quantity}</TableCell>
-                        <TableCell className="p-2 text-right">{entry.bundle ?? '-'}</TableCell>
                         <TableCell className="p-2 text-right">{entry.rate?.toFixed(2) ?? '-'}</TableCell>
                         <TableCell className="p-2 text-right font-medium">{(entry.cft * entry.quantity).toFixed(4)}</TableCell>
                         <TableCell className="p-2 text-right font-bold">₹{entry.totalAmount.toFixed(2)}</TableCell>
@@ -452,10 +443,6 @@ function SawnWoodCalculator() {
                         <div className="space-y-1 w-20 shrink-0">
                             <Label htmlFor="sawn-quantity-float" className="text-xs px-1 text-center h-8 flex items-center justify-center">Qty</Label>
                             <Input id="sawn-quantity-float" value={formValues.quantity} onChange={e => handleFormChange('quantity', e.target.value)} onKeyDown={handleInputKeyDown} type="number" inputMode="numeric" min="1" className="h-11 text-center text-base" />
-                        </div>
-                         <div className="space-y-1 w-20 shrink-0">
-                            <Label htmlFor="sawn-bundle-float" className="text-xs px-1 text-center h-8 flex items-center justify-center">Bundle</Label>
-                            <Input id="sawn-bundle-float" value={formValues.bundle} onChange={e => handleFormChange('bundle', e.target.value)} onKeyDown={handleInputKeyDown} type="number" inputMode="numeric" min="1" className="h-11 text-center text-base" />
                         </div>
                         <div className="space-y-1 w-20 shrink-0">
                             <Label htmlFor="sawn-rate-float" className="text-xs px-1 text-center h-8 flex items-center justify-center">Rate</Label>
@@ -833,7 +820,7 @@ function RoundLogsCalculator() {
 }
 
 function BeadingPattiCalculator() {
-  const initialFormState = { size: "", length: "", quantity: "", rate: "" };
+  const initialFormState = { size: "", length: "", quantity: "", bundle: "", rate: "" };
   const [formValues, setFormValues] = useState(initialFormState);
   const [entries, setEntries] = useState<BeadingPattiEntry[]>([]);
   const [formError, setFormError] = useState<string | null>(null);
@@ -872,7 +859,7 @@ function BeadingPattiCalculator() {
     }
     
     setFormError(null);
-    const { size, length, quantity, rate } = parsed.data;
+    const { size, length, quantity, bundle, rate } = parsed.data;
     const totalLength = length * quantity;
     const totalAmount = totalLength * (rate || 0);
 
@@ -883,7 +870,7 @@ function BeadingPattiCalculator() {
     if (editingId) {
         setEntries(prev => prev.map(entry => 
             entry.id === editingId 
-            ? { ...entry, size, length, quantity, rate, totalLength, totalAmount } 
+            ? { ...entry, size, length, quantity, bundle, rate, totalLength, totalAmount } 
             : entry
         ));
     } else {
@@ -892,6 +879,7 @@ function BeadingPattiCalculator() {
             size,
             length,
             quantity,
+            bundle,
             rate,
             totalLength,
             totalAmount
@@ -908,6 +896,7 @@ function BeadingPattiCalculator() {
         size: entry.size,
         length: String(entry.length),
         quantity: String(entry.quantity),
+        bundle: String(entry.bundle ?? ""),
         rate: String(entry.rate ?? ''),
     });
     setFormError(null);
@@ -956,12 +945,13 @@ function BeadingPattiCalculator() {
     currentY += 7;
 
     (doc as any).autoTable({
-        head: [['#', 'Size', 'Length (ft)', 'Qty', 'Rate (per ft)', 'Total RFT', 'Total Amt']],
+        head: [['#', 'Size', 'Length (ft)', 'Qty', 'Bundle', 'Rate (per ft)', 'Total RFT', 'Total Amt']],
         body: entries.map((entry, index) => [
             index + 1,
             entry.size,
             `${entry.length}"`,
             entry.quantity,
+            entry.bundle ?? '-',
             entry.rate?.toFixed(2) ?? '-',
             entry.totalLength.toFixed(2),
             entry.totalAmount.toFixed(2),
@@ -1048,7 +1038,7 @@ function BeadingPattiCalculator() {
       </CardHeader>
       <CardContent className="p-2 sm:p-6 space-y-4">
         <form onSubmit={handleFormSubmit} className="hidden md:block p-2 sm:p-4 border rounded-lg bg-muted/50 space-y-4">
-            <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-5 gap-4">
                 <div className="space-y-1">
                     <Label htmlFor="beading-size">Size</Label>
                     <Select name="size" value={formValues.size} onValueChange={value => handleFormChange('size', value)} required>
@@ -1067,6 +1057,10 @@ function BeadingPattiCalculator() {
                  <div className="space-y-1">
                     <Label htmlFor="beading-quantity">Quantity</Label>
                     <Input id="beading-quantity" value={formValues.quantity} onChange={e => handleFormChange('quantity', e.target.value)} onKeyDown={handleInputKeyDown} type="number" inputMode="numeric" min="1" placeholder="" />
+                </div>
+                <div className="space-y-1">
+                    <Label htmlFor="beading-bundle">Bundle</Label>
+                    <Input id="beading-bundle" value={formValues.bundle} onChange={e => handleFormChange('bundle', e.target.value)} onKeyDown={handleInputKeyDown} type="number" inputMode="numeric" min="1" placeholder="" />
                 </div>
                 <div className="space-y-1">
                     <Label htmlFor="beading-rate">Rate (per ft)</Label>
@@ -1092,6 +1086,7 @@ function BeadingPattiCalculator() {
                         <TableHead className="px-2">Size</TableHead>
                         <TableHead className="px-2">Length</TableHead>
                         <TableHead className="text-right px-2">Qty</TableHead>
+                        <TableHead className="text-right px-2">Bundle</TableHead>
                         <TableHead className="text-right px-2">Rate</TableHead>
                         <TableHead className="text-right px-2">Total RFT</TableHead>
                         <TableHead className="text-right px-2">Total Amt</TableHead>
@@ -1101,7 +1096,7 @@ function BeadingPattiCalculator() {
                 <TableBody>
                     {entries.length === 0 ? (
                         <TableRow>
-                            <TableCell colSpan={8} className="text-center h-24 text-muted-foreground p-4">No entries added yet.</TableCell>
+                            <TableCell colSpan={9} className="text-center h-24 text-muted-foreground p-4">No entries added yet.</TableCell>
                         </TableRow>
                     ) : entries.map((entry, index) => (
                       <TableRow key={entry.id}>
@@ -1111,6 +1106,7 @@ function BeadingPattiCalculator() {
                             <div className="font-medium whitespace-normal">{entry.length}"</div>
                         </TableCell>
                         <TableCell className="p-2 text-right">{entry.quantity}</TableCell>
+                        <TableCell className="p-2 text-right">{entry.bundle ?? '-'}</TableCell>
                         <TableCell className="p-2 text-right">{entry.rate?.toFixed(2) ?? '-'}</TableCell>
                         <TableCell className="p-2 text-right font-medium">{entry.totalLength.toFixed(2)}</TableCell>
                         <TableCell className="p-2 text-right font-bold">₹{entry.totalAmount.toFixed(2)}</TableCell>
@@ -1192,6 +1188,10 @@ function BeadingPattiCalculator() {
                             <Input id="beading-quantity-float" value={formValues.quantity} onChange={e => handleFormChange('quantity', e.target.value)} onKeyDown={handleInputKeyDown} type="number" inputMode="numeric" min="1" className="h-11 text-center text-base" />
                         </div>
                         <div className="space-y-1 w-24 shrink-0">
+                            <Label htmlFor="beading-bundle-float" className="text-xs px-1 text-center h-8 flex items-center justify-center">Bundle</Label>
+                            <Input id="beading-bundle-float" value={formValues.bundle} onChange={e => handleFormChange('bundle', e.target.value)} onKeyDown={handleInputKeyDown} type="number" inputMode="numeric" min="1" className="h-11 text-center text-base" />
+                        </div>
+                        <div className="space-y-1 w-24 shrink-0">
                             <Label htmlFor="beading-rate-float" className="text-xs px-1 text-center h-8 flex items-center justify-center">Rate</Label>
                             <Input id="beading-rate-float" value={formValues.rate} onChange={e => handleFormChange('rate', e.target.value)} onKeyDown={handleInputKeyDown} type="number" inputMode="decimal" step="any" className="h-11 text-center text-base" />
                         </div>
@@ -1250,6 +1250,8 @@ export default function CalculatorPage() {
     
 
 
+
+    
 
     
 
