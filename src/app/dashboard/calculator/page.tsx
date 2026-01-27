@@ -19,6 +19,7 @@ import {
 } from "@/components/ui/table";
 import jsPDF from "jspdf";
 import "jspdf-autotable";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 
 const SawnWoodEntrySchema = z.object({
@@ -41,6 +42,7 @@ const RoundLogEntrySchema = z.object({
 type RoundLogEntry = z.infer<typeof RoundLogEntrySchema> & { id: number; cft: number; totalAmount: number };
 
 const BeadingPattiEntrySchema = z.object({
+  size: z.string().min(1, "Size is required"),
   length: z.coerce.number().min(0.01, "Length must be positive"),
   quantity: z.coerce.number().int().min(1, "Quantity must be at least 1"),
   rate: z.coerce.number().min(0, "Rate must be non-negative").optional(),
@@ -787,13 +789,23 @@ function RoundLogsCalculator() {
 }
 
 function BeadingPattiCalculator() {
-  const initialFormState = { length: "", quantity: "", rate: "" };
+  const initialFormState = { size: "", length: "", quantity: "", rate: "" };
   const [formValues, setFormValues] = useState(initialFormState);
   const [entries, setEntries] = useState<BeadingPattiEntry[]>([]);
   const [formError, setFormError] = useState<string | null>(null);
   const [editingId, setEditingId] = useState<number | null>(null);
   const [customerName, setCustomerName] = useState("");
   const [lastUsedRate, setLastUsedRate] = useState("");
+  
+  const beadingSizes = [
+    "19mm x 12mm",
+    "25mm x 12mm",
+    "19mm x 19mm",
+    "25mm x 19mm",
+    "32mm x 19mm",
+    "38mm x 19mm",
+    "50mm x 19mm",
+  ];
 
   useEffect(() => {
     if (!editingId) {
@@ -816,7 +828,7 @@ function BeadingPattiCalculator() {
     }
     
     setFormError(null);
-    const { length, quantity, rate } = parsed.data;
+    const { size, length, quantity, rate } = parsed.data;
     const totalLength = length * quantity;
     const totalAmount = totalLength * (rate || 0);
 
@@ -827,12 +839,13 @@ function BeadingPattiCalculator() {
     if (editingId) {
         setEntries(prev => prev.map(entry => 
             entry.id === editingId 
-            ? { ...entry, length, quantity, rate, totalLength, totalAmount } 
+            ? { ...entry, size, length, quantity, rate, totalLength, totalAmount } 
             : entry
         ));
     } else {
         setEntries(prev => [...prev, {
             id: Date.now(),
+            size,
             length,
             quantity,
             rate,
@@ -842,18 +855,19 @@ function BeadingPattiCalculator() {
     }
 
     clearForm();
-    (e.currentTarget.elements[0] as HTMLInputElement)?.focus();
+    (document.getElementById('beading-length') as HTMLInputElement)?.focus();
   };
 
   const handleEditClick = (entry: BeadingPattiEntry) => {
     setEditingId(entry.id);
     setFormValues({
+        size: entry.size,
         length: String(entry.length),
         quantity: String(entry.quantity),
         rate: String(entry.rate ?? ''),
     });
     setFormError(null);
-    (document.getElementById('beading-length') as HTMLInputElement)?.focus();
+    (document.getElementById('beading-size')?.parentElement as HTMLButtonElement)?.focus();
   }
 
   const removeEntry = (id: number) => {
@@ -898,9 +912,10 @@ function BeadingPattiCalculator() {
     currentY += 7;
 
     (doc as any).autoTable({
-        head: [['#', 'Length (ft)', 'Qty', 'Rate (per ft)', 'Total RFT', 'Total Amt']],
+        head: [['#', 'Size', 'Length (ft)', 'Qty', 'Rate (per ft)', 'Total RFT', 'Total Amt']],
         body: entries.map((entry, index) => [
             index + 1,
+            entry.size,
             `${entry.length}"`,
             entry.quantity,
             entry.rate?.toFixed(2) ?? '-',
@@ -914,6 +929,7 @@ function BeadingPattiCalculator() {
         columnStyles: {
             0: { halign: 'center' },
             1: { halign: 'left' },
+            2: { halign: 'left' },
         }
     });
 
@@ -988,7 +1004,18 @@ function BeadingPattiCalculator() {
       </CardHeader>
       <CardContent className="p-2 sm:p-6 space-y-4">
         <form onSubmit={handleFormSubmit} className="hidden md:block p-2 sm:p-4 border rounded-lg bg-muted/50 space-y-4">
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
+                <div className="space-y-1">
+                    <Label htmlFor="beading-size">Size</Label>
+                    <Select name="size" value={formValues.size} onValueChange={value => handleFormChange('size', value)} required>
+                        <SelectTrigger id="beading-size">
+                            <SelectValue placeholder="Select a size" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            {beadingSizes.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}
+                        </SelectContent>
+                    </Select>
+                </div>
                  <div className="space-y-1">
                     <Label htmlFor="beading-length">Length (ft)</Label>
                     <Input id="beading-length" value={formValues.length} onChange={e => handleFormChange('length', e.target.value)} onKeyDown={handleInputKeyDown} type="number" inputMode="decimal" step="any" placeholder="" />
@@ -1018,6 +1045,7 @@ function BeadingPattiCalculator() {
                 <TableHeader>
                     <TableRow>
                         <TableHead className="w-12 text-center px-2">#</TableHead>
+                        <TableHead className="px-2">Size</TableHead>
                         <TableHead className="px-2">Length</TableHead>
                         <TableHead className="text-right px-2">Qty</TableHead>
                         <TableHead className="text-right px-2">Rate</TableHead>
@@ -1029,11 +1057,12 @@ function BeadingPattiCalculator() {
                 <TableBody>
                     {entries.length === 0 ? (
                         <TableRow>
-                            <TableCell colSpan={7} className="text-center h-24 text-muted-foreground p-4">No entries added yet.</TableCell>
+                            <TableCell colSpan={8} className="text-center h-24 text-muted-foreground p-4">No entries added yet.</TableCell>
                         </TableRow>
                     ) : entries.map((entry, index) => (
                       <TableRow key={entry.id}>
                         <TableCell className="p-2 text-center font-medium">{index + 1}</TableCell>
+                        <TableCell className="p-2 font-medium">{entry.size}</TableCell>
                         <TableCell className="p-2">
                             <div className="font-medium whitespace-normal">{entry.length}"</div>
                         </TableCell>
@@ -1099,6 +1128,17 @@ function BeadingPattiCalculator() {
             <div className="flex items-end gap-2">
                 <div className="flex-1 overflow-x-auto">
                     <div className="flex gap-2 pr-2">
+                        <div className="space-y-1 w-36 shrink-0">
+                            <Label htmlFor="beading-size-float" className="text-xs px-1 text-center h-8 flex items-center justify-center">Size</Label>
+                            <Select name="size" value={formValues.size} onValueChange={value => handleFormChange('size', value)} required>
+                                <SelectTrigger id="beading-size-float" className="h-11 text-base">
+                                    <SelectValue placeholder="Select" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    {beadingSizes.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}
+                                </SelectContent>
+                            </Select>
+                        </div>
                         <div className="space-y-1 w-24 shrink-0">
                             <Label htmlFor="beading-length-float" className="text-xs px-1 text-center h-8 flex items-center justify-center">Length (ft)</Label>
                             <Input id="beading-length-float" value={formValues.length} onChange={e => handleFormChange('length', e.target.value)} onKeyDown={handleInputKeyDown} type="number" inputMode="decimal" step="any" className="h-11 text-center text-base" />
