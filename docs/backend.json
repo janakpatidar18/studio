@@ -43,6 +43,20 @@
       "required": [
         "name"
       ]
+    },
+    "beadingPattiSize": {
+      "title": "Beading Patti Size",
+      "description": "Represents a size for beading patti.",
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "The size name (e.g., '19mm x 12mm')."
+        }
+      },
+      "required": [
+        "name"
+      ]
     }
   },
   "auth": {
@@ -62,6 +76,12 @@
         "$ref": "#/entities/galleryCategory"
       },
       "description": "Stores gallery image categories."
+    },
+    "/beadingPattiSizes/{beadingPattiSizeId}": {
+      "schema": {
+        "$ref": "#/entities/beadingPattiSize"
+      },
+      "description": "Stores beading patti sizes for the calculator dropdown."
     }
   }
 }

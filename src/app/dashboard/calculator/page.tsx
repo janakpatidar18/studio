@@ -20,6 +20,7 @@ import {
 import jsPDF from "jspdf";
 import "jspdf-autotable";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useInventory } from "@/context/InventoryContext";
 
 
 const SawnWoodEntrySchema = z.object({
@@ -790,6 +791,7 @@ function RoundLogsCalculator() {
 }
 
 function BeadingPattiCalculator() {
+  const { beadingPattiSizes } = useInventory();
   const initialFormState = { size: "", length: "", quantity: "", bundle: "", rate: "" };
   const [formValues, setFormValues] = useState(initialFormState);
   const [entries, setEntries] = useState<BeadingPattiEntry[]>([]);
@@ -799,15 +801,6 @@ function BeadingPattiCalculator() {
   const [lastUsedRate, setLastUsedRate] = useState("");
   const [lastUsedSize, setLastUsedSize] = useState("");
   
-  const beadingSizes = [
-    "19mm x 12mm",
-    "25mm x 12mm",
-    "19mm x 19mm",
-    "25mm x 19mm",
-    "32mm x 19mm",
-    "38mm x 19mm",
-    "50mm x 19mm",
-  ];
 
   useEffect(() => {
     if (!editingId) {
@@ -1018,7 +1011,7 @@ function BeadingPattiCalculator() {
                             <SelectValue placeholder="Select a size" />
                         </SelectTrigger>
                         <SelectContent>
-                            {beadingSizes.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}
+                            {beadingPattiSizes?.map(s => <SelectItem key={s.id} value={s.name}>{s.name}</SelectItem>)}
                         </SelectContent>
                     </Select>
                 </div>
@@ -1147,7 +1140,7 @@ function BeadingPattiCalculator() {
                                     <SelectValue placeholder="Select" />
                                 </SelectTrigger>
                                 <SelectContent>
-                                    {beadingSizes.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}
+                                    {beadingPattiSizes?.map(s => <SelectItem key={s.id} value={s.name}>{s.name}</SelectItem>)}
                                 </SelectContent>
                             </Select>
                         </div>

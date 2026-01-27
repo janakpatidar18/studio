@@ -485,6 +485,92 @@ function AdminImageManager() {
     );
 }
 
+function AdminBeadingPattiSizeManager() {
+    const { beadingPattiSizes, addBeadingPattiSize, removeBeadingPattiSize } = useInventory();
+    const [newSize, setNewSize] = useState("");
+    const { toast } = useToast();
+
+    const handleAddSize = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!newSize.trim()) {
+            toast({ title: "Size name cannot be empty", variant: "destructive" });
+            return;
+        }
+        const result = await addBeadingPattiSize(newSize);
+        if (result.success) {
+            toast({ title: "Size Added", description: `"${newSize}" has been added.` });
+            setNewSize("");
+        } else {
+            toast({ title: "Failed to Add", description: result.message, variant: "destructive" });
+        }
+    };
+
+    const handleDeleteSize = async (sizeId: string, sizeName: string) => {
+        const result = await removeBeadingPattiSize(sizeId);
+        if (result.success) {
+            toast({ title: "Size Removed", description: `"${sizeName}" has been removed.`, variant: "destructive" });
+        } else {
+            toast({ title: "Failed to Remove", description: result.message, variant: "destructive" });
+        }
+    };
+
+    return (
+        <Card>
+            <CardHeader>
+                <CardTitle>Manage Beading Patti Sizes</CardTitle>
+                <CardDescription>Add or remove sizes for the calculator dropdown.</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+                <form onSubmit={handleAddSize} className="flex items-center gap-2">
+                    <Input
+                        value={newSize}
+                        onChange={(e) => setNewSize(e.target.value)}
+                        placeholder="New size name (e.g. 19mm x 12mm)"
+                    />
+                    <Button type="submit">
+                        <PlusCircle className="mr-2 h-4 w-4" /> Add
+                    </Button>
+                </form>
+                <div className="space-y-2">
+                    <h3 className="text-sm font-medium text-muted-foreground">Existing Sizes</h3>
+                    <div className="border rounded-md p-2 space-y-2 max-h-60 overflow-y-auto">
+                        {beadingPattiSizes && beadingPattiSizes.length > 0 ? (
+                            beadingPattiSizes.map((size) => (
+                                <div key={size.id} className="flex items-center justify-between p-2 bg-muted/50 rounded-md">
+                                    <span>{size.name}</span>
+                                    <AlertDialog>
+                                        <AlertDialogTrigger asChild>
+                                            <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-destructive">
+                                                <Trash2 className="h-4 w-4" />
+                                            </Button>
+                                        </AlertDialogTrigger>
+                                        <AlertDialogContent>
+                                            <AlertDialogHeader>
+                                                <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                                                <AlertDialogDescription>
+                                                   This will remove the size "{size.name}". This action cannot be undone.
+                                                </AlertDialogDescription>
+                                            </AlertDialogHeader>
+                                            <AlertDialogFooter>
+                                                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                                <AlertDialogAction onClick={() => handleDeleteSize(size.id, size.name)}>
+                                                    Delete
+                                                </AlertDialogAction>
+                                            </AlertDialogFooter>
+                                        </AlertDialogContent>
+                                    </AlertDialog>
+                                </div>
+                            ))
+                        ) : (
+                            <p className="text-sm text-center text-muted-foreground py-4">No sizes found.</p>
+                        )}
+                    </div>
+                </div>
+            </CardContent>
+        </Card>
+    );
+}
+
 
 export default function AdminPage() {
     const [pin, setPin] = useState('');
@@ -564,6 +650,7 @@ export default function AdminPage() {
             </header>
             <AdminCategoryManager />
             <AdminImageManager />
+            <AdminBeadingPattiSizeManager />
         </div>
     );
 }

@@ -12,3 +12,8 @@ export type GalleryImage = {
     image: string;
     createdAt: any;
 }
+
+export type BeadingPattiSize = {
+    id: string;
+    name: string;
+}
