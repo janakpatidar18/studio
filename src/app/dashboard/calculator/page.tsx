@@ -196,7 +196,7 @@ function SawnWoodCalculator() {
             entry.quantity,
             entry.rate?.toFixed(2) ?? '-',
             (entry.cft * entry.quantity).toFixed(4),
-            entry.totalAmount.toFixed(2),
+            `Rs. ${entry.totalAmount.toFixed(2)}`,
         ]),
         startY: currentY,
         headStyles: { fillColor: [36, 69, 76] },
@@ -213,7 +213,7 @@ function SawnWoodCalculator() {
         body: [
             ['Total Nos.', `${totalQuantity}`],
             ['Total CFT', `${totalCft.toFixed(4)}`],
-            ['Grand Total', `₹ ${totalAmount.toFixed(2)}`],
+            ['Grand Total', `Rs. ${totalAmount.toFixed(2)}`],
         ],
         startY: finalY + 5,
         theme: 'plain',
@@ -558,7 +558,7 @@ function RoundLogsCalculator() {
                 entry.quantity,
                 entry.rate?.toFixed(2) ?? '-',
                 (entry.cft * entry.quantity).toFixed(4),
-                entry.totalAmount.toFixed(2),
+                `Rs. ${entry.totalAmount.toFixed(2)}`,
             ]),
             startY: currentY,
             headStyles: { fillColor: [36, 69, 76] },
@@ -575,7 +575,7 @@ function RoundLogsCalculator() {
             body: [
                 ['Total Nos.', `${totalQuantity}`],
                 ['Total CFT', `${totalCft.toFixed(4)}`],
-                ['Grand Total', `₹ ${totalAmount.toFixed(2)}`],
+                ['Grand Total', `Rs. ${totalAmount.toFixed(2)}`],
             ],
             startY: finalY + 5,
             theme: 'plain',
@@ -873,7 +873,8 @@ function BeadingPattiCalculator() {
   };
   
   const clearForm = () => {
-      setFormValues(initialFormState);
+      const { size, rate } = formValues;
+      setFormValues({ ...initialFormState, size, rate });
       setFormError(null);
       setEditingId(null);
   }
@@ -919,7 +920,7 @@ function BeadingPattiCalculator() {
             entry.bundle ?? '-',
             entry.rate?.toFixed(2) ?? '-',
             entry.totalLength.toFixed(2),
-            entry.totalAmount.toFixed(2),
+            `Rs. ${entry.totalAmount.toFixed(2)}`,
         ]),
         startY: currentY,
         headStyles: { fillColor: [36, 69, 76] },
@@ -937,7 +938,7 @@ function BeadingPattiCalculator() {
         body: [
             ['Total Nos.', `${totalQuantity}`],
             ['Total RFT', `${totalRunningFeet.toFixed(2)}`],
-            ['Grand Total', `₹ ${totalAmount.toFixed(2)}`],
+            ['Grand Total', `Rs. ${totalAmount.toFixed(2)}`],
         ],
         startY: finalY + 5,
         theme: 'plain',
@@ -1214,8 +1215,6 @@ export default function CalculatorPage() {
 
     
 
-
-
     
 
     
@@ -1242,3 +1241,6 @@ export default function CalculatorPage() {
 
     
 
+    
+
+    
