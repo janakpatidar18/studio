@@ -798,15 +798,7 @@ function BeadingPattiCalculator() {
   const [formError, setFormError] = useState<string | null>(null);
   const [editingId, setEditingId] = useState<number | null>(null);
   const [customerName, setCustomerName] = useState("");
-  const [lastUsedRate, setLastUsedRate] = useState("");
-  const [lastUsedSize, setLastUsedSize] = useState("");
-  
-
-  useLayoutEffect(() => {
-    if (!editingId) {
-      setFormValues(prev => ({ ...prev, rate: lastUsedRate, size: lastUsedSize }));
-    }
-  }, [lastUsedRate, lastUsedSize, editingId]);
+  const [ratesBySize, setRatesBySize] = useState<Record<string, string>>({});
 
   const sortedEntries = useMemo(() => {
     const parseSize = (sizeStr: string): number[] => {
@@ -827,7 +819,11 @@ function BeadingPattiCalculator() {
   }, [entries]);
 
   const handleFormChange = (field: string, value: string) => {
-    setFormValues(prev => ({ ...prev, [field]: value }));
+    const newValues = { ...formValues, [field]: value };
+    if (field === 'size') {
+        newValues.rate = ratesBySize[value] || '';
+    }
+    setFormValues(newValues);
     setFormError(null);
   };
   
@@ -845,10 +841,9 @@ function BeadingPattiCalculator() {
     const totalLength = length * quantity * (bundle || 1);
     const totalAmount = totalLength * (rate || 0);
 
-    if (rate !== undefined) {
-      setLastUsedRate(String(rate));
+    if (rate !== undefined && size) {
+      setRatesBySize(prev => ({...prev, [size]: String(rate)}));
     }
-    setLastUsedSize(size);
     
     if (editingId) {
         setEntries(prev => prev.map(entry => 
@@ -869,19 +864,21 @@ function BeadingPattiCalculator() {
         }]);
     }
 
-    clearFormAndFocus();
+    clearFormAndFocus(size, String(rate || ''));
   };
 
-  const clearFormAndFocus = () => {
-      setFormValues(prev => ({
+  const clearFormAndFocus = (currentSize: string, currentRate: string) => {
+      setFormValues({
           ...initialFormState,
-          size: prev.size,
-          rate: prev.rate
-      }));
+          size: currentSize,
+          rate: currentRate,
+      });
       setFormError(null);
       setEditingId(null);
       const lengthInput = document.getElementById('beading-length') || document.getElementById('beading-length-float');
-      lengthInput?.focus();
+      if (lengthInput) {
+        lengthInput.focus();
+      }
   }
 
   const handleEditClick = (entry: BeadingPattiEntry) => {
@@ -905,7 +902,7 @@ function BeadingPattiCalculator() {
       setFormValues(prev => ({
           ...initialFormState,
           size: prev.size,
-          rate: prev.rate,
+          rate: ratesBySize[prev.size] || '',
       }));
       setFormError(null);
       setEditingId(null);
