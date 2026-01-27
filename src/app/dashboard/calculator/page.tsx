@@ -53,14 +53,14 @@ const BeadingPattiEntrySchema = z.object({
 type BeadingPattiEntry = z.infer<typeof BeadingPattiEntrySchema> & { id: number; totalLength: number; totalAmount: number };
 
 
-const handleInputKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+const handleInputKeyDown = (e: React.KeyboardEvent<HTMLInputElement | HTMLButtonElement>) => {
     if (e.key === 'Enter') {
       e.preventDefault();
       const form = e.currentTarget.form;
       if (!form) return;
 
       const inputs = Array.from(form.querySelectorAll('input, button[aria-haspopup="listbox"]'));
-      const currentIndex = inputs.indexOf(e.currentTarget);
+      const currentIndex = inputs.indexOf(e.currentTarget as any);
       
       if (currentIndex > -1 && currentIndex < inputs.length - 1) {
         (inputs[currentIndex + 1] as HTMLElement).focus();
@@ -340,7 +340,7 @@ function SawnWoodCalculator() {
                         <TableCell className="p-2 text-right">{entry.quantity}</TableCell>
                         <TableCell className="p-2 text-right">{entry.rate?.toFixed(2) ?? '-'}</TableCell>
                         <TableCell className="p-2 text-right font-medium">{(entry.cft * entry.quantity).toFixed(4)}</TableCell>
-                        <TableCell className="p-2 text-right font-bold">₹{entry.totalAmount.toFixed(2)}</TableCell>
+                        <TableCell className="p-2 text-right font-bold">Rs. {entry.totalAmount.toFixed(2)}</TableCell>
                         <TableCell className="p-2 text-center">
                           <div className="flex items-center justify-center">
                             <Button variant="ghost" size="icon" type="button" onClick={() => handleEditClick(entry)} className="text-muted-foreground hover:text-primary h-8 w-8">
@@ -371,7 +371,7 @@ function SawnWoodCalculator() {
             </div>
             <div className="flex justify-between text-2xl sm:text-3xl">
                 <span className="text-muted-foreground">Total Amount</span>
-                <span className="font-bold font-headline text-primary">₹ {totalAmount.toFixed(2)}</span>
+                <span className="font-bold font-headline text-primary">Rs. {totalAmount.toFixed(2)}</span>
             </div>
             <div className="flex justify-end gap-2 mt-4">
                 <Button onClick={handleDownloadPdf} variant="outline">
@@ -697,7 +697,7 @@ function RoundLogsCalculator() {
                                 <TableCell className="p-2 text-right">{entry.quantity}</TableCell>
                                 <TableCell className="p-2 text-right">{entry.rate?.toFixed(2) ?? '-'}</TableCell>
                                 <TableCell className="p-2 text-right font-medium">{(entry.cft * entry.quantity).toFixed(4)}</TableCell>
-                                <TableCell className="p-2 text-right font-bold">₹{entry.totalAmount.toFixed(2)}</TableCell>
+                                <TableCell className="p-2 text-right font-bold">Rs. {entry.totalAmount.toFixed(2)}</TableCell>
                                 <TableCell className="p-2 text-center">
                                   <div className="flex items-center justify-center">
                                     <Button variant="ghost" size="icon" type="button" onClick={() => handleEditClick(entry)} className="text-muted-foreground hover:text-primary h-8 w-8">
@@ -728,7 +728,7 @@ function RoundLogsCalculator() {
                     </div>
                     <div className="flex justify-between text-2xl sm:text-3xl">
                         <span className="text-muted-foreground">Total Amount</span>
-                        <span className="font-bold font-headline text-primary">₹ {totalAmount.toFixed(2)}</span>
+                        <span className="font-bold font-headline text-primary">Rs. {totalAmount.toFixed(2)}</span>
                     </div>
                      <div className="flex justify-end gap-2 mt-4">
                         <Button onClick={handleDownloadPdf} variant="outline">
@@ -864,22 +864,21 @@ function BeadingPattiCalculator() {
         }]);
     }
 
-    clearFormAndFocus(size, String(rate || ''));
+    setFormValues({
+        ...initialFormState,
+        size: size,
+        rate: String(rate || ''),
+    });
+    setFormError(null);
+    setEditingId(null);
+    
+    setTimeout(() => {
+        const lengthInput = document.getElementById('beading-length') || document.getElementById('beading-length-float');
+        if (lengthInput) {
+            lengthInput.focus();
+        }
+    }, 0);
   };
-
-  const clearFormAndFocus = (currentSize: string, currentRate: string) => {
-      setFormValues({
-          ...initialFormState,
-          size: currentSize,
-          rate: currentRate,
-      });
-      setFormError(null);
-      setEditingId(null);
-      const lengthInput = document.getElementById('beading-length') || document.getElementById('beading-length-float');
-      if (lengthInput) {
-        lengthInput.focus();
-      }
-  }
 
   const handleEditClick = (entry: BeadingPattiEntry) => {
     setEditingId(entry.id);
@@ -1168,7 +1167,7 @@ function BeadingPattiCalculator() {
                         <TableCell className="p-2 text-right">{entry.bundle ?? '-'}</TableCell>
                         <TableCell className="p-2 text-right">{entry.rate?.toFixed(2) ?? '-'}</TableCell>
                         <TableCell className="p-2 text-right font-medium">{entry.totalLength.toFixed(2)}</TableCell>
-                        <TableCell className="p-2 text-right font-bold">₹{entry.totalAmount.toFixed(2)}</TableCell>
+                        <TableCell className="p-2 text-right font-bold">Rs. {entry.totalAmount.toFixed(2)}</TableCell>
                         <TableCell className="p-2 text-center">
                           <div className="flex items-center justify-center">
                             <Button variant="ghost" size="icon" type="button" onClick={() => handleEditClick(entry)} className="text-muted-foreground hover:text-primary h-8 w-8">
@@ -1199,7 +1198,7 @@ function BeadingPattiCalculator() {
             </div>
             <div className="flex justify-between text-2xl sm:text-3xl">
                 <span className="text-muted-foreground">Total Amount</span>
-                <span className="font-bold font-headline text-primary">₹ {totalAmount.toFixed(2)}</span>
+                <span className="font-bold font-headline text-primary">Rs. {totalAmount.toFixed(2)}</span>
             </div>
             <div className="flex justify-end gap-2 mt-4">
                 <Button onClick={handleDownloadPdf} variant="outline">
@@ -1341,3 +1340,4 @@ export default function CalculatorPage() {
 
 
     
+
