@@ -59,11 +59,11 @@ const handleInputKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
       const form = e.currentTarget.form;
       if (!form) return;
 
-      const inputs = Array.from(form.querySelectorAll('input'));
+      const inputs = Array.from(form.querySelectorAll('input, button[aria-haspopup="listbox"]'));
       const currentIndex = inputs.indexOf(e.currentTarget);
-
+      
       if (currentIndex > -1 && currentIndex < inputs.length - 1) {
-        inputs[currentIndex + 1].focus();
+        (inputs[currentIndex + 1] as HTMLElement).focus();
       } else if (currentIndex === inputs.length - 1) {
         const submitButton = form.querySelector('button[type="submit"]');
         if (submitButton instanceof HTMLElement) {
@@ -152,7 +152,7 @@ function SawnWoodCalculator() {
   };
   
   const clearForm = () => {
-      setFormValues(initialFormState);
+      setFormValues({ ...initialFormState, rate: lastUsedRate });
       setFormError(null);
       setEditingId(null);
   }
@@ -514,7 +514,7 @@ function RoundLogsCalculator() {
     };
     
     const clearForm = () => {
-        setFormValues(initialFormState);
+        setFormValues({ ...initialFormState, rate: lastUsedRate });
         setFormError(null);
         setEditingId(null);
     }
@@ -808,6 +808,24 @@ function BeadingPattiCalculator() {
     }
   }, [lastUsedRate, lastUsedSize, editingId]);
 
+  const sortedEntries = useMemo(() => {
+    const parseSize = (sizeStr: string): number[] => {
+      const parts = sizeStr.match(/(\d*\.?\d+)/g);
+      if (!parts || parts.length < 2) return [0, 0];
+      return parts.map(Number);
+    };
+
+    return [...entries].sort((a, b) => {
+      const [widthA, thicknessA] = parseSize(a.size);
+      const [widthB, thicknessB] = parseSize(b.size);
+
+      if (widthA !== widthB) return widthA - widthB;
+      if (thicknessA !== thicknessB) return thicknessA - thicknessB;
+      if (a.length !== b.length) return a.length - b.length;
+      return 0;
+    });
+  }, [entries]);
+
   const handleFormChange = (field: string, value: string) => {
     setFormValues(prev => ({ ...prev, [field]: value }));
     setFormError(null);
@@ -851,9 +869,20 @@ function BeadingPattiCalculator() {
         }]);
     }
 
-    clearForm();
-    (document.getElementById('beading-length') as HTMLInputElement)?.focus();
+    clearFormAndFocus();
   };
+
+  const clearFormAndFocus = () => {
+      setFormValues(prev => ({
+          ...initialFormState,
+          size: prev.size,
+          rate: prev.rate
+      }));
+      setFormError(null);
+      setEditingId(null);
+      const lengthInput = document.getElementById('beading-length') || document.getElementById('beading-length-float');
+      lengthInput?.focus();
+  }
 
   const handleEditClick = (entry: BeadingPattiEntry) => {
     setEditingId(entry.id);
@@ -873,8 +902,11 @@ function BeadingPattiCalculator() {
   };
   
   const clearForm = () => {
-      const { size, rate } = formValues;
-      setFormValues({ ...initialFormState, size, rate });
+      setFormValues(prev => ({
+          ...initialFormState,
+          size: prev.size,
+          rate: prev.rate,
+      }));
       setFormError(null);
       setEditingId(null);
   }
@@ -883,7 +915,7 @@ function BeadingPattiCalculator() {
     return entries.reduce(
       (acc, entry) => {
         acc.totalRunningFeet += entry.totalLength;
-        acc.totalQuantity += entry.quantity;
+        acc.totalQuantity += entry.quantity * (entry.bundle || 1);
         acc.totalAmount += entry.totalAmount;
         return acc;
       },
@@ -909,10 +941,27 @@ function BeadingPattiCalculator() {
     doc.setFontSize(10);
     doc.text(`Date: ${new Date().toLocaleDateString()}`, pageWidth / 2, currentY, { align: 'center' });
     currentY += 7;
+    
+    const parseSize = (sizeStr: string): number[] => {
+      const parts = sizeStr.match(/(\d*\.?\d+)/g);
+      if (!parts || parts.length < 2) return [0, 0];
+      return parts.map(Number);
+    };
+
+    const sortedEntriesForPdf = [...entries].sort((a, b) => {
+      const [widthA, thicknessA] = parseSize(a.size);
+      const [widthB, thicknessB] = parseSize(b.size);
+
+      if (widthA !== widthB) return widthA - widthB;
+      if (thicknessA !== thicknessB) return thicknessA - thicknessB;
+      if (a.length !== b.length) return a.length - b.length;
+      return 0;
+    });
+
 
     (doc as any).autoTable({
         head: [['#', 'Size', 'Length (ft)', 'Qty', 'Bundle', 'Rate (per ft)', 'Total RFT', 'Total Amt']],
-        body: entries.map((entry, index) => [
+        body: sortedEntriesForPdf.map((entry, index) => [
             index + 1,
             entry.size,
             `${entry.length}"`,
@@ -1007,8 +1056,8 @@ function BeadingPattiCalculator() {
             <div className="grid grid-cols-1 sm:grid-cols-5 gap-4">
                 <div className="space-y-1">
                     <Label htmlFor="beading-size">Size</Label>
-                    <Select name="size" value={formValues.size} onValueChange={value => handleFormChange('size', value)} required>
-                        <SelectTrigger id="beading-size">
+                    <Select name="size" value={formValues.size} onValueChange={value => handleFormChange('size', value)}>
+                        <SelectTrigger id="beading-size" onKeyDown={handleInputKeyDown}>
                             <SelectValue placeholder="Select a size" />
                         </SelectTrigger>
                         <SelectContent>
@@ -1064,7 +1113,7 @@ function BeadingPattiCalculator() {
                         <TableRow>
                             <TableCell colSpan={9} className="text-center h-24 text-muted-foreground p-4">No entries added yet.</TableCell>
                         </TableRow>
-                    ) : entries.map((entry, index) => (
+                    ) : sortedEntries.map((entry, index) => (
                       <TableRow key={entry.id}>
                         <TableCell className="p-2 text-center font-medium">{index + 1}</TableCell>
                         <TableCell className="p-2 font-medium">{entry.size}</TableCell>
@@ -1136,7 +1185,7 @@ function BeadingPattiCalculator() {
                     <div className="flex gap-2 pr-2">
                         <div className="space-y-1 w-36 shrink-0">
                             <Label htmlFor="beading-size-float" className="text-xs px-1 text-center h-8 flex items-center justify-center">Size</Label>
-                            <Select name="size" value={formValues.size} onValueChange={value => handleFormChange('size', value)} required>
+                            <Select name="size" value={formValues.size} onValueChange={value => handleFormChange('size', value)}>
                                 <SelectTrigger id="beading-size-float" className="h-11 text-base">
                                     <SelectValue placeholder="Select" />
                                 </SelectTrigger>
@@ -1244,3 +1293,4 @@ export default function CalculatorPage() {
     
 
     
+
