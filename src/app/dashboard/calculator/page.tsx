@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect, useLayoutEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -82,7 +82,7 @@ function SawnWoodCalculator() {
   const [customerName, setCustomerName] = useState("");
   const [lastUsedRate, setLastUsedRate] = useState("");
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (!editingId) {
       setFormValues(prev => ({ ...prev, rate: lastUsedRate }));
     }
@@ -446,7 +446,7 @@ function RoundLogsCalculator() {
     const [customerName, setCustomerName] = useState("");
     const [lastUsedRate, setLastUsedRate] = useState("");
 
-     useEffect(() => {
+     useLayoutEffect(() => {
         if (!editingId) {
             setFormValues(prev => ({ ...prev, rate: lastUsedRate }));
         }
@@ -802,7 +802,7 @@ function BeadingPattiCalculator() {
   const [lastUsedSize, setLastUsedSize] = useState("");
   
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (!editingId) {
       setFormValues(prev => ({ ...prev, rate: lastUsedRate, size: lastUsedSize }));
     }
@@ -1241,3 +1241,4 @@ export default function CalculatorPage() {
     
 
     
+
