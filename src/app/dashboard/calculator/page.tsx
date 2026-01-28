@@ -878,7 +878,7 @@ function BeadingPattiCalculator() {
         ...initialFormState,
         size: prev.size,
         grade: prev.grade,
-        rate: rate !== undefined ? String(rate) : '',
+        rate: ratesByGradeAndSize[`${prev.size}::${prev.grade}`] || '',
     }));
     setFormError(null);
     setEditingId(null);
@@ -959,13 +959,17 @@ function BeadingPattiCalculator() {
     doc.text(`Date: ${new Date().toLocaleDateString()}`, pageWidth / 2, currentY, { align: 'center' });
     currentY += 10;
     
-    const entriesBySize = entries.reduce((acc, entry) => {
-        if (!acc[entry.size]) {
-            acc[entry.size] = [];
+    const entriesByGradeAndSize = entries.reduce((acc, entry) => {
+        const grade = entry.grade || 'N/A';
+        if (!acc[grade]) {
+            acc[grade] = {};
         }
-        acc[entry.size].push(entry);
+        if (!acc[grade][entry.size]) {
+            acc[grade][entry.size] = [];
+        }
+        acc[grade][entry.size].push(entry);
         return acc;
-    }, {} as Record<string, BeadingPattiEntry[]>);
+    }, {} as Record<string, Record<string, BeadingPattiEntry[]>>);
 
     const parseSize = (sizeStr: string): number[] => {
       const parts = sizeStr.match(/(\d*\.?\d+)/g);
@@ -973,68 +977,90 @@ function BeadingPattiCalculator() {
       return parts.map(Number);
     };
 
-    const sortedSizes = Object.keys(entriesBySize).sort((a, b) => {
-      const [widthA, thicknessA] = parseSize(a);
-      const [widthB, thicknessB] = parseSize(b);
-      if (widthA !== widthB) return widthA - widthB;
-      return thicknessA - thicknessB;
+    const sortedGrades = Object.keys(entriesByGradeAndSize).sort((a, b) => {
+        const gradeOrder: Record<string, number> = { "1st Grade": 1, "2nd Grade": 2 };
+        const aOrder = gradeOrder[a] || 99;
+        const bOrder = gradeOrder[b] || 99;
+        if (aOrder !== bOrder) {
+            return aOrder - bOrder;
+        }
+        return a.localeCompare(b);
     });
 
-    sortedSizes.forEach((size) => {
-        const sizeEntries = entriesBySize[size].sort((a, b) => a.length - b.length);
-        const sizeTotalRFT = sizeEntries.reduce((sum, entry) => sum + entry.totalLength, 0);
-        const sizeTotalAmount = sizeEntries.reduce((sum, entry) => sum + entry.totalAmount, 0);
-        const sizeTotalQty = sizeEntries.reduce((sum, entry) => sum + entry.quantity * (entry.bundle || 1), 0);
-
+    sortedGrades.forEach(grade => {
         if (currentY > doc.internal.pageSize.getHeight() - 80) {
             doc.addPage();
             currentY = 22;
         }
 
-        doc.setFontSize(12);
+        doc.setFontSize(14);
         doc.setFont('helvetica', 'bold');
-        doc.text(`Size: ${size}`, 14, currentY);
-        currentY += 6;
+        doc.text(grade, 14, currentY);
+        currentY += 8;
 
-        (doc as any).autoTable({
-            head: [['#', 'Grade', 'Length (ft)', 'Qty', 'Bundle', 'Rate (per ft)', 'Total RFT', 'Total Amt']],
-            body: sizeEntries.map((entry, index) => [
-                index + 1,
-                entry.grade ?? '-',
-                `${entry.length}"`,
-                entry.quantity,
-                entry.bundle ?? '-',
-                entry.rate?.toFixed(2) ?? '-',
-                entry.totalLength.toFixed(2),
-                `Rs. ${entry.totalAmount.toFixed(2)}`,
-            ]),
-            startY: currentY,
-            headStyles: { fillColor: [36, 69, 76] },
-            theme: 'grid',
-            styles: { halign: 'right' },
-            columnStyles: {
-                0: { halign: 'center' },
-                1: { halign: 'left' },
-                2: { halign: 'left' },
+        const entriesBySize = entriesByGradeAndSize[grade];
+        const sortedSizes = Object.keys(entriesBySize).sort((a, b) => {
+          const [widthA, thicknessA] = parseSize(a);
+          const [widthB, thicknessB] = parseSize(b);
+          if (widthA !== widthB) return widthA - widthB;
+          return thicknessA - thicknessB;
+        });
+
+        sortedSizes.forEach((size) => {
+            const sizeEntries = entriesBySize[size].sort((a, b) => a.length - b.length);
+            const sizeTotalRFT = sizeEntries.reduce((sum, entry) => sum + entry.totalLength, 0);
+            const sizeTotalAmount = sizeEntries.reduce((sum, entry) => sum + entry.totalAmount, 0);
+            const sizeTotalQty = sizeEntries.reduce((sum, entry) => sum + entry.quantity * (entry.bundle || 1), 0);
+
+            if (currentY > doc.internal.pageSize.getHeight() - 80) {
+                doc.addPage();
+                currentY = 22;
             }
-        });
-        
-        let finalY = (doc as any).lastAutoTable.finalY;
 
-        (doc as any).autoTable({
-            body: [
-                ['Total Nos.', `${sizeTotalQty}`],
-                ['Total RFT', `${sizeTotalRFT.toFixed(2)}`],
-                ['Total Amount', `Rs. ${sizeTotalAmount.toFixed(2)}`],
-            ],
-            startY: finalY + 2,
-            theme: 'plain',
-            bodyStyles: { fontStyle: 'bold', fontSize: 10 },
-            columnStyles: { 0: { halign: 'right' }, 1: { halign: 'right' } }
+            doc.setFontSize(12);
+            doc.setFont('helvetica', 'bold');
+            doc.text(`Size: ${size}`, 14, currentY);
+            currentY += 6;
+
+            (doc as any).autoTable({
+                head: [['#', 'Length (ft)', 'Qty', 'Bundle', 'Rate (per ft)', 'Total RFT', 'Total Amt']],
+                body: sizeEntries.map((entry, index) => [
+                    index + 1,
+                    `${entry.length}"`,
+                    entry.quantity,
+                    entry.bundle ?? '-',
+                    entry.rate?.toFixed(2) ?? '-',
+                    entry.totalLength.toFixed(2),
+                    `Rs. ${entry.totalAmount.toFixed(2)}`,
+                ]),
+                startY: currentY,
+                headStyles: { fillColor: [36, 69, 76] },
+                theme: 'grid',
+                styles: { halign: 'right' },
+                columnStyles: {
+                    0: { halign: 'center' },
+                    1: { halign: 'left' },
+                }
+            });
+            
+            let finalY = (doc as any).lastAutoTable.finalY;
+
+            (doc as any).autoTable({
+                body: [
+                    ['Total Nos.', `${sizeTotalQty}`],
+                    ['Total RFT', `${sizeTotalRFT.toFixed(2)}`],
+                    ['Total Amount', `Rs. ${sizeTotalAmount.toFixed(2)}`],
+                ],
+                startY: finalY + 2,
+                theme: 'plain',
+                bodyStyles: { fontStyle: 'bold', fontSize: 10 },
+                columnStyles: { 0: { halign: 'right' }, 1: { halign: 'right' } }
+            });
+            
+            currentY = (doc as any).lastAutoTable.finalY + 12;
         });
-        
-        currentY = (doc as any).lastAutoTable.finalY + 12;
     });
+
 
     if (currentY > doc.internal.pageSize.getHeight() - 50) {
         doc.addPage();
@@ -1390,6 +1416,8 @@ export default function CalculatorPage() {
     
 
 
+
+    
 
     
 
