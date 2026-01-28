@@ -871,6 +871,7 @@ function BeadingPattiCalculator() {
     setFormValues(prev => ({
         ...initialFormState,
         size: prev.size,
+        grade: prev.grade,
         rate: ratesBySize[prev.size] || '',
     }));
     setFormError(null);
@@ -896,7 +897,11 @@ function BeadingPattiCalculator() {
         rate: String(entry.rate ?? ''),
     });
     setFormError(null);
-    (document.getElementById('beading-length') as HTMLInputElement)?.focus();
+    const id = isMobile ? 'beading-length-float' : 'beading-length';
+    const lengthInput = document.getElementById(id);
+    if (lengthInput) {
+        lengthInput.focus();
+    }
   }
 
   const removeEntry = (id: number) => {
@@ -907,6 +912,7 @@ function BeadingPattiCalculator() {
       setFormValues(prev => ({
           ...initialFormState,
           size: prev.size,
+          grade: prev.grade,
           rate: ratesBySize[prev.size] || '',
       }));
       setFormError(null);
@@ -1115,12 +1121,22 @@ function BeadingPattiCalculator() {
                 </div>
                 <div className="space-y-1">
                     <Label htmlFor="beading-grade">Grade</Label>
-                    <Input id="beading-grade" value={formValues.grade} onChange={e => handleFormChange('grade', e.target.value)} onKeyDown={handleInputKeyDown} type="text" placeholder="e.g. A, B" />
+                     <Select name="grade" value={formValues.grade} onValueChange={value => handleFormChange('grade', value)}>
+                        <SelectTrigger id="beading-grade" onKeyDown={handleInputKeyDown}>
+                            <SelectValue placeholder="Select a grade" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="1st Grade">1st Grade</SelectItem>
+                            <SelectItem value="2nd Grade">2nd Grade</SelectItem>
+                        </SelectContent>
+                    </Select>
                 </div>
                 <div className="space-y-1">
                     <Label htmlFor="beading-rate">Rate (per ft)</Label>
                     <Input id="beading-rate" value={formValues.rate} onChange={e => handleFormChange('rate', e.target.value)} onKeyDown={handleInputKeyDown} type="number" inputMode="decimal" step="any" placeholder="per RFT" />
                 </div>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <div className="space-y-1">
                     <Label htmlFor="beading-length">Length (ft)</Label>
                     <Input id="beading-length" value={formValues.length} onChange={e => handleFormChange('length', e.target.value)} onKeyDown={handleInputKeyDown} type="number" inputMode="decimal" step="any" placeholder="" />
@@ -1250,7 +1266,15 @@ function BeadingPattiCalculator() {
                         </div>
                         <div className="space-y-1 w-24 shrink-0">
                             <Label htmlFor="beading-grade-float" className="text-xs px-1 text-center h-8 flex items-center justify-center">Grade</Label>
-                            <Input id="beading-grade-float" value={formValues.grade} onChange={e => handleFormChange('grade', e.target.value)} onKeyDown={handleInputKeyDown} type="text" className="h-11 text-center text-base" />
+                            <Select name="grade" value={formValues.grade} onValueChange={value => handleFormChange('grade', value)}>
+                                <SelectTrigger id="beading-grade-float" className="h-11 text-base">
+                                    <SelectValue placeholder="Grade" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="1st Grade">1st Grade</SelectItem>
+                                    <SelectItem value="2nd Grade">2nd Grade</SelectItem>
+                                </SelectContent>
+                            </Select>
                         </div>
                         <div className="space-y-1 w-24 shrink-0">
                             <Label htmlFor="beading-rate-float" className="text-xs px-1 text-center h-8 flex items-center justify-center">Rate</Label>
