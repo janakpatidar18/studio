@@ -191,7 +191,7 @@ function SawnWoodCalculator() {
     currentY += 7;
 
     (doc as any).autoTable({
-        head: [['#', 'Dimensions (L×W×T)', 'Qty', 'Rate', 'Total CFT', 'Total Amt']],
+        head: [['#', 'Dimensions (L\'×W"×T")', 'Qty', 'Rate', 'Total CFT', 'Total Amt']],
         body: entries.map((entry, index) => [
             index + 1,
             `${entry.length}' × ${entry.width}" × ${entry.height}"`,
@@ -319,7 +319,7 @@ function SawnWoodCalculator() {
                 <TableHeader>
                     <TableRow>
                         <TableHead className="w-12 text-center px-2">#</TableHead>
-                        <TableHead className="px-2 w-[160px]">Dimensions (L×W×T)</TableHead>
+                        <TableHead className="px-2 w-[160px]">Dimensions (L'×W"×T")</TableHead>
                         <TableHead className="text-right px-2">Qty</TableHead>
                         <TableHead className="text-right px-2">Rate</TableHead>
                         <TableHead className="text-right px-2">Total CFT</TableHead>
@@ -375,23 +375,25 @@ function SawnWoodCalculator() {
                 <span className="text-muted-foreground">Total Amount</span>
                 <span className="font-bold font-headline text-primary">Rs. {totalAmount.toFixed(2)}</span>
             </div>
-            <div className="flex justify-end gap-2 mt-4">
-                <Button onClick={handleDownloadPdf} variant="outline">
-                    <FileDown className="mr-2 h-4 w-4" /> Download PDF
-                </Button>
-                <Button onClick={handleSharePdf}>
-                    <Share2 className="mr-2 h-4 w-4" /> Share PDF
-                </Button>
-            </div>
-            <div className="space-y-2 pt-4">
-                <Label htmlFor="sawn-customer-name">Customer Name (for PDF)</Label>
-                <Input 
-                    id="sawn-customer-name"
-                    value={customerName}
-                    onChange={(e) => setCustomerName(e.target.value)}
-                    placeholder="Optional: Enter name for PDF filename"
-                    className="h-11"
-                />
+            <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 pt-4">
+                <div className="space-y-2 flex-grow">
+                    <Label htmlFor="sawn-customer-name">Customer Name (for PDF)</Label>
+                    <Input 
+                        id="sawn-customer-name"
+                        value={customerName}
+                        onChange={(e) => setCustomerName(e.target.value)}
+                        placeholder="Optional: Enter name for PDF filename"
+                        className="h-11"
+                    />
+                </div>
+                <div className="flex gap-2 w-full sm:w-auto shrink-0">
+                    <Button onClick={handleDownloadPdf} variant="outline" className="w-full sm:w-auto">
+                        <FileDown className="mr-2 h-4 w-4" /> Download PDF
+                    </Button>
+                    <Button onClick={handleSharePdf} className="w-full sm:w-auto">
+                        <Share2 className="mr-2 h-4 w-4" /> Share PDF
+                    </Button>
+                </div>
             </div>
           </CardFooter>
       )}
@@ -553,7 +555,7 @@ function RoundLogsCalculator() {
         currentY += 7;
 
         (doc as any).autoTable({
-            head: [['#', 'Dimensions (L×G)', 'Qty', 'Rate', 'Total CFT', 'Total Amt']],
+            head: [['#', 'Dimensions (L\'×G")', 'Qty', 'Rate', 'Total CFT', 'Total Amt']],
             body: entries.map((entry, index) => [
                 index + 1,
                 `${entry.length}' × ${entry.girth}"`,
@@ -676,7 +678,7 @@ function RoundLogsCalculator() {
                         <TableHeader>
                             <TableRow>
                                 <TableHead className="w-12 text-center px-2">#</TableHead>
-                                <TableHead className="px-2 w-[160px]">Dimensions (L×G)</TableHead>
+                                <TableHead className="px-2 w-[160px]">Dimensions (L'×G")</TableHead>
                                 <TableHead className="text-right px-2">Qty</TableHead>
                                 <TableHead className="text-right px-2">Rate</TableHead>
                                 <TableHead className="text-right px-2">Total CFT</TableHead>
@@ -732,23 +734,25 @@ function RoundLogsCalculator() {
                         <span className="text-muted-foreground">Total Amount</span>
                         <span className="font-bold font-headline text-primary">Rs. {totalAmount.toFixed(2)}</span>
                     </div>
-                     <div className="flex justify-end gap-2 mt-4">
-                        <Button onClick={handleDownloadPdf} variant="outline">
-                            <FileDown className="mr-2 h-4 w-4" /> Download PDF
-                        </Button>
-                        <Button onClick={handleSharePdf}>
-                            <Share2 className="mr-2 h-4 w-4" /> Share PDF
-                        </Button>
-                    </div>
-                    <div className="space-y-2 pt-4">
-                        <Label htmlFor="round-customer-name">Customer Name (for PDF)</Label>
-                        <Input 
-                            id="round-customer-name"
-                            value={customerName}
-                            onChange={(e) => setCustomerName(e.target.value)}
-                            placeholder="Optional: Enter name for PDF filename"
-                            className="h-11"
-                        />
+                     <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 pt-4">
+                        <div className="space-y-2 flex-grow">
+                            <Label htmlFor="round-customer-name">Customer Name (for PDF)</Label>
+                            <Input 
+                                id="round-customer-name"
+                                value={customerName}
+                                onChange={(e) => setCustomerName(e.target.value)}
+                                placeholder="Optional: Enter name for PDF filename"
+                                className="h-11"
+                            />
+                        </div>
+                        <div className="flex gap-2 w-full sm:w-auto shrink-0">
+                            <Button onClick={handleDownloadPdf} variant="outline" className="w-full sm:w-auto">
+                                <FileDown className="mr-2 h-4 w-4" /> Download PDF
+                            </Button>
+                            <Button onClick={handleSharePdf} className="w-full sm:w-auto">
+                                <Share2 className="mr-2 h-4 w-4" /> Share PDF
+                            </Button>
+                        </div>
                     </div>
                 </CardFooter>
             )}
@@ -826,9 +830,9 @@ function BeadingPattiCalculator() {
         const newValues = { ...prev, [field]: value };
         if (field === 'size' || field === 'grade') {
             const size = newValues.size;
-            const grade = newValues.grade;
+            const grade = newValues.grade ?? '';
             if (size) {
-                const rateKey = `${size}::${grade || ''}`;
+                const rateKey = `${size}::${grade}`;
                 newValues.rate = ratesByGradeAndSize[rateKey] || '';
             }
         }
@@ -885,7 +889,7 @@ function BeadingPattiCalculator() {
             ...initialFormState,
             size: currentSize,
             grade: currentGrade,
-            rate: prev.rate,
+            rate: ratesByGradeAndSize[rateKey] || '',
         };
     });
 
@@ -1270,23 +1274,25 @@ function BeadingPattiCalculator() {
                 <span className="text-muted-foreground">Total Amount</span>
                 <span className="font-bold font-headline text-primary">Rs. {totalAmount.toFixed(2)}</span>
             </div>
-            <div className="flex justify-end gap-2 mt-4">
-                <Button onClick={handleDownloadPdf} variant="outline">
-                    <FileDown className="mr-2 h-4 w-4" /> Download PDF
-                </Button>
-                <Button onClick={handleSharePdf}>
-                    <Share2 className="mr-2 h-4 w-4" /> Share PDF
-                </Button>
-            </div>
-            <div className="space-y-2 pt-4">
-                <Label htmlFor="beading-customer-name">Customer Name (for PDF)</Label>
-                <Input 
-                    id="beading-customer-name"
-                    value={customerName}
-                    onChange={(e) => setCustomerName(e.target.value)}
-                    placeholder="Optional: Enter name for PDF filename"
-                    className="h-11"
-                />
+            <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 pt-4">
+                <div className="space-y-2 flex-grow">
+                    <Label htmlFor="beading-customer-name">Customer Name (for PDF)</Label>
+                    <Input 
+                        id="beading-customer-name"
+                        value={customerName}
+                        onChange={(e) => setCustomerName(e.target.value)}
+                        placeholder="Optional: Enter name for PDF filename"
+                        className="h-11"
+                    />
+                </div>
+                <div className="flex gap-2 w-full sm:w-auto shrink-0">
+                    <Button onClick={handleDownloadPdf} variant="outline" className="w-full sm:w-auto">
+                        <FileDown className="mr-2 h-4 w-4" /> Download PDF
+                    </Button>
+                    <Button onClick={handleSharePdf} className="w-full sm:w-auto">
+                        <Share2 className="mr-2 h-4 w-4" /> Share PDF
+                    </Button>
+                </div>
             </div>
           </CardFooter>
       )}
@@ -1437,3 +1443,6 @@ export default function CalculatorPage() {
 
     
 
+
+
+    
