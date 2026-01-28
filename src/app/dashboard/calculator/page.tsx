@@ -801,7 +801,7 @@ function BeadingPattiCalculator() {
   const [formError, setFormError] = useState<string | null>(null);
   const [editingId, setEditingId] = useState<number | null>(null);
   const [customerName, setCustomerName] = useState("");
-  const [ratesBySize, setRatesBySize] = useState<Record<string, string>>({});
+  const [ratesByGradeAndSize, setRatesByGradeAndSize] = useState<Record<string, string>>({});
 
   const sortedEntries = useMemo(() => {
     const parseSize = (sizeStr: string): number[] => {
@@ -823,8 +823,13 @@ function BeadingPattiCalculator() {
 
   const handleFormChange = (field: string, value: string) => {
     const newValues = { ...formValues, [field]: value };
-    if (field === 'size') {
-        newValues.rate = ratesBySize[value] || '';
+    if (field === 'size' || field === 'grade') {
+        const size = newValues.size;
+        const grade = newValues.grade;
+        if (size && grade) {
+            const rateKey = `${size}::${grade}`;
+            newValues.rate = ratesByGradeAndSize[rateKey] || '';
+        }
     }
     setFormValues(newValues);
     setFormError(null);
@@ -844,8 +849,9 @@ function BeadingPattiCalculator() {
     const totalLength = length * quantity * (bundle || 1);
     const totalAmount = totalLength * (rate || 0);
 
-    if (rate !== undefined && size) {
-      setRatesBySize(prev => ({...prev, [size]: String(rate)}));
+    if (rate !== undefined && size && grade) {
+      const rateKey = `${size}::${grade}`;
+      setRatesByGradeAndSize(prev => ({...prev, [rateKey]: String(rate)}));
     }
     
     if (editingId) {
@@ -909,12 +915,15 @@ function BeadingPattiCalculator() {
   };
   
   const clearForm = () => {
-      setFormValues(prev => ({
-          ...initialFormState,
-          size: prev.size,
-          grade: prev.grade,
-          rate: ratesBySize[prev.size] || '',
-      }));
+      setFormValues(prev => {
+          const rateKey = `${prev.size}::${prev.grade}`;
+          return {
+            ...initialFormState,
+            size: prev.size,
+            grade: prev.grade,
+            rate: ratesByGradeAndSize[rateKey] || '',
+          };
+      });
       setFormError(null);
       setEditingId(null);
   }
@@ -1381,6 +1390,8 @@ export default function CalculatorPage() {
     
 
 
+
+    
 
     
 
