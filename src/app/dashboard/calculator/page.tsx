@@ -21,6 +21,7 @@ import jsPDF from "jspdf";
 import "jspdf-autotable";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useInventory } from "@/context/InventoryContext";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 
 const SawnWoodEntrySchema = z.object({
@@ -792,6 +793,7 @@ function RoundLogsCalculator() {
 
 function BeadingPattiCalculator() {
   const { beadingPattiSizes } = useInventory();
+  const isMobile = useIsMobile();
   const initialFormState = { size: "", length: "", quantity: "", bundle: "", rate: "" };
   const [formValues, setFormValues] = useState(initialFormState);
   const [entries, setEntries] = useState<BeadingPattiEntry[]>([]);
@@ -873,7 +875,8 @@ function BeadingPattiCalculator() {
     setEditingId(null);
     
     setTimeout(() => {
-        const lengthInput = document.getElementById('beading-length') || document.getElementById('beading-length-float');
+        const id = isMobile ? 'beading-length-float' : 'beading-length';
+        const lengthInput = document.getElementById(id);
         if (lengthInput) {
             lengthInput.focus();
         }
@@ -1341,3 +1344,6 @@ export default function CalculatorPage() {
 
     
 
+
+
+    
