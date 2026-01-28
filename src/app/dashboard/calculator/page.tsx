@@ -872,7 +872,7 @@ function BeadingPattiCalculator() {
         ...initialFormState,
         size: prev.size,
         grade: prev.grade,
-        rate: ratesBySize[prev.size] || '',
+        rate: rate !== undefined ? String(rate) : '',
     }));
     setFormError(null);
     setEditingId(null);
@@ -1381,6 +1381,8 @@ export default function CalculatorPage() {
     
 
 
+
+    
 
     
 
