@@ -826,7 +826,7 @@ function BeadingPattiCalculator() {
     if (field === 'size' || field === 'grade') {
         const size = newValues.size;
         const grade = newValues.grade;
-        if (size && grade) {
+        if (size) {
             const rateKey = `${size}::${grade}`;
             newValues.rate = ratesByGradeAndSize[rateKey] || '';
         }
@@ -849,10 +849,9 @@ function BeadingPattiCalculator() {
     const totalLength = length * quantity * (bundle || 1);
     const totalAmount = totalLength * (rate || 0);
 
-    let newRates = ratesByGradeAndSize;
-    if (rate !== undefined && size && grade) {
-      const rateKey = `${size}::${grade}`;
-      newRates = { ...ratesByGradeAndSize, [rateKey]: String(rate) };
+    if (rate !== undefined && size) {
+      const rateKey = `${size}::${grade || ''}`;
+      const newRates = { ...ratesByGradeAndSize, [rateKey]: String(rate) };
       setRatesByGradeAndSize(newRates);
     }
     
@@ -877,12 +876,14 @@ function BeadingPattiCalculator() {
     }
 
     setFormValues(prev => {
-        const rateKey = `${prev.size}::${prev.grade}`;
+        const rateKey = `${prev.size}::${prev.grade || ''}`;
         return {
             ...initialFormState,
             size: prev.size,
             grade: prev.grade,
-            rate: newRates[rateKey] || '',
+            rate: (rate !== undefined && size === prev.size && (grade || '') === (prev.grade || '')) 
+                  ? String(rate) 
+                  : (ratesByGradeAndSize[rateKey] || ''),
         };
     });
     setFormError(null);
@@ -921,7 +922,7 @@ function BeadingPattiCalculator() {
   
   const clearForm = () => {
       setFormValues(prev => {
-          const rateKey = `${prev.size}::${prev.grade}`;
+          const rateKey = `${prev.size}::${prev.grade || ''}`;
           return {
             ...initialFormState,
             size: prev.size,
