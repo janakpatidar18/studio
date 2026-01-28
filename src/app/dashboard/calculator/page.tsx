@@ -196,7 +196,7 @@ function SawnWoodCalculator() {
             index + 1,
             `${entry.length}' × ${entry.width}" × ${entry.height}"`,
             entry.quantity,
-            entry.rate?.toFixed(2) ?? '-',
+            entry.rate ? `Rs. ${entry.rate.toFixed(2)}` : '-',
             (entry.cft * entry.quantity).toFixed(4),
             `Rs. ${entry.totalAmount.toFixed(2)}`,
         ]),
@@ -558,7 +558,7 @@ function RoundLogsCalculator() {
                 index + 1,
                 `${entry.length}' × ${entry.girth}"`,
                 entry.quantity,
-                entry.rate?.toFixed(2) ?? '-',
+                entry.rate ? `Rs. ${entry.rate.toFixed(2)}` : '-',
                 (entry.cft * entry.quantity).toFixed(4),
                 `Rs. ${entry.totalAmount.toFixed(2)}`,
             ]),
@@ -826,9 +826,9 @@ function BeadingPattiCalculator() {
         const newValues = { ...prev, [field]: value };
         if (field === 'size' || field === 'grade') {
             const size = newValues.size;
-            const grade = newValues.grade || '';
+            const grade = newValues.grade;
             if (size) {
-                const rateKey = `${size}::${grade}`;
+                const rateKey = `${size}::${grade || ''}`;
                 newValues.rate = ratesByGradeAndSize[rateKey] || '';
             }
         }
@@ -878,13 +878,15 @@ function BeadingPattiCalculator() {
     
     const currentSize = formValues.size;
     const currentGrade = formValues.grade;
-    const currentRateKey = `${currentSize}::${currentGrade || ''}`;
     
-    setFormValues({
-        ...initialFormState,
-        size: currentSize,
-        grade: currentGrade,
-        rate: ratesByGradeAndSize[currentRateKey] || formValues.rate,
+    setFormValues(prev => {
+        const rateKey = `${currentSize}::${currentGrade || ''}`;
+        return {
+            ...initialFormState,
+            size: currentSize,
+            grade: currentGrade,
+            rate: prev.rate,
+        };
     });
 
     setEditingId(null);
@@ -1032,10 +1034,10 @@ function BeadingPattiCalculator() {
                 head: [['#', 'Length (ft)', 'Qty', 'Bundle', 'Rate (per ft)', 'Total RFT', 'Total Amt']],
                 body: sizeEntries.map((entry, index) => [
                     index + 1,
-                    `${entry.length}"`,
+                    `${entry.length}'`,
                     entry.quantity,
                     entry.bundle ?? '-',
-                    entry.rate?.toFixed(2) ?? '-',
+                    entry.rate ? `Rs. ${entry.rate.toFixed(2)}` : '-',
                     entry.totalLength.toFixed(2),
                     `Rs. ${entry.totalAmount.toFixed(2)}`,
                 ]),
@@ -1229,7 +1231,7 @@ function BeadingPattiCalculator() {
                         <TableCell className="p-2 font-medium">{entry.size}</TableCell>
                         <TableCell className="p-2 font-medium">{entry.grade ?? '-'}</TableCell>
                         <TableCell className="p-2">
-                            <div className="font-medium whitespace-normal">{entry.length}"</div>
+                            <div className="font-medium whitespace-normal">{entry.length}'</div>
                         </TableCell>
                         <TableCell className="p-2 text-right">{entry.quantity}</TableCell>
                         <TableCell className="p-2 text-right">{entry.bundle ?? '-'}</TableCell>
@@ -1434,3 +1436,4 @@ export default function CalculatorPage() {
     
 
     
+
