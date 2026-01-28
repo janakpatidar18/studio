@@ -849,9 +849,11 @@ function BeadingPattiCalculator() {
     const totalLength = length * quantity * (bundle || 1);
     const totalAmount = totalLength * (rate || 0);
 
+    let newRates = ratesByGradeAndSize;
     if (rate !== undefined && size && grade) {
       const rateKey = `${size}::${grade}`;
-      setRatesByGradeAndSize(prev => ({...prev, [rateKey]: String(rate)}));
+      newRates = { ...ratesByGradeAndSize, [rateKey]: String(rate) };
+      setRatesByGradeAndSize(newRates);
     }
     
     if (editingId) {
@@ -874,12 +876,15 @@ function BeadingPattiCalculator() {
         }]);
     }
 
-    setFormValues(prev => ({
-        ...initialFormState,
-        size: prev.size,
-        grade: prev.grade,
-        rate: ratesByGradeAndSize[`${prev.size}::${prev.grade}`] || '',
-    }));
+    setFormValues(prev => {
+        const rateKey = `${prev.size}::${prev.grade}`;
+        return {
+            ...initialFormState,
+            size: prev.size,
+            grade: prev.grade,
+            rate: newRates[rateKey] || '',
+        };
+    });
     setFormError(null);
     setEditingId(null);
     
@@ -1416,6 +1421,8 @@ export default function CalculatorPage() {
     
 
 
+
+    
 
     
 
