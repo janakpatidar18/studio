@@ -194,7 +194,7 @@ function SawnWoodCalculator() {
         head: [['#', 'Dimensions (L×W×T)', 'Qty', 'Rate', 'Total CFT', 'Total Amt']],
         body: entries.map((entry, index) => [
             index + 1,
-            `${entry.length}" × ${entry.width}' × ${entry.height}'`,
+            `${entry.length}' × ${entry.width}" × ${entry.height}"`,
             entry.quantity,
             entry.rate?.toFixed(2) ?? '-',
             (entry.cft * entry.quantity).toFixed(4),
@@ -319,7 +319,7 @@ function SawnWoodCalculator() {
                 <TableHeader>
                     <TableRow>
                         <TableHead className="w-12 text-center px-2">#</TableHead>
-                        <TableHead className="px-2">Dimensions</TableHead>
+                        <TableHead className="px-2 w-[160px]">Dimensions (L×W×T)</TableHead>
                         <TableHead className="text-right px-2">Qty</TableHead>
                         <TableHead className="text-right px-2">Rate</TableHead>
                         <TableHead className="text-right px-2">Total CFT</TableHead>
@@ -336,7 +336,7 @@ function SawnWoodCalculator() {
                       <TableRow key={entry.id}>
                         <TableCell className="p-2 text-center font-medium">{index + 1}</TableCell>
                         <TableCell className="p-2">
-                            <div className="font-medium whitespace-normal">{entry.length}" × {entry.width}' × {entry.height}'</div>
+                            <div className="font-medium whitespace-normal">{entry.length}' × {entry.width}" × {entry.height}"</div>
                             <div className="text-xs text-muted-foreground">Item CFT: {entry.cft.toFixed(4)}</div>
                         </TableCell>
                         <TableCell className="p-2 text-right">{entry.quantity}</TableCell>
@@ -556,7 +556,7 @@ function RoundLogsCalculator() {
             head: [['#', 'Dimensions (L×G)', 'Qty', 'Rate', 'Total CFT', 'Total Amt']],
             body: entries.map((entry, index) => [
                 index + 1,
-                `${entry.length}" × ${entry.girth}'`,
+                `${entry.length}' × ${entry.girth}"`,
                 entry.quantity,
                 entry.rate?.toFixed(2) ?? '-',
                 (entry.cft * entry.quantity).toFixed(4),
@@ -676,7 +676,7 @@ function RoundLogsCalculator() {
                         <TableHeader>
                             <TableRow>
                                 <TableHead className="w-12 text-center px-2">#</TableHead>
-                                <TableHead className="px-2">Dimensions</TableHead>
+                                <TableHead className="px-2 w-[160px]">Dimensions (L×G)</TableHead>
                                 <TableHead className="text-right px-2">Qty</TableHead>
                                 <TableHead className="text-right px-2">Rate</TableHead>
                                 <TableHead className="text-right px-2">Total CFT</TableHead>
@@ -693,7 +693,7 @@ function RoundLogsCalculator() {
                               <TableRow key={entry.id}>
                                 <TableCell className="p-2 text-center font-medium">{index + 1}</TableCell>
                                 <TableCell className="p-2">
-                                    <div className="font-medium whitespace-normal">{entry.length}" × {entry.girth}'</div>
+                                    <div className="font-medium whitespace-normal">{entry.length}' × {entry.girth}"</div>
                                     <div className="text-xs text-muted-foreground">Item CFT: {entry.cft.toFixed(4)}</div>
                                 </TableCell>
                                 <TableCell className="p-2 text-right">{entry.quantity}</TableCell>
@@ -822,16 +822,18 @@ function BeadingPattiCalculator() {
   }, [entries]);
 
   const handleFormChange = (field: string, value: string) => {
-    const newValues = { ...formValues, [field]: value };
-    if (field === 'size' || field === 'grade') {
-        const size = newValues.size;
-        const grade = newValues.grade;
-        if (size) {
-            const rateKey = `${size}::${grade}`;
-            newValues.rate = ratesByGradeAndSize[rateKey] || '';
+    setFormValues(prev => {
+        const newValues = { ...prev, [field]: value };
+        if (field === 'size' || field === 'grade') {
+            const size = newValues.size;
+            const grade = newValues.grade || '';
+            if (size) {
+                const rateKey = `${size}::${grade}`;
+                newValues.rate = ratesByGradeAndSize[rateKey] || '';
+            }
         }
-    }
-    setFormValues(newValues);
+        return newValues;
+    });
     setFormError(null);
   };
   
@@ -851,8 +853,7 @@ function BeadingPattiCalculator() {
 
     if (rate !== undefined && size) {
       const rateKey = `${size}::${grade || ''}`;
-      const newRates = { ...ratesByGradeAndSize, [rateKey]: String(rate) };
-      setRatesByGradeAndSize(newRates);
+      setRatesByGradeAndSize(prev => ({ ...prev, [rateKey]: String(rate) }));
     }
     
     if (editingId) {
@@ -874,19 +875,18 @@ function BeadingPattiCalculator() {
             totalAmount
         }]);
     }
-
-    setFormValues(prev => {
-        const rateKey = `${prev.size}::${prev.grade || ''}`;
-        return {
-            ...initialFormState,
-            size: prev.size,
-            grade: prev.grade,
-            rate: (rate !== undefined && size === prev.size && (grade || '') === (prev.grade || '')) 
-                  ? String(rate) 
-                  : (ratesByGradeAndSize[rateKey] || ''),
-        };
+    
+    const currentSize = formValues.size;
+    const currentGrade = formValues.grade;
+    const currentRateKey = `${currentSize}::${currentGrade || ''}`;
+    
+    setFormValues({
+        ...initialFormState,
+        size: currentSize,
+        grade: currentGrade,
+        rate: ratesByGradeAndSize[currentRateKey] || formValues.rate,
     });
-    setFormError(null);
+
     setEditingId(null);
     
     setTimeout(() => {
@@ -921,14 +921,14 @@ function BeadingPattiCalculator() {
   };
   
   const clearForm = () => {
-      setFormValues(prev => {
-          const rateKey = `${prev.size}::${prev.grade || ''}`;
-          return {
-            ...initialFormState,
-            size: prev.size,
-            grade: prev.grade,
-            rate: ratesByGradeAndSize[rateKey] || '',
-          };
+      const currentSize = formValues.size;
+      const currentGrade = formValues.grade;
+      const currentRateKey = `${currentSize}::${currentGrade || ''}`;
+      setFormValues({
+        ...initialFormState,
+        size: currentSize,
+        grade: currentGrade,
+        rate: ratesByGradeAndSize[currentRateKey] || '',
       });
       setFormError(null);
       setEditingId(null);
