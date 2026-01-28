@@ -45,6 +45,7 @@ type RoundLogEntry = z.infer<typeof RoundLogEntrySchema> & { id: number; cft: nu
 
 const BeadingPattiEntrySchema = z.object({
   size: z.string().min(1, "Size is required"),
+  grade: z.string().optional(),
   length: z.coerce.number().min(0.01, "Length must be positive"),
   quantity: z.coerce.number().int().min(1, "Quantity must be at least 1"),
   bundle: z.preprocess((val) => val === "" ? undefined : val, z.coerce.number().int().min(1).optional()),
@@ -794,7 +795,7 @@ function RoundLogsCalculator() {
 function BeadingPattiCalculator() {
   const { beadingPattiSizes } = useInventory();
   const isMobile = useIsMobile();
-  const initialFormState = { size: "", length: "", quantity: "", bundle: "", rate: "" };
+  const initialFormState = { size: "", grade: "", length: "", quantity: "", bundle: "", rate: "" };
   const [formValues, setFormValues] = useState(initialFormState);
   const [entries, setEntries] = useState<BeadingPattiEntry[]>([]);
   const [formError, setFormError] = useState<string | null>(null);
@@ -839,7 +840,7 @@ function BeadingPattiCalculator() {
     }
     
     setFormError(null);
-    const { size, length, quantity, bundle, rate } = parsed.data;
+    const { size, grade, length, quantity, bundle, rate } = parsed.data;
     const totalLength = length * quantity * (bundle || 1);
     const totalAmount = totalLength * (rate || 0);
 
@@ -850,13 +851,14 @@ function BeadingPattiCalculator() {
     if (editingId) {
         setEntries(prev => prev.map(entry => 
             entry.id === editingId 
-            ? { ...entry, size, length, quantity, bundle, rate, totalLength, totalAmount } 
+            ? { ...entry, size, grade, length, quantity, bundle, rate, totalLength, totalAmount } 
             : entry
         ));
     } else {
         setEntries(prev => [...prev, {
             id: Date.now(),
             size,
+            grade,
             length,
             quantity,
             bundle,
@@ -866,11 +868,11 @@ function BeadingPattiCalculator() {
         }]);
     }
 
-    setFormValues({
+    setFormValues(prev => ({
         ...initialFormState,
-        size: size,
-        rate: String(rate || ''),
-    });
+        size: prev.size,
+        rate: ratesBySize[prev.size] || '',
+    }));
     setFormError(null);
     setEditingId(null);
     
@@ -887,6 +889,7 @@ function BeadingPattiCalculator() {
     setEditingId(entry.id);
     setFormValues({
         size: entry.size,
+        grade: entry.grade ?? "",
         length: String(entry.length),
         quantity: String(entry.quantity),
         bundle: String(entry.bundle ?? ""),
@@ -979,9 +982,10 @@ function BeadingPattiCalculator() {
         currentY += 6;
 
         (doc as any).autoTable({
-            head: [['#', 'Length (ft)', 'Qty', 'Bundle', 'Rate (per ft)', 'Total RFT', 'Total Amt']],
+            head: [['#', 'Grade', 'Length (ft)', 'Qty', 'Bundle', 'Rate (per ft)', 'Total RFT', 'Total Amt']],
             body: sizeEntries.map((entry, index) => [
                 index + 1,
+                entry.grade ?? '-',
                 `${entry.length}"`,
                 entry.quantity,
                 entry.bundle ?? '-',
@@ -996,9 +1000,7 @@ function BeadingPattiCalculator() {
             columnStyles: {
                 0: { halign: 'center' },
                 1: { halign: 'left' },
-                2: { halign: 'right' },
-                3: { halign: 'right' },
-                4: { halign: 'right' },
+                2: { halign: 'left' },
             }
         });
         
@@ -1099,7 +1101,7 @@ function BeadingPattiCalculator() {
       </CardHeader>
       <CardContent className="p-2 sm:p-6 space-y-4">
         <form onSubmit={handleFormSubmit} className="hidden md:block p-2 sm:p-4 border rounded-lg bg-muted/50 space-y-4">
-            <div className="grid grid-cols-1 sm:grid-cols-5 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <div className="space-y-1">
                     <Label htmlFor="beading-size">Size</Label>
                     <Select name="size" value={formValues.size} onValueChange={value => handleFormChange('size', value)}>
@@ -1111,7 +1113,15 @@ function BeadingPattiCalculator() {
                         </SelectContent>
                     </Select>
                 </div>
-                 <div className="space-y-1">
+                <div className="space-y-1">
+                    <Label htmlFor="beading-grade">Grade</Label>
+                    <Input id="beading-grade" value={formValues.grade} onChange={e => handleFormChange('grade', e.target.value)} onKeyDown={handleInputKeyDown} type="text" placeholder="e.g. A, B" />
+                </div>
+                <div className="space-y-1">
+                    <Label htmlFor="beading-rate">Rate (per ft)</Label>
+                    <Input id="beading-rate" value={formValues.rate} onChange={e => handleFormChange('rate', e.target.value)} onKeyDown={handleInputKeyDown} type="number" inputMode="decimal" step="any" placeholder="per RFT" />
+                </div>
+                <div className="space-y-1">
                     <Label htmlFor="beading-length">Length (ft)</Label>
                     <Input id="beading-length" value={formValues.length} onChange={e => handleFormChange('length', e.target.value)} onKeyDown={handleInputKeyDown} type="number" inputMode="decimal" step="any" placeholder="" />
                 </div>
@@ -1122,10 +1132,6 @@ function BeadingPattiCalculator() {
                 <div className="space-y-1">
                     <Label htmlFor="beading-bundle">Bundle</Label>
                     <Input id="beading-bundle" value={formValues.bundle} onChange={e => handleFormChange('bundle', e.target.value)} onKeyDown={handleInputKeyDown} type="number" inputMode="numeric" min="1" placeholder="" />
-                </div>
-                <div className="space-y-1">
-                    <Label htmlFor="beading-rate">Rate (per ft)</Label>
-                    <Input id="beading-rate" value={formValues.rate} onChange={e => handleFormChange('rate', e.target.value)} onKeyDown={handleInputKeyDown} type="number" inputMode="decimal" step="any" placeholder="per RFT" />
                 </div>
             </div>
             {formError && <p className="text-sm text-destructive">{formError}</p>}
@@ -1145,6 +1151,7 @@ function BeadingPattiCalculator() {
                     <TableRow>
                         <TableHead className="w-12 text-center px-2">#</TableHead>
                         <TableHead className="px-2">Size</TableHead>
+                        <TableHead className="px-2">Grade</TableHead>
                         <TableHead className="px-2">Length</TableHead>
                         <TableHead className="text-right px-2">Qty</TableHead>
                         <TableHead className="text-right px-2">Bundle</TableHead>
@@ -1157,12 +1164,13 @@ function BeadingPattiCalculator() {
                 <TableBody>
                     {entries.length === 0 ? (
                         <TableRow>
-                            <TableCell colSpan={9} className="text-center h-24 text-muted-foreground p-4">No entries added yet.</TableCell>
+                            <TableCell colSpan={10} className="text-center h-24 text-muted-foreground p-4">No entries added yet.</TableCell>
                         </TableRow>
                     ) : sortedEntries.map((entry, index) => (
                       <TableRow key={entry.id}>
                         <TableCell className="p-2 text-center font-medium">{index + 1}</TableCell>
                         <TableCell className="p-2 font-medium">{entry.size}</TableCell>
+                        <TableCell className="p-2 font-medium">{entry.grade ?? '-'}</TableCell>
                         <TableCell className="p-2">
                             <div className="font-medium whitespace-normal">{entry.length}"</div>
                         </TableCell>
@@ -1241,6 +1249,14 @@ function BeadingPattiCalculator() {
                             </Select>
                         </div>
                         <div className="space-y-1 w-24 shrink-0">
+                            <Label htmlFor="beading-grade-float" className="text-xs px-1 text-center h-8 flex items-center justify-center">Grade</Label>
+                            <Input id="beading-grade-float" value={formValues.grade} onChange={e => handleFormChange('grade', e.target.value)} onKeyDown={handleInputKeyDown} type="text" className="h-11 text-center text-base" />
+                        </div>
+                        <div className="space-y-1 w-24 shrink-0">
+                            <Label htmlFor="beading-rate-float" className="text-xs px-1 text-center h-8 flex items-center justify-center">Rate</Label>
+                            <Input id="beading-rate-float" value={formValues.rate} onChange={e => handleFormChange('rate', e.target.value)} onKeyDown={handleInputKeyDown} type="number" inputMode="decimal" step="any" className="h-11 text-center text-base" />
+                        </div>
+                        <div className="space-y-1 w-24 shrink-0">
                             <Label htmlFor="beading-length-float" className="text-xs px-1 text-center h-8 flex items-center justify-center">Length (ft)</Label>
                             <Input id="beading-length-float" value={formValues.length} onChange={e => handleFormChange('length', e.target.value)} onKeyDown={handleInputKeyDown} type="number" inputMode="decimal" step="any" className="h-11 text-center text-base" />
                         </div>
@@ -1251,10 +1267,6 @@ function BeadingPattiCalculator() {
                         <div className="space-y-1 w-24 shrink-0">
                             <Label htmlFor="beading-bundle-float" className="text-xs px-1 text-center h-8 flex items-center justify-center">Bundle</Label>
                             <Input id="beading-bundle-float" value={formValues.bundle} onChange={e => handleFormChange('bundle', e.target.value)} onKeyDown={handleInputKeyDown} type="number" inputMode="numeric" min="1" className="h-11 text-center text-base" />
-                        </div>
-                        <div className="space-y-1 w-24 shrink-0">
-                            <Label htmlFor="beading-rate-float" className="text-xs px-1 text-center h-8 flex items-center justify-center">Rate</Label>
-                            <Input id="beading-rate-float" value={formValues.rate} onChange={e => handleFormChange('rate', e.target.value)} onKeyDown={handleInputKeyDown} type="number" inputMode="decimal" step="any" className="h-11 text-center text-base" />
                         </div>
                     </div>
                 </div>
@@ -1345,5 +1357,7 @@ export default function CalculatorPage() {
     
 
 
+
+    
 
     
