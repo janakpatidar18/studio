@@ -830,9 +830,9 @@ function BeadingPattiCalculator() {
         const newValues = { ...prev, [field]: value };
         if (field === 'size' || field === 'grade') {
             const size = newValues.size;
-            const grade = newValues.grade;
+            const grade = newValues.grade || '';
             if (size) {
-                const rateKey = `${size}::${grade || ''}`;
+                const rateKey = `${size}::${grade}`;
                 newValues.rate = ratesByGradeAndSize[rateKey] || '';
             }
         }
@@ -1361,7 +1361,7 @@ function BeadingPattiCalculator() {
 }
 
 function MSPCalculator() {
-  const initialFormState = { costAmt: "", freightAmt: "", topAmt: "", taxPercentage: "18" };
+  const initialFormState = { qty: "", unit: "", costAmt: "", freightAmt: "", topAmt: "", taxPercentage: "18" };
   const [formValues, setFormValues] = useState(initialFormState);
   const [results, setResults] = useState<{
       costAmt: number;
@@ -1433,7 +1433,26 @@ function MSPCalculator() {
       </CardHeader>
       <CardContent className="p-2 sm:p-6 space-y-6">
         <form onSubmit={handleFormSubmit} className="p-2 sm:p-4 border rounded-lg bg-muted/50 space-y-6">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-4">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-x-6 gap-y-4">
+                 <div className="space-y-2">
+                    <Label htmlFor="msp-qty">Qty</Label>
+                    <Input id="msp-qty" value={formValues.qty} onChange={e => handleFormChange('qty', e.target.value)} onKeyDown={handleInputKeyDown} type="number" inputMode="numeric" placeholder="e.g. 10" />
+                </div>
+                <div className="space-y-2">
+                    <Label htmlFor="msp-unit">Unit</Label>
+                    <Select value={formValues.unit} onValueChange={value => handleFormChange('unit', value)}>
+                        <SelectTrigger id="msp-unit" onKeyDown={handleInputKeyDown}>
+                            <SelectValue placeholder="Select Unit" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="CBM">CBM</SelectItem>
+                            <SelectItem value="CFT">CFT</SelectItem>
+                            <SelectItem value="Ft">Ft</SelectItem>
+                            <SelectItem value="In">In</SelectItem>
+                            <SelectItem value="Pc">Pc</SelectItem>
+                        </SelectContent>
+                    </Select>
+                </div>
                  <div className="space-y-2">
                     <Label htmlFor="msp-cost-amt">Cost Amt</Label>
                     <Input id="msp-cost-amt" value={formValues.costAmt} onChange={e => handleFormChange('costAmt', e.target.value)} onKeyDown={handleInputKeyDown} type="number" inputMode="decimal" step="any" placeholder="Enter Cost Amount" />
@@ -1459,7 +1478,7 @@ function MSPCalculator() {
                     <Input id="msp-top-amt" value={formValues.topAmt} onChange={e => handleFormChange('topAmt', e.target.value)} onKeyDown={handleInputKeyDown} type="number" inputMode="decimal" step="any" placeholder="Enter Any Top Amount" />
                 </div>
             </div>
-             <div className="flex justify-end gap-2">
+             <div className="flex justify-end gap-2 pt-4">
                 <Button type="button" variant="ghost" onClick={clearForm}>
                     <X className="mr-2 h-4 w-4" /> Clear
                 </Button>
@@ -1633,3 +1652,6 @@ export default function CalculatorPage() {
 
 
 
+
+
+    
