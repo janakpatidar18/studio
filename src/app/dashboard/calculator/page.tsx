@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useMemo, useEffect, useLayoutEffect } from "react";
@@ -190,7 +191,7 @@ function SawnWoodCalculator() {
     currentY += 7;
 
     (doc as any).autoTable({
-        head: [['#', "L'×W\"×T\"", 'Qty', 'Rate', 'Total CFT', 'Total Amt']],
+        head: [['#', 'L×W×T', 'Qty', 'Rate', 'Total CFT', 'Total Amt']],
         body: entries.map((entry, index) => [
             index + 1,
             `${entry.length}'×${entry.width}"×${entry.height}"`,
@@ -318,7 +319,7 @@ function SawnWoodCalculator() {
                 <TableHeader>
                     <TableRow>
                         <TableHead className="w-12 text-center px-2">#</TableHead>
-                        <TableHead className="px-2 w-[120px]">L'×W"×T"</TableHead>
+                        <TableHead className="px-2 w-[120px]">L×W×T</TableHead>
                         <TableHead className="text-right px-2">Qty</TableHead>
                         <TableHead className="text-right px-2">Rate</TableHead>
                         <TableHead className="text-right px-2">Total CFT</TableHead>
@@ -554,7 +555,7 @@ function RoundLogsCalculator() {
         currentY += 7;
 
         (doc as any).autoTable({
-            head: [['#', "L'×G\"", 'Qty', 'Rate', 'Total CFT', 'Total Amt']],
+            head: [['#', 'L×G', 'Qty', 'Rate', 'Total CFT', 'Total Amt']],
             body: entries.map((entry, index) => [
                 index + 1,
                 `${entry.length}'×${entry.girth}"`,
@@ -677,7 +678,7 @@ function RoundLogsCalculator() {
                         <TableHeader>
                             <TableRow>
                                 <TableHead className="w-12 text-center px-2">#</TableHead>
-                                <TableHead className="px-2 w-[120px]">L'×G"</TableHead>
+                                <TableHead className="px-2 w-[120px]">L×G</TableHead>
                                 <TableHead className="text-right px-2">Qty</TableHead>
                                 <TableHead className="text-right px-2">Rate</TableHead>
                                 <TableHead className="text-right px-2">Total CFT</TableHead>
@@ -831,7 +832,7 @@ function BeadingPattiCalculator() {
             const size = newValues.size;
             const grade = newValues.grade ?? '';
             if (size) {
-                const rateKey = `${size}::${grade}`;
+                const rateKey = `${size}::${grade || ''}`;
                 newValues.rate = ratesByGradeAndSize[rateKey] || '';
             }
         }
@@ -884,6 +885,8 @@ function BeadingPattiCalculator() {
     
     setEditingId(null);
 
+    // We use a timeout to ensure the state update for ratesByGradeAndSize has been processed
+    // before we reset the form and try to use the newly saved rate.
     setTimeout(() => {
         const rateKey = `${currentSize}::${currentGrade || ''}`;
         setFormValues({
@@ -1033,7 +1036,7 @@ function BeadingPattiCalculator() {
             currentY += 6;
 
             (doc as any).autoTable({
-                head: [['#', "Length'", 'Qty', 'Bundle', 'Rate (per ft)', 'Total RFT', 'Total Amt']],
+                head: [['#', "Length", 'Qty', 'Bundle', 'Rate (per ft)', 'Total RFT', 'Total Amt']],
                 body: sizeEntries.map((entry, index) => [
                     index + 1,
                     `${entry.length}'`,
@@ -1358,11 +1361,12 @@ function BeadingPattiCalculator() {
 }
 
 function MSPCalculator() {
-  const initialFormState = { costAmt: "", taxAmt: "", freightAmt: "", topAmt: "" };
+  const initialFormState = { costAmt: "", freightAmt: "", topAmt: "", taxPercentage: "18" };
   const [formValues, setFormValues] = useState(initialFormState);
   const [results, setResults] = useState<{
       costAmt: number;
       taxAmt: number;
+      taxPercentage: number;
       freightAmt: number;
       topAmt: number;
       purchaseBillAmt: number;
@@ -1374,6 +1378,12 @@ function MSPCalculator() {
       taxDifferenceAmt: number;
       totalMspAmt: number;
   } | null>(null);
+
+  const costAmt = parseFloat(formValues.costAmt) || 0;
+  const taxPercentage = parseFloat(formValues.taxPercentage) || 0;
+  const calculatedTaxAmt = useMemo(() => {
+    return (costAmt * taxPercentage) / 100;
+  }, [costAmt, taxPercentage]);
   
   const handleFormChange = (field: string, value: string) => {
     setFormValues(prev => ({ ...prev, [field]: value }));
@@ -1384,7 +1394,8 @@ function MSPCalculator() {
     e.preventDefault();
     
     const costPrice = parseFloat(formValues.costAmt) || 0;
-    const inputTaxCredit = parseFloat(formValues.taxAmt) || 0;
+    const taxPercent = parseFloat(formValues.taxPercentage) || 0;
+    const inputTaxCredit = (costPrice * taxPercent) / 100;
     const freightAmt = parseFloat(formValues.freightAmt) || 0;
     const anyTopAmt = parseFloat(formValues.topAmt) || 0;
 
@@ -1392,14 +1403,15 @@ function MSPCalculator() {
     const totalInputAmt = purchaseBillAmt + freightAmt + anyTopAmt;
     const x = totalInputAmt - anyTopAmt;
     const z = x * 1.10;
-    const a = z / 1.18;
-    const outputTaxLiability = a * 0.18;
+    const a = z / (1 + (taxPercent / 100));
+    const outputTaxLiability = a * (taxPercent / 100);
     const taxDifferenceAmt = outputTaxLiability - inputTaxCredit;
     const totalMspAmt = totalInputAmt + taxDifferenceAmt;
     
     setResults({
         costAmt: costPrice,
         taxAmt: inputTaxCredit,
+        taxPercentage: taxPercent,
         freightAmt: freightAmt,
         topAmt: anyTopAmt,
         purchaseBillAmt,
@@ -1432,8 +1444,20 @@ function MSPCalculator() {
                     <Input id="msp-cost-amt" value={formValues.costAmt} onChange={e => handleFormChange('costAmt', e.target.value)} onKeyDown={handleInputKeyDown} type="number" inputMode="decimal" step="any" placeholder="Enter Cost Amount" />
                 </div>
                 <div className="space-y-2">
+                    <Label htmlFor="msp-tax-percentage">Tax %</Label>
+                    <Select value={formValues.taxPercentage} onValueChange={value => handleFormChange('taxPercentage', value)}>
+                        <SelectTrigger id="msp-tax-percentage" onKeyDown={handleInputKeyDown}>
+                            <SelectValue placeholder="Select Tax %" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="5">5%</SelectItem>
+                            <SelectItem value="18">18%</SelectItem>
+                        </SelectContent>
+                    </Select>
+                </div>
+                <div className="space-y-2">
                     <Label htmlFor="msp-tax-amt">Tax Amt (Input Tax Credit)</Label>
-                    <Input id="msp-tax-amt" value={formValues.taxAmt} onChange={e => handleFormChange('taxAmt', e.target.value)} onKeyDown={handleInputKeyDown} type="number" inputMode="decimal" step="any" placeholder="Enter Tax Amount" />
+                    <Input id="msp-tax-amt" value={calculatedTaxAmt.toFixed(2)} readOnly disabled onKeyDown={handleInputKeyDown} type="number" inputMode="decimal" step="any" placeholder="Calculated Tax" />
                 </div>
                  <div className="space-y-2">
                     <Label htmlFor="msp-freight-amt">Freight Amt</Label>
@@ -1462,7 +1486,7 @@ function MSPCalculator() {
                         <span className="font-medium">Rs. {results.costAmt.toFixed(2)}</span>
                     </div>
                     <div className="flex justify-between items-center">
-                        <span className="text-muted-foreground">Tax Amt (Input)</span>
+                        <span className="text-muted-foreground">Tax Amt (Input @ {results.taxPercentage}%)</span>
                         <span className="font-medium">Rs. {results.taxAmt.toFixed(2)}</span>
                     </div>
                     <div className="flex justify-between items-center font-bold border-t pt-2 mt-2">
@@ -1498,7 +1522,7 @@ function MSPCalculator() {
                              <span className="font-medium">Rs. {results.a.toFixed(2)}</span>
                          </div>
                          <div className="flex justify-between items-center font-bold">
-                             <span>Output Tax Liability <span className="text-xs font-normal text-muted-foreground/70">(A * 18%)</span></span>
+                             <span>Output Tax Liability <span className="text-xs font-normal text-muted-foreground/70">(Sale Bill Amt * {results.taxPercentage}%)</span></span>
                              <span>Rs. {results.outputTaxLiability.toFixed(2)}</span>
                          </div>
                     </div>
@@ -1614,5 +1638,6 @@ export default function CalculatorPage() {
 
 
     
+
 
 
