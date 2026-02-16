@@ -1377,6 +1377,9 @@ function MSPCalculator() {
       outputTaxLiability: number;
       taxDifferenceAmt: number;
       totalMspAmt: number;
+      qty: number;
+      unit: string;
+      perUnitAmt: number;
   } | null>(null);
 
   
@@ -1403,6 +1406,10 @@ function MSPCalculator() {
     const taxDifferenceAmt = outputTaxLiability - inputTaxCredit;
     const totalMspAmt = totalInputAmt + taxDifferenceAmt;
     
+    const qty = parseFloat(formValues.qty) || 0;
+    const unit = formValues.unit || '';
+    const perUnitAmt = qty > 0 ? totalMspAmt / qty : 0;
+    
     setResults({
         costAmt: costPrice,
         taxAmt: inputTaxCredit,
@@ -1416,7 +1423,10 @@ function MSPCalculator() {
         a,
         outputTaxLiability,
         taxDifferenceAmt,
-        totalMspAmt
+        totalMspAmt,
+        qty,
+        unit,
+        perUnitAmt,
     });
   };
   
@@ -1551,6 +1561,15 @@ function MSPCalculator() {
                 <span className="text-muted-foreground">Total MSP Amt</span>
                 <span className="font-bold font-headline text-primary">Rs. {results.totalMspAmt.toFixed(2)}</span>
             </div>
+            {results.qty > 0 && (
+                <div className="flex justify-between text-xl sm:text-2xl pt-2 border-t mt-2">
+                    <span className="text-muted-foreground">Per Unit MSP</span>
+                    <span className="font-bold font-headline">
+                        Rs. {results.perUnitAmt.toFixed(2)}
+                        {results.unit && ` / ${results.unit}`}
+                    </span>
+                </div>
+            )}
         </CardFooter>
       )}
     </Card>
