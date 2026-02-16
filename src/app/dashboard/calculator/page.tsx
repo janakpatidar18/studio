@@ -830,7 +830,7 @@ function BeadingPattiCalculator() {
         const newValues = { ...prev, [field]: value };
         if (field === 'size' || field === 'grade') {
             const size = newValues.size;
-            const grade = newValues.grade ?? '';
+            const grade = newValues.grade;
             if (size) {
                 const rateKey = `${size}::${grade || ''}`;
                 newValues.rate = ratesByGradeAndSize[rateKey] || '';
@@ -1379,11 +1379,6 @@ function MSPCalculator() {
       totalMspAmt: number;
   } | null>(null);
 
-  const costAmt = parseFloat(formValues.costAmt) || 0;
-  const taxPercentage = parseFloat(formValues.taxPercentage) || 0;
-  const calculatedTaxAmt = useMemo(() => {
-    return (costAmt * taxPercentage) / 100;
-  }, [costAmt, taxPercentage]);
   
   const handleFormChange = (field: string, value: string) => {
     setFormValues(prev => ({ ...prev, [field]: value }));
@@ -1454,10 +1449,6 @@ function MSPCalculator() {
                             <SelectItem value="18">18%</SelectItem>
                         </SelectContent>
                     </Select>
-                </div>
-                <div className="space-y-2">
-                    <Label htmlFor="msp-tax-amt">Tax Amt (Input Tax Credit)</Label>
-                    <Input id="msp-tax-amt" value={calculatedTaxAmt.toFixed(2)} readOnly disabled onKeyDown={handleInputKeyDown} type="number" inputMode="decimal" step="any" placeholder="Calculated Tax" />
                 </div>
                  <div className="space-y-2">
                     <Label htmlFor="msp-freight-amt">Freight Amt</Label>
@@ -1638,6 +1629,7 @@ export default function CalculatorPage() {
 
 
     
+
 
 
 
