@@ -22,6 +22,7 @@ import "jspdf-autotable";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useInventory } from "@/context/InventoryContext";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { useToast } from "@/hooks/use-toast";
 
 
 const SawnWoodEntrySchema = z.object({
@@ -1363,6 +1364,8 @@ function BeadingPattiCalculator() {
 function LandingPriceCalculator() {
   const initialFormState = { qty: "", unit: "", costAmt: "", freightAmt: "", topAmt: "", taxPercentage: "18" };
   const [formValues, setFormValues] = useState(initialFormState);
+  const [productName, setProductName] = useState("");
+  const { toast } = useToast();
   const [results, setResults] = useState<{
       costAmt: number;
       taxAmt: number;
@@ -1435,8 +1438,131 @@ function LandingPriceCalculator() {
   
   const clearForm = () => {
     setFormValues(initialFormState);
+    setProductName("");
     setResults(null);
   }
+
+  const generateLandingPricePdfDoc = (productName: string) => {
+    if (!results) return new jsPDF();
+
+    const doc = new jsPDF();
+    const pageWidth = doc.internal.pageSize.getWidth();
+    let currentY = 22;
+
+    doc.setFontSize(20);
+    doc.text("SVLSM Timber Pro - Landing Price", pageWidth / 2, currentY, { align: 'center' });
+    currentY += 8;
+    
+    doc.setFontSize(12);
+    doc.text(`Product: ${productName}`, pageWidth / 2, currentY, { align: 'center' });
+    currentY += 6;
+    
+    doc.setFontSize(10);
+    doc.text(`Date: ${new Date().toLocaleDateString()}`, pageWidth / 2, currentY, { align: 'center' });
+    currentY += 10;
+
+    const tableBody = [
+        ['Cost Amt', `Rs. ${results.costAmt.toFixed(2)}`],
+        [`Tax Amt (Input @ ${results.taxPercentage}%)`, `Rs. ${results.taxAmt.toFixed(2)}`],
+        [{content: 'Purchase Bill Amt', styles: {fontStyle: 'bold'}} , {content: `Rs. ${results.purchaseBillAmt.toFixed(2)}`, styles: {fontStyle: 'bold'}}],
+        
+        ['Freight Amt', `Rs. ${results.freightAmt.toFixed(2)}`],
+        ['Any Top Amt', `Rs. ${results.topAmt.toFixed(2)}`],
+        [{content: 'Total Input Amt', styles: {fontStyle: 'bold'}}, {content: `Rs. ${results.totalInputAmt.toFixed(2)}`, styles: {fontStyle: 'bold'}}],
+        
+        ['Input Excluding Top Amt', `Rs. ${results.x.toFixed(2)}`],
+        ['Input with Min Profit ( 10% )', `Rs. ${results.z.toFixed(2)}`],
+        ['Sale Bill Amt', `Rs. ${results.a.toFixed(2)}`],
+        [`Output Tax Liability (Sale Bill Amt * ${results.taxPercentage}%)`, `Rs. ${results.outputTaxLiability.toFixed(2)}`],
+        ['Tax Difference Amt', `Rs. ${results.taxDifferenceAmt.toFixed(2)}`],
+    ];
+
+    (doc as any).autoTable({
+        head: [['Calculation Step', 'Amount']],
+        body: tableBody,
+        startY: currentY,
+        headStyles: { fillColor: [36, 69, 76] },
+        theme: 'grid',
+        styles: { halign: 'right' },
+        columnStyles: { 0: { halign: 'left', fontStyle: 'normal' } },
+    });
+
+    let finalY = (doc as any).lastAutoTable.finalY;
+    
+    const totalsBody = [
+        ['Total Landing Price', `Rs. ${results.totalMspAmt.toFixed(2)}`],
+    ];
+    if (results.qty > 0) {
+        totalsBody.push(['Per Unit Landing Price', `Rs. ${results.perUnitAmt.toFixed(2)}${results.unit ? ` / ${results.unit}` : ''}`]);
+        totalsBody.push(['Per Unit Sale Bill', `Rs. ${results.perUnitSaleBillAmt.toFixed(2)}${results.unit ? ` / ${results.unit}` : ''}`]);
+    }
+
+    (doc as any).autoTable({
+        body: totalsBody,
+        startY: finalY + 5,
+        theme: 'plain',
+        bodyStyles: { fontStyle: 'bold', fontSize: 12 },
+        columnStyles: { 0: { halign: 'right' }, 1: { halign: 'right' } }
+    });
+
+    const pageCount = (doc as any).internal.getNumberOfPages();
+    for (let i = 1; i <= pageCount; i++) {
+        doc.setPage(i);
+        doc.setFontSize(8);
+        doc.setTextColor(150);
+        doc.text('SVLSM Timber Pro', pageWidth / 2, doc.internal.pageSize.getHeight() - 10, { align: 'center' });
+    }
+
+    return doc;
+  };
+
+  const handleDownloadPdf = () => {
+    if (!productName.trim()) {
+        toast({
+            title: "Product Name Required",
+            description: "Please enter a product name before downloading the PDF.",
+            variant: "destructive",
+        });
+        return;
+    }
+    const doc = generateLandingPricePdfDoc(productName);
+    const dateStr = new Date().toLocaleDateString('en-CA'); // YYYY-MM-DD
+    const fileName = `${productName.trim()}_${dateStr}.pdf`;
+    doc.save(fileName);
+  };
+  
+  const handleSharePdf = async () => {
+    if (!productName.trim()) {
+        toast({
+            title: "Product Name Required",
+            description: "Please enter a product name before sharing the PDF.",
+            variant: "destructive",
+        });
+        return;
+    }
+    const doc = generateLandingPricePdfDoc(productName);
+    const dateStr = new Date().toLocaleDateString('en-CA');
+    const fileName = `${productName.trim()}_${dateStr}.pdf`;
+    const pdfBlob = doc.output('blob');
+    const pdfFile = new File([pdfBlob], fileName, { type: 'application/pdf' });
+
+    if (navigator.share) {
+        try {
+            await navigator.share({
+                title: `SVLSM Timber Pro - Landing Price for ${productName.trim()}`,
+                text: `Landing Price calculation for ${productName.trim()}.`,
+                files: [pdfFile],
+            });
+        } catch (error) {
+            console.log('Sharing failed, falling back to download', error);
+            // Re-trigger download on mobile share-cancel
+            // handleDownloadPdf();
+        }
+    } else {
+        handleDownloadPdf();
+    }
+  };
+
 
   return (
     <Card>
@@ -1581,6 +1707,26 @@ function LandingPriceCalculator() {
                     </div>
                 </div>
             )}
+             <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 pt-4 mt-4 border-t">
+                <div className="space-y-2 flex-grow">
+                    <Label htmlFor="landing-price-product-name">Product Name (for PDF)</Label>
+                    <Input 
+                        id="landing-price-product-name"
+                        value={productName}
+                        onChange={(e) => setProductName(e.target.value)}
+                        placeholder="Enter product name"
+                        className="h-11"
+                    />
+                </div>
+                <div className="flex gap-2 w-full sm:w-auto shrink-0">
+                    <Button onClick={handleDownloadPdf} variant="outline" className="w-full sm:w-auto">
+                        <FileDown className="mr-2 h-4 w-4" /> Download PDF
+                    </Button>
+                    <Button onClick={handleSharePdf} className="w-full sm:w-auto">
+                        <Share2 className="mr-2 h-4 w-4" /> Share PDF
+                    </Button>
+                </div>
+            </div>
         </CardFooter>
       )}
     </Card>
@@ -1683,6 +1829,8 @@ export default function CalculatorPage() {
 
 
 
+
+    
 
     
 
