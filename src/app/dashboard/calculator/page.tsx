@@ -1746,7 +1746,7 @@ export default function CalculatorPage() {
                 </p>
             </header>
             <Tabs defaultValue="sawn-wood" className="w-full">
-                <TabsList className="grid w-full grid-cols-4">
+                <TabsList className="grid h-auto w-full grid-cols-2 sm:h-10 sm:grid-cols-4">
                     <TabsTrigger value="sawn-wood">Sawn Wood</TabsTrigger>
                     <TabsTrigger value="round-logs">Round Logs</TabsTrigger>
                     <TabsTrigger value="beading-patti">Beading Patti</TabsTrigger>
@@ -1837,5 +1837,8 @@ export default function CalculatorPage() {
     
 
     
+
+    
+
 
     
