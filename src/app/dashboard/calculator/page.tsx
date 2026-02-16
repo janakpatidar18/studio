@@ -1449,14 +1449,16 @@ function LandingPriceCalculator() {
     const pageWidth = doc.internal.pageSize.getWidth();
     let currentY = 22;
 
-    doc.setFontSize(20);
+    doc.setFontSize(18);
     doc.text("SVLSM Timber Pro - Landing Price", pageWidth / 2, currentY, { align: 'center' });
+    currentY += 10;
+    
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(16);
+    doc.text(productName, pageWidth / 2, currentY, { align: 'center' });
     currentY += 8;
     
-    doc.setFontSize(12);
-    doc.text(`Product: ${productName}`, pageWidth / 2, currentY, { align: 'center' });
-    currentY += 6;
-    
+    doc.setFont('helvetica', 'normal');
     doc.setFontSize(10);
     doc.text(`Date: ${new Date().toLocaleDateString()}`, pageWidth / 2, currentY, { align: 'center' });
     currentY += 10;
