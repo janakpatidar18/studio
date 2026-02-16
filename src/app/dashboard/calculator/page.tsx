@@ -830,7 +830,7 @@ function BeadingPattiCalculator() {
         const newValues = { ...prev, [field]: value };
         if (field === 'size' || field === 'grade') {
             const size = newValues.size;
-            const grade = newValues.grade ?? '';
+            const grade = newValues.grade || '';
             if (size) {
                 const rateKey = `${size}::${grade}`;
                 newValues.rate = ratesByGradeAndSize[rateKey] || '';
@@ -857,7 +857,7 @@ function BeadingPattiCalculator() {
 
     if (rate !== undefined && size) {
       const rateKey = `${size}::${grade || ''}`;
-      setRatesByGradeAndSize(prev => ({ ...prev, [rateKey]: String(rate) }));
+       setRatesByGradeAndSize(prev => ({ ...prev, [rateKey]: String(rate) }));
     }
     
     if (editingId) {
@@ -885,14 +885,15 @@ function BeadingPattiCalculator() {
     
     setEditingId(null);
 
+    // Use a timeout to ensure the state update from setRatesByGradeAndSize is processed before we reset the form
     setTimeout(() => {
         const rateKey = `${currentSize}::${currentGrade || ''}`;
-        setFormValues({
+        setFormValues(prev => ({
             ...initialFormState,
             size: currentSize,
             grade: currentGrade,
-            rate: ratesByGradeAndSize[rateKey] || '',
-        });
+            rate: ratesByGradeAndSize[rateKey] || prev.rate, // Keep the just-set rate
+        }));
 
         const id = isMobile ? 'beading-length-float' : 'beading-length';
         const lengthInput = document.getElementById(id);
@@ -1362,8 +1363,15 @@ function MSPCalculator() {
   const initialFormState = { costAmt: "", taxAmt: "", freightAmt: "", topAmt: "" };
   const [formValues, setFormValues] = useState(initialFormState);
   const [results, setResults] = useState<{
+      costAmt: number;
+      taxAmt: number;
+      freightAmt: number;
+      topAmt: number;
       purchaseBillAmt: number;
       totalInputAmt: number;
+      x: number;
+      z: number;
+      a: number;
       outputTaxLiability: number;
       taxDifferenceAmt: number;
       totalMspAmt: number;
@@ -1392,8 +1400,15 @@ function MSPCalculator() {
     const totalMspAmt = totalInputAmt + taxDifferenceAmt;
     
     setResults({
+        costAmt: costPrice,
+        taxAmt: inputTaxCredit,
+        freightAmt: freightAmt,
+        topAmt: anyTopAmt,
         purchaseBillAmt,
         totalInputAmt,
+        x,
+        z,
+        a,
         outputTaxLiability,
         taxDifferenceAmt,
         totalMspAmt
@@ -1443,22 +1458,56 @@ function MSPCalculator() {
         {results && (
             <div className="pt-6 space-y-4">
                 <h3 className="text-xl font-semibold text-center">Calculation Details</h3>
-                <div className="p-4 border rounded-lg bg-background space-y-3 text-lg">
+                <div className="p-4 border rounded-lg bg-background space-y-3 text-base">
                     <div className="flex justify-between items-center">
-                        <span className="text-muted-foreground">Purchase Bill Amt</span>
-                        <span className="font-medium">Rs. {results.purchaseBillAmt.toFixed(2)}</span>
+                        <span className="text-muted-foreground">Cost Amt</span>
+                        <span className="font-medium">Rs. {results.costAmt.toFixed(2)}</span>
                     </div>
                     <div className="flex justify-between items-center">
-                        <span className="text-muted-foreground">Total Input Amt</span>
-                        <span className="font-medium">Rs. {results.totalInputAmt.toFixed(2)}</span>
+                        <span className="text-muted-foreground">Tax Amt (Input)</span>
+                        <span className="font-medium">Rs. {results.taxAmt.toFixed(2)}</span>
                     </div>
-                     <div className="flex justify-between items-center">
-                        <span className="text-muted-foreground">Output Tax Liability</span>
-                        <span className="font-medium">Rs. {results.outputTaxLiability.toFixed(2)}</span>
+                    <div className="flex justify-between items-center font-bold border-t pt-2 mt-2">
+                        <span>Purchase Bill Amt</span>
+                        <span>Rs. {results.purchaseBillAmt.toFixed(2)}</span>
+                    </div>
+                    
+                    <div className="flex justify-between items-center pt-4">
+                        <span className="text-muted-foreground">Freight Amt</span>
+                        <span className="font-medium">Rs. {results.freightAmt.toFixed(2)}</span>
                     </div>
                     <div className="flex justify-between items-center">
-                        <span className="text-muted-foreground">Tax Difference Amt</span>
-                        <span className="font-medium">Rs. {results.taxDifferenceAmt.toFixed(2)}</span>
+                        <span className="text-muted-foreground">Any Top Amt</span>
+                        <span className="font-medium">Rs. {results.topAmt.toFixed(2)}</span>
+                    </div>
+                    <div className="flex justify-between items-center font-bold border-t pt-2 mt-2">
+                        <span>Total Input Amt</span>
+                        <span>Rs. {results.totalInputAmt.toFixed(2)}</span>
+                    </div>
+
+                    <div className="pt-4 space-y-2 border-t mt-2">
+                         <h4 className="font-semibold text-center text-muted-foreground mb-2">Tax Calculation</h4>
+                         <div className="flex justify-between items-center">
+                             <span className="text-muted-foreground text-sm">Total Input Amt - Any Top Amt (X)</span>
+                             <span className="font-medium">Rs. {results.x.toFixed(2)}</span>
+                         </div>
+                         <div className="flex justify-between items-center">
+                             <span className="text-muted-foreground text-sm">X + 10% Profit (Z)</span>
+                             <span className="font-medium">Rs. {results.z.toFixed(2)}</span>
+                         </div>
+                          <div className="flex justify-between items-center">
+                             <span className="text-muted-foreground text-sm">Z / 1.18 (A)</span>
+                             <span className="font-medium">Rs. {results.a.toFixed(2)}</span>
+                         </div>
+                         <div className="flex justify-between items-center font-bold">
+                             <span>Output Tax Liability (A * 18%)</span>
+                             <span>Rs. {results.outputTaxLiability.toFixed(2)}</span>
+                         </div>
+                    </div>
+
+                    <div className="flex justify-between items-center font-bold border-t pt-2 mt-2">
+                        <span>Tax Difference Amt</span>
+                        <span>Rs. {results.taxDifferenceAmt.toFixed(2)}</span>
                     </div>
                 </div>
             </div>
