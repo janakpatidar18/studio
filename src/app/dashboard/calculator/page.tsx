@@ -1380,6 +1380,7 @@ function MSPCalculator() {
       qty: number;
       unit: string;
       perUnitAmt: number;
+      perUnitSaleBillAmt: number;
   } | null>(null);
 
   
@@ -1409,6 +1410,7 @@ function MSPCalculator() {
     const qty = parseFloat(formValues.qty) || 0;
     const unit = formValues.unit || '';
     const perUnitAmt = qty > 0 ? totalMspAmt / qty : 0;
+    const perUnitSaleBillAmt = qty > 0 ? a / qty : 0;
     
     setResults({
         costAmt: costPrice,
@@ -1427,6 +1429,7 @@ function MSPCalculator() {
         qty,
         unit,
         perUnitAmt,
+        perUnitSaleBillAmt,
     });
   };
   
@@ -1562,12 +1565,21 @@ function MSPCalculator() {
                 <span className="font-bold font-headline text-primary">Rs. {results.totalMspAmt.toFixed(2)}</span>
             </div>
             {results.qty > 0 && (
-                <div className="flex justify-between text-xl sm:text-2xl pt-2 border-t mt-2">
-                    <span className="text-muted-foreground">Per Unit MSP</span>
-                    <span className="font-bold font-headline">
-                        Rs. {results.perUnitAmt.toFixed(2)}
-                        {results.unit && ` / ${results.unit}`}
-                    </span>
+                <div className="space-y-1 pt-2 border-t mt-2">
+                    <div className="flex justify-between text-xl sm:text-2xl">
+                        <span className="text-muted-foreground">Per Unit MSP</span>
+                        <span className="font-bold font-headline">
+                            Rs. {results.perUnitAmt.toFixed(2)}
+                            {results.unit && ` / ${results.unit}`}
+                        </span>
+                    </div>
+                     <div className="flex justify-between text-lg sm:text-xl">
+                        <span className="text-muted-foreground">Per Unit Sale Bill</span>
+                        <span className="font-medium">
+                            Rs. {results.perUnitSaleBillAmt.toFixed(2)}
+                            {results.unit && ` / ${results.unit}`}
+                        </span>
+                    </div>
                 </div>
             )}
         </CardFooter>
