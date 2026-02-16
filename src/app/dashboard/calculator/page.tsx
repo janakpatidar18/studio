@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState, useMemo, useEffect, useLayoutEffect } from "react";
@@ -830,7 +829,7 @@ function BeadingPattiCalculator() {
         const newValues = { ...prev, [field]: value };
         if (field === 'size' || field === 'grade') {
             const size = newValues.size;
-            const grade = newValues.grade || '';
+            const grade = newValues.grade ?? '';
             if (size) {
                 const rateKey = `${size}::${grade}`;
                 newValues.rate = ratesByGradeAndSize[rateKey] || '';
@@ -882,16 +881,16 @@ function BeadingPattiCalculator() {
     
     const currentSize = formValues.size;
     const currentGrade = formValues.grade;
-    const currentRate = String(rate || '');
     
     setEditingId(null);
 
     setTimeout(() => {
+        const rateKey = `${currentSize}::${currentGrade || ''}`;
         setFormValues({
             ...initialFormState,
             size: currentSize,
             grade: currentGrade,
-            rate: currentRate,
+            rate: ratesByGradeAndSize[rateKey] || '',
         });
 
         const id = isMobile ? 'beading-length-float' : 'beading-length';
@@ -1487,15 +1486,15 @@ function MSPCalculator() {
                     <div className="pt-4 space-y-2 border-t mt-2">
                          <h4 className="font-semibold text-center text-muted-foreground mb-2">Tax Calculation</h4>
                          <div className="flex justify-between items-center">
-                             <span className="text-muted-foreground text-sm">X <span className="text-xs text-muted-foreground/70">(Total Input - Top Amt)</span></span>
+                             <span className="text-muted-foreground">Input Excluding Top Amt</span>
                              <span className="font-medium">Rs. {results.x.toFixed(2)}</span>
                          </div>
                          <div className="flex justify-between items-center">
-                             <span className="text-muted-foreground text-sm">Z <span className="text-xs text-muted-foreground/70">(X + 10% Profit)</span></span>
+                             <span className="text-muted-foreground">Input with Min Profit ( 10% )</span>
                              <span className="font-medium">Rs. {results.z.toFixed(2)}</span>
                          </div>
                           <div className="flex justify-between items-center">
-                             <span className="text-muted-foreground text-sm">A <span className="text-xs text-muted-foreground/70">(Z / 1.18)</span></span>
+                             <span className="text-muted-foreground">Sale Bill Amt</span>
                              <span className="font-medium">Rs. {results.a.toFixed(2)}</span>
                          </div>
                          <div className="flex justify-between items-center font-bold">
@@ -1615,4 +1614,5 @@ export default function CalculatorPage() {
 
 
     
+
 
