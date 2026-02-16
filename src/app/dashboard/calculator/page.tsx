@@ -1360,7 +1360,7 @@ function BeadingPattiCalculator() {
   );
 }
 
-function MSPCalculator() {
+function LandingPriceCalculator() {
   const initialFormState = { qty: "", unit: "", costAmt: "", freightAmt: "", topAmt: "", taxPercentage: "18" };
   const [formValues, setFormValues] = useState(initialFormState);
   const [results, setResults] = useState<{
@@ -1441,8 +1441,8 @@ function MSPCalculator() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>MSP Calculator</CardTitle>
-        <CardDescription>Calculate the Minimum Selling Price (MSP) based on your costs and profit margin.</CardDescription>
+        <CardTitle>Landing Price Calculator</CardTitle>
+        <CardDescription>Calculate the Landing Price based on your costs and profit margin.</CardDescription>
       </CardHeader>
       <CardContent className="p-2 sm:p-6 space-y-6">
         <form onSubmit={handleFormSubmit} className="p-2 sm:p-4 border rounded-lg bg-muted/50 space-y-6">
@@ -1560,13 +1560,13 @@ function MSPCalculator() {
        {results && (
         <CardFooter className="flex-col items-stretch p-2 sm:p-6 border-t bg-muted/50 space-y-2">
              <div className="flex justify-between text-2xl sm:text-3xl">
-                <span className="text-muted-foreground">Total MSP Amt</span>
+                <span className="text-muted-foreground">Total Landing Price</span>
                 <span className="font-bold font-headline text-primary">Rs. {results.totalMspAmt.toFixed(2)}</span>
             </div>
             {results.qty > 0 && (
                 <div className="space-y-1 pt-2 border-t mt-2">
                     <div className="flex justify-between text-xl sm:text-2xl">
-                        <span className="text-muted-foreground">Per Unit MSP</span>
+                        <span className="text-muted-foreground">Per Unit Landing Price</span>
                         <span className="font-bold font-headline">
                             Rs. {results.perUnitAmt.toFixed(2)}
                             {results.unit && ` / ${results.unit}`}
@@ -1602,7 +1602,7 @@ export default function CalculatorPage() {
                     <TabsTrigger value="sawn-wood">Sawn Wood</TabsTrigger>
                     <TabsTrigger value="round-logs">Round Logs</TabsTrigger>
                     <TabsTrigger value="beading-patti">Beading Patti</TabsTrigger>
-                    <TabsTrigger value="msp-calculator">MSP Calculator</TabsTrigger>
+                    <TabsTrigger value="msp-calculator">Landing Price</TabsTrigger>
                 </TabsList>
                 <TabsContent value="sawn-wood">
                     <SawnWoodCalculator />
@@ -1614,7 +1614,7 @@ export default function CalculatorPage() {
                     <BeadingPattiCalculator />
                 </TabsContent>
                 <TabsContent value="msp-calculator">
-                    <MSPCalculator />
+                    <LandingPriceCalculator />
                 </TabsContent>
             </Tabs>
         </div>
@@ -1683,6 +1683,8 @@ export default function CalculatorPage() {
 
 
 
+
+    
 
     
 
