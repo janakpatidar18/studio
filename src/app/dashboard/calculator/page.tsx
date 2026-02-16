@@ -319,7 +319,7 @@ function SawnWoodCalculator() {
                 <TableHeader>
                     <TableRow>
                         <TableHead className="w-12 text-center px-2">#</TableHead>
-                        <TableHead className="px-2 w-[120px]">Dimensions (L'×W"×T")</TableHead>
+                        <TableHead className="px-2 w-[120px]">L'×W"×T"</TableHead>
                         <TableHead className="text-right px-2">Qty</TableHead>
                         <TableHead className="text-right px-2">Rate</TableHead>
                         <TableHead className="text-right px-2">Total CFT</TableHead>
@@ -678,7 +678,7 @@ function RoundLogsCalculator() {
                         <TableHeader>
                             <TableRow>
                                 <TableHead className="w-12 text-center px-2">#</TableHead>
-                                <TableHead className="px-2 w-[120px]">Dimensions (L'×G")</TableHead>
+                                <TableHead className="px-2 w-[120px]">L'×G"</TableHead>
                                 <TableHead className="text-right px-2">Qty</TableHead>
                                 <TableHead className="text-right px-2">Rate</TableHead>
                                 <TableHead className="text-right px-2">Total CFT</TableHead>
@@ -830,7 +830,7 @@ function BeadingPattiCalculator() {
         const newValues = { ...prev, [field]: value };
         if (field === 'size' || field === 'grade') {
             const size = newValues.size;
-            const grade = newValues.grade || '';
+            const grade = newValues.grade ?? '';
             if (size) {
                 const rateKey = `${size}::${grade}`;
                 newValues.rate = ratesByGradeAndSize[rateKey] || '';
@@ -882,18 +882,18 @@ function BeadingPattiCalculator() {
     
     const currentSize = formValues.size;
     const currentGrade = formValues.grade;
-    const rateKey = `${currentSize}::${currentGrade || ''}`;
-    
-    setFormValues({
-        ...initialFormState,
-        size: currentSize,
-        grade: currentGrade,
-        rate: ratesByGradeAndSize[rateKey] || '',
-    });
     
     setEditingId(null);
-    
+
     setTimeout(() => {
+        const rateKey = `${currentSize}::${currentGrade || ''}`;
+        setFormValues({
+            ...initialFormState,
+            size: currentSize,
+            grade: currentGrade,
+            rate: ratesByGradeAndSize[rateKey] || '',
+        });
+
         const id = isMobile ? 'beading-length-float' : 'beading-length';
         const lengthInput = document.getElementById(id);
         if (lengthInput) {
@@ -1361,28 +1361,57 @@ function BeadingPattiCalculator() {
 function MSPCalculator() {
   const initialFormState = { costAmt: "", taxAmt: "", freightAmt: "", topAmt: "" };
   const [formValues, setFormValues] = useState(initialFormState);
+  const [results, setResults] = useState<{
+      purchaseBillAmt: number;
+      totalInputAmt: number;
+      outputTaxLiability: number;
+      taxDifferenceAmt: number;
+      totalMspAmt: number;
+  } | null>(null);
   
   const handleFormChange = (field: string, value: string) => {
     setFormValues(prev => ({ ...prev, [field]: value }));
+    setResults(null);
   };
   
   const handleFormSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    // Calculation logic will be added in the next step as per user's instruction.
-    alert("Calculator logic to be implemented.");
+    
+    const costPrice = parseFloat(formValues.costAmt) || 0;
+    const inputTaxCredit = parseFloat(formValues.taxAmt) || 0;
+    const freightAmt = parseFloat(formValues.freightAmt) || 0;
+    const anyTopAmt = parseFloat(formValues.topAmt) || 0;
+
+    const purchaseBillAmt = costPrice + inputTaxCredit;
+    const totalInputAmt = purchaseBillAmt + freightAmt + anyTopAmt;
+    const x = totalInputAmt - anyTopAmt;
+    const z = x * 1.10;
+    const a = z / 1.18;
+    const outputTaxLiability = a * 0.18;
+    const taxDifferenceAmt = outputTaxLiability - inputTaxCredit;
+    const totalMspAmt = totalInputAmt + taxDifferenceAmt;
+    
+    setResults({
+        purchaseBillAmt,
+        totalInputAmt,
+        outputTaxLiability,
+        taxDifferenceAmt,
+        totalMspAmt
+    });
   };
   
   const clearForm = () => {
     setFormValues(initialFormState);
+    setResults(null);
   }
 
   return (
     <Card>
       <CardHeader>
         <CardTitle>MSP Calculator</CardTitle>
-        <CardDescription>Calculate the final cost based on various amounts.</CardDescription>
+        <CardDescription>Calculate the Minimum Selling Price (MSP) based on your costs and profit margin.</CardDescription>
       </CardHeader>
-      <CardContent className="p-2 sm:p-6">
+      <CardContent className="p-2 sm:p-6 space-y-6">
         <form onSubmit={handleFormSubmit} className="p-2 sm:p-4 border rounded-lg bg-muted/50 space-y-6">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-4">
                  <div className="space-y-2">
@@ -1390,7 +1419,7 @@ function MSPCalculator() {
                     <Input id="msp-cost-amt" value={formValues.costAmt} onChange={e => handleFormChange('costAmt', e.target.value)} onKeyDown={handleInputKeyDown} type="number" inputMode="decimal" step="any" placeholder="Enter Cost Amount" />
                 </div>
                 <div className="space-y-2">
-                    <Label htmlFor="msp-tax-amt">Tax Amt</Label>
+                    <Label htmlFor="msp-tax-amt">Tax Amt (Input Tax Credit)</Label>
                     <Input id="msp-tax-amt" value={formValues.taxAmt} onChange={e => handleFormChange('taxAmt', e.target.value)} onKeyDown={handleInputKeyDown} type="number" inputMode="decimal" step="any" placeholder="Enter Tax Amount" />
                 </div>
                  <div className="space-y-2">
@@ -1411,7 +1440,38 @@ function MSPCalculator() {
                 </Button>
             </div>
         </form>
+        {results && (
+            <div className="pt-6 space-y-4">
+                <h3 className="text-xl font-semibold text-center">Calculation Details</h3>
+                <div className="p-4 border rounded-lg bg-background space-y-3 text-lg">
+                    <div className="flex justify-between items-center">
+                        <span className="text-muted-foreground">Purchase Bill Amt</span>
+                        <span className="font-medium">Rs. {results.purchaseBillAmt.toFixed(2)}</span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                        <span className="text-muted-foreground">Total Input Amt</span>
+                        <span className="font-medium">Rs. {results.totalInputAmt.toFixed(2)}</span>
+                    </div>
+                     <div className="flex justify-between items-center">
+                        <span className="text-muted-foreground">Output Tax Liability</span>
+                        <span className="font-medium">Rs. {results.outputTaxLiability.toFixed(2)}</span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                        <span className="text-muted-foreground">Tax Difference Amt</span>
+                        <span className="font-medium">Rs. {results.taxDifferenceAmt.toFixed(2)}</span>
+                    </div>
+                </div>
+            </div>
+        )}
       </CardContent>
+       {results && (
+        <CardFooter className="flex-col items-stretch p-2 sm:p-6 border-t bg-muted/50 space-y-2">
+             <div className="flex justify-between text-2xl sm:text-3xl">
+                <span className="text-muted-foreground">Total MSP Amt</span>
+                <span className="font-bold font-headline text-primary">Rs. {results.totalMspAmt.toFixed(2)}</span>
+            </div>
+        </CardFooter>
+      )}
     </Card>
   );
 }
