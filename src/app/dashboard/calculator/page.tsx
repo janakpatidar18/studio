@@ -1490,10 +1490,10 @@ function LandingPriceCalculator() {
     let finalY = (doc as any).lastAutoTable.finalY;
     
     const totalsBody = [
-        ['Total Landing Price', `Rs. ${results.totalMspAmt.toFixed(2)}`],
+        ['Total Landing Amount', `Rs. ${results.totalMspAmt.toFixed(2)}`],
     ];
     if (results.qty > 0) {
-        totalsBody.push(['Per Unit Landing Price', `Rs. ${results.perUnitAmt.toFixed(2)}${results.unit ? ` / ${results.unit}` : ''}`]);
+        totalsBody.push(['Per Unit Landing Amount', `Rs. ${results.perUnitAmt.toFixed(2)}${results.unit ? ` / ${results.unit}` : ''}`]);
         totalsBody.push(['Per Unit Sale Bill', `Rs. ${results.perUnitSaleBillAmt.toFixed(2)}${results.unit ? ` / ${results.unit}` : ''}`]);
     }
 
@@ -1686,13 +1686,13 @@ function LandingPriceCalculator() {
        {results && (
         <CardFooter className="flex-col items-stretch p-2 sm:p-6 border-t bg-muted/50 space-y-2">
              <div className="flex justify-between text-2xl sm:text-3xl">
-                <span className="text-muted-foreground">Total Landing Price</span>
+                <span className="text-muted-foreground">Total Landing Amount</span>
                 <span className="font-bold font-headline text-primary">Rs. {results.totalMspAmt.toFixed(2)}</span>
             </div>
             {results.qty > 0 && (
                 <div className="space-y-1 pt-2 border-t mt-2">
                     <div className="flex justify-between text-xl sm:text-2xl">
-                        <span className="text-muted-foreground">Per Unit Landing Price</span>
+                        <span className="text-muted-foreground">Per Unit Landing Amount</span>
                         <span className="font-bold font-headline">
                             Rs. {results.perUnitAmt.toFixed(2)}
                             {results.unit && ` / ${results.unit}`}
