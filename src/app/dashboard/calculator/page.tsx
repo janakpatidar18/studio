@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { z } from "zod";
-import { Plus, Trash2, X, Edit, FileDown, Share2 } from "lucide-react";
+import { Plus, Trash2, X, Edit, FileDown, Share2, MessageSquare } from "lucide-react";
 import {
   Table,
   TableBody,
@@ -1364,6 +1364,7 @@ function LandingPriceCalculator() {
   const initialFormState = { qty: "", unit: "", costAmt: "", freightAmt: "", topAmt: "", taxPercentage: "18" };
   const [formValues, setFormValues] = useState(initialFormState);
   const [productName, setProductName] = useState("");
+  const [supplier, setSupplier] = useState("");
   const { toast } = useToast();
   const [results, setResults] = useState<{
       costAmt: number;
@@ -1438,6 +1439,7 @@ function LandingPriceCalculator() {
   const clearForm = () => {
     setFormValues(initialFormState);
     setProductName("");
+    setSupplier("");
     setResults(null);
   }
 
@@ -1456,6 +1458,12 @@ function LandingPriceCalculator() {
     doc.setFontSize(16);
     doc.text(productName, pageWidth / 2, currentY, { align: 'center' });
     currentY += 8;
+
+    if (supplier) {
+        doc.setFontSize(12);
+        doc.text(`Supplier: ${supplier}`, pageWidth / 2, currentY, { align: 'center' });
+        currentY += 6;
+    }
     
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(10);
@@ -1558,6 +1566,43 @@ function LandingPriceCalculator() {
     } else {
         handleDownloadPdf();
     }
+  };
+
+  const handleShareText = async () => {
+      if (!results) return;
+      if (!productName.trim()) {
+           toast({
+                title: "Product Name Required",
+                description: "Please enter a product name before sharing.",
+                variant: "destructive",
+            });
+            return;
+      }
+
+      const text = `Product Name : ${productName}
+Date : ${new Date().toLocaleDateString()}
+Supplier : ${supplier || 'N/A'}
+Qty : ${results.qty} ${results.unit}
+Landing Price Per Unit : Rs. ${results.perUnitAmt.toFixed(2)}
+Sale Bill Per Unit : Rs. ${results.perUnitSaleBillAmt.toFixed(2)}`;
+
+      if (navigator.share) {
+          try {
+              await navigator.share({
+                  title: `Landing Price: ${productName}`,
+                  text: text,
+              });
+          } catch (error) {
+              console.log('Sharing failed', error);
+          }
+      } else {
+          // Fallback to clipboard
+          navigator.clipboard.writeText(text);
+          toast({
+              title: "Copied to Clipboard",
+              description: "Share functionality not supported on this browser. Text copied to clipboard instead.",
+          });
+      }
   };
 
 
@@ -1704,22 +1749,37 @@ function LandingPriceCalculator() {
                     </div>
                 </div>
             )}
-             <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 pt-4 mt-4 border-t">
-                <div className="space-y-2 flex-grow">
-                    <Label htmlFor="landing-price-product-name">Product Name (for PDF)</Label>
-                    <Input 
-                        id="landing-price-product-name"
-                        value={productName}
-                        onChange={(e) => setProductName(e.target.value)}
-                        placeholder="Enter product name"
-                        className="h-11"
-                    />
+             <div className="flex flex-col gap-4 pt-4 mt-4 border-t">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                        <Label htmlFor="landing-price-product-name">Product Name</Label>
+                        <Input 
+                            id="landing-price-product-name"
+                            value={productName}
+                            onChange={(e) => setProductName(e.target.value)}
+                            placeholder="Enter product name"
+                            className="h-11"
+                        />
+                    </div>
+                    <div className="space-y-2">
+                        <Label htmlFor="landing-price-supplier">Supplier Name</Label>
+                        <Input 
+                            id="landing-price-supplier"
+                            value={supplier}
+                            onChange={(e) => setSupplier(e.target.value)}
+                            placeholder="Enter supplier name"
+                            className="h-11"
+                        />
+                    </div>
                 </div>
-                <div className="flex gap-2 w-full sm:w-auto shrink-0">
-                    <Button onClick={handleDownloadPdf} variant="outline" className="w-full sm:w-auto">
+                <div className="flex flex-wrap gap-2 justify-end">
+                    <Button onClick={handleShareText} variant="secondary" className="flex-1 sm:flex-none">
+                        <MessageSquare className="mr-2 h-4 w-4" /> Share Text
+                    </Button>
+                    <Button onClick={handleDownloadPdf} variant="outline" className="flex-1 sm:flex-none">
                         <FileDown className="mr-2 h-4 w-4" /> Download PDF
                     </Button>
-                    <Button onClick={handleSharePdf} className="w-full sm:w-auto">
+                    <Button onClick={handleSharePdf} className="flex-1 sm:flex-none">
                         <Share2 className="mr-2 h-4 w-4" /> Share PDF
                     </Button>
                 </div>
