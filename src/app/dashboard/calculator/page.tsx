@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState, useMemo, useEffect, useLayoutEffect } from "react";
@@ -17,7 +16,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import jsPDF from "jspdf";
+import jsPDF from "jsPDF";
 import "jspdf-autotable";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useInventory } from "@/context/InventoryContext";
@@ -310,7 +309,7 @@ function SawnWoodCalculator() {
                     <X className="mr-2 h-4 w-4" /> {editingId ? 'Cancel' : 'Clear'}
                 </Button>
                 <Button type="submit">
-                    <Plus className="mr-2 h-4 w-4" /> {editingId ? 'Update Entry' : 'Add Entry'}
+                    <Plus className="mr-2 h-4 w-4" /> {editingId ? 'Add Entry' : 'Add Entry'}
                 </Button>
             </div>
         </form>
@@ -1528,8 +1527,7 @@ function LandingPriceCalculator() {
         return;
     }
     const doc = generateLandingPricePdfDoc(productName);
-    const dateStr = new Date().toLocaleDateString('en-CA'); // YYYY-MM-DD
-    const fileName = `${productName.trim()}_${dateStr}.pdf`;
+    const fileName = `${productName.trim()}.pdf`;
     doc.save(fileName);
   };
   
@@ -1543,8 +1541,7 @@ function LandingPriceCalculator() {
         return;
     }
     const doc = generateLandingPricePdfDoc(productName);
-    const dateStr = new Date().toLocaleDateString('en-CA');
-    const fileName = `${productName.trim()}_${dateStr}.pdf`;
+    const fileName = `${productName.trim()}.pdf`;
     const pdfBlob = doc.output('blob');
     const pdfFile = new File([pdfBlob], fileName, { type: 'application/pdf' });
 
@@ -1557,8 +1554,6 @@ function LandingPriceCalculator() {
             });
         } catch (error) {
             console.log('Sharing failed, falling back to download', error);
-            // Re-trigger download on mobile share-cancel
-            // handleDownloadPdf();
         }
     } else {
         handleDownloadPdf();
@@ -1768,77 +1763,3 @@ export default function CalculatorPage() {
         </div>
     )
 }
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-
-
-    
-
-
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-
-    
-
-
-
-
-
-
-    
-
-    
-
-    
-
-    
-
-
-    
